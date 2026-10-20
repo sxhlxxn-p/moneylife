@@ -4,5 +4,5 @@
 
 Plan, Event, Run, AIRequest의 필드명·단위·오류 코드는 이 영역에서 한 번만 정의한다. 현재 기술 스택이 확정되지 않아 구현 파일은 만들지 않았으며, 합의 후 검증 스키마와 함께 추가한다.
 
-공통 계약을 변경할 때는 Client·Server·Engine 담당자가 함께 검토하고 `../docs/api-contract.md`와 관련 테스트를 같은 변경에 포함한다. 구현 전 결정 항목은 `SCHEMA_PLAN.md`에 기록한다.
+공통 계약을 변경할 때는 Client·Server·Engine 담당자가 함께 검토하고 `../docs/api-contract.md`와 관련 테스트를 같은 변경에 포함한다. 구현 전에는 필드명·금액 단위·반올림·오류 코드와 스키마 라이브러리를 합의한다. 결정 내용은 [결정 기록](../docs/decisions.md)에 남긴다.
 

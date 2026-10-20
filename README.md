@@ -2,6 +2,12 @@
 
 현재 소득·지출·자산과 목표를 입력하고 생애 이벤트와 조건 변경에 따라 10년의 금융 경로를 비교하는 웹 서비스다. 현재 기술 스택인 HTML·CSS·JavaScript client와 Node.js 개발 서버를 유지하면서 Notion 기획의 workspace 경계를 반영한다.
 
+## 팀원 시작 안내
+
+1. [처음 시작하기](docs/getting-started.md)에서 저장소 복제와 실행을 진행한다.
+2. 담당 영역의 README와 Guideline을 읽고 [협업 규칙](CONTRIBUTING.md)에 따라 개인 브랜치를 만든다.
+3. 계약이나 기술 스택을 바꾸기 전 [문서 목차](docs/README.md)에서 기존 계획과 결정 사항을 확인한다.
+
 ## 실행
 
 Node.js 18 이상에서 저장소 루트의 workspace 의존성을 설치한다.
@@ -60,7 +66,7 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. 실제 LLM, 토스증권 API, 사용자 인증, PostgreSQL과 Server API는 아직 연결되지 않았다.
 
-이번 구조 정리는 기존 HTML·CSS·JavaScript와 Node.js 실행 방식을 보존한다. React·TypeScript 전환, 서버 프레임워크와 스키마 라이브러리 선택은 후속 합의 사항이다.
+현재 실행은 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용한다. React·TypeScript 전환, 서버 프레임워크와 스키마 라이브러리 선택은 후속 합의 사항이다.
 
 ## 데이터와 비밀정보
 
