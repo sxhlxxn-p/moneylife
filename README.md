@@ -71,4 +71,6 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 ## 협업
 
+팀장은 수현([@sxhlxxn-p](https://github.com/sxhlxxn-p))이다. 리뷰어를 정하기 어렵거나 영역 간 조율이 필요하면 팀장에게 요청한다.
+
 기능 작업은 개인 브랜치에서 진행하고 PR을 통해 `main`에 반영한다. 일반 변경은 최소 1명의 리뷰 승인을 받고, 다른 workspace와 겹치지 않는 간단한 작업이나 동작에 영향이 없는 문서 변경은 리뷰어 없이 셀프 머지할 수 있다. PR의 Assignees는 본인으로 지정한다. 설치한 모듈과 실행 방법은 문서로 남긴다. 전체 작업 방식은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따른다.
