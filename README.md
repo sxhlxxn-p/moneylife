@@ -1,12 +1,12 @@
 # 머니 라이프 · 금융 미래 시뮬레이터
 
-현재 소득·지출·자산과 목표를 입력하고 생애 이벤트와 조건 변경에 따라 10년의 금융 경로를 비교하는 웹 서비스다. 현재 기술 스택인 HTML·CSS·JavaScript client와 Node.js 개발 서버를 유지하면서 Notion 기획의 workspace 경계를 반영한다.
+현재 소득·지출·자산과 목표를 입력하고 생애 이벤트와 조건 변경에 따라 10년의 금융 경로를 비교하는 웹 서비스로 계획해두었습니다. 현재 기술 스택인 HTML·CSS·JavaScript client와 Node.js 개발 서버를 유지하면서 Notion 기획의 workspace 반영 진행하려고 합니다. 
 
-## 팀원 시작 안내
+## 시작 안내
 
-1. [처음 시작하기](docs/getting-started.md)에서 저장소 복제와 실행을 진행한다.
-2. 담당 영역의 README와 Guideline을 읽고 [협업 규칙](CONTRIBUTING.md)에 따라 개인 브랜치를 만든다.
-3. 계약이나 기술 스택을 바꾸기 전 [문서 목차](docs/README.md)에서 기존 계획과 결정 사항을 확인한다.
+1. [처음 시작하기](docs/getting-started.md)에서 저장소 복제와 실행 진행
+2. 담당 영역의 README와 Guideline을 읽고 [협업 규칙](CONTRIBUTING.md)에 따라 개인 브랜치를 만들어주세요.
+3. 계약이나 기술 스택을 바꾸기 전 [문서 목차](docs/README.md)에서 기존 계획과 결정 사항을 확인 부탁드립니다.
 
 ## 실행
 
@@ -77,6 +77,6 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 ## 협업
 
-팀장은 수현([@sxhlxxn-p](https://github.com/sxhlxxn-p))이다. 리뷰어를 정하기 어렵거나 영역 간 조율이 필요하면 팀장에게 요청한다.
+리포지토리 관리는 수현([@sxhlxxn-p](https://github.com/sxhlxxn-p))으로 두었습니다. 리뷰어를 정하기 어렵거나 영역 간 조율이 필요하면 제게 호출해주세요.
 
-기능 작업은 개인 브랜치에서 진행하고 PR을 통해 `main`에 반영한다. 일반 변경은 최소 1명의 리뷰 승인을 받고, 다른 workspace와 겹치지 않는 간단한 작업이나 동작에 영향이 없는 문서 변경은 리뷰어 없이 셀프 머지할 수 있다. PR의 Assignees는 본인으로 지정한다. 설치한 모듈과 실행 방법은 문서로 남긴다. 전체 작업 방식은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따른다.
+기능 작업은 개인 브랜치에서 진행하고 PR을 통해 `main`에 반영해주세요. 일반 변경은 최소 1명의 리뷰 승인을 받고, 다른 workspace와 겹치지 않는 간단한 작업이나 동작에 영향이 없는 문서 변경은 리뷰어 없이 셀프 머지해주시면 됩니다. PR의 Assignees는 본인으로 지정. 설치한 모듈과 실행 방법은 문서로 남겨주세요. 전체 작업 방식은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따라주시면 됩니다.
