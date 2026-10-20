@@ -1,0 +1,55 @@
+{
+  "units": "10000_KRW",
+  "plan": {
+    "initial": {
+      "cash": 300,
+      "saved": 700,
+      "income": 250,
+      "expense": 160
+    },
+    "months": 120,
+    "monthlySaving": 70,
+    "annualRate": 3
+  },
+  "monthlyResults": [
+    {
+      "cash": 300,
+      "saved": 700,
+      "unpaid": 0,
+      "total": 1000,
+      "income": 250,
+      "expense": 160,
+      "short": 0
+    },
+    {
+      "cash": 320,
+      "saved": 771.7263888406126,
+      "unpaid": 0,
+      "total": 1091.7263888406126,
+      "income": 250,
+      "expense": 160,
+      "short": 0
+    },
+    {
+      "cash": 340,
+      "saved": 843.6296743058992,
+      "unpaid": 0,
+      "total": 1183.6296743058992,
+      "income": 250,
+      "expense": 160,
+      "short": 0
+    },
+    {
+      "cash": 360,
+      "saved": 915.7102926706583,
+      "unpaid": 0,
+      "total": 1275.7102926706584,
+      "income": 250,
+      "expense": 160,
+      "short": 0
+    }
+  ],
+  "summary": {
+    "finalNetAssets": 13402.101242335471
+  }
+}

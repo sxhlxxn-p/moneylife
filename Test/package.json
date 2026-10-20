@@ -1,0 +1,10 @@
+{
+  "name": "@moneylife/test",
+  "version": "0.1.0",
+  "private": true,
+  "description": "머니 라이프 통합·회귀·AI 평가 영역",
+  "scripts": {
+    "test": "node --test *.test.cjs",
+    "check": "node --check engine.test.cjs"
+  }
+}

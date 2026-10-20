@@ -1,0 +1,23 @@
+{
+  "name": "future-wallet-life",
+  "version": "0.1.0",
+  "private": true,
+  "description": "머니 라이프 — 금융 미래 시뮬레이션 게임 개발 초안",
+  "workspaces": [
+    "Client",
+    "Server",
+    "Engine",
+    "Shared",
+    "Test"
+  ],
+  "scripts": {
+    "dev": "npm run dev:client",
+    "dev:client": "npm run dev --workspace Client",
+    "start": "npm run dev:client",
+    "prototype": "node scripts/dev-server.cjs --prototype",
+    "tree": "node scripts/print-tree.cjs",
+    "test": "npm run test --workspace Test",
+    "check": "npm run check --workspaces --if-present && node --check prototype/app.js && node --check prototype/engine.js && node --check scripts/dev-server.cjs && node --check scripts/print-tree.cjs"
+  },
+  "engines": { "node": ">=18" }
+}

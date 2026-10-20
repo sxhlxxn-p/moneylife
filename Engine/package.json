@@ -1,0 +1,10 @@
+{
+  "name": "@moneylife/engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "머니 라이프 독립 금융 계산 엔진",
+  "main": "src/index.js",
+  "scripts": {
+    "check": "node --check src/index.js"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "folders": [{"name": "Money Life", "path": "."}],
+  "settings": {
+    "files.exclude": {"**/.DS_Store": true},
+    "search.exclude": {"**/node_modules": true, "**/coverage": true}
+  }
+}

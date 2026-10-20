@@ -1,0 +1,6 @@
+{
+  "name": "@moneylife/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "머니 라이프 공통 타입·검증 스키마 영역"
+}
