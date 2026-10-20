@@ -18,7 +18,7 @@ prototype          기존 정적 초안 원본
 - 기존 정적 초안은 `prototype`에 동일본으로 보관했다.
 - 현재 실행본은 `Client`와 `Engine`으로 분리했다.
 - 실행 가능한 상태를 유지하기 위해 루트 개발 서버가 웹 파일과 엔진 파일만 명시적으로 제공한다.
-- 서버·공통 계약·테스트는 기술 스택 합의 전이므로 README와 명세만 준비했다.
+- Server와 Shared는 기술 스택 합의 전이므로 README와 명세만 준비했다. Test에는 Node 내장 러너 기반 엔진 회귀 테스트 4개가 구현되어 있다.
 - `dist`는 향후 빌드 산출물 전용이며 Git에 포함하지 않는다.
 - Notion과 동일한 `Client`, `Server`, `Engine`, `Shared`, `Test` 경로명을 사용한다.
 - npm workspaces로 역할 경계를 선언하고 루트 lockfile 하나를 사용한다.
