@@ -1,30 +1,58 @@
 # Server
 
-현재 서버는 미구현이다. 기술 스택 합의 후 이 경로에 팀이 선택한 Node.js 서버 프레임워크를 구성한다.
+FastAPI 기반의 머니 라이프 API 서버다. 개발 환경은 Docker Compose로 실행하며, 로컬 Python 설치 없이 소스 변경 자동 반영을 지원한다.
 
-- 사용자 인증 및 금융 계획 저장·조회
-- 금융 시뮬레이션 실행 API
-- LLM 요청 처리 및 계산 도구 호출
-- 토스증권 API 연동 가능 범위 확인 후 서버 측 연동
+## 실행
 
-API 초안은 `../docs/api-contract.md`, 계산 규칙은 `../docs/simulation-rules.md`, 화면 연결은 `../docs/FRONTEND_HANDOFF.md`를 참고한다.
-API 비밀키는 프론트엔드 코드에 넣지 않고 서버 환경변수로 관리한다.
+저장소 루트에서 다음 명령을 실행한다.
 
-## 팀 작업 기준
+```bash
+npm run dev:server
+```
 
-- 요청 검증과 단위 변환은 API 경계에서 수행한다.
-- 금융 결과는 `../Engine`을 호출해 계산하고 Server나 LLM에서 다시 구현하지 않는다.
-- Client·Server 공통 필드는 `../Shared`에서 합의한 뒤 변경한다.
-- LLM과 토스증권 연동은 실패해도 수동 시뮬레이션이 동작하도록 어댑터 경계로 분리한다.
-- 서버 프레임워크가 확정되기 전에는 실행되지 않는 빈 라우트나 DB 파일을 만들지 않는다.
+또는 `Server` 디렉터리에서 직접 실행할 수 있다.
 
-## 구현 순서
+```bash
+docker compose up --build
+```
 
-1. 서버 프레임워크와 PostgreSQL 접근 방식을 합의한다.
-2. 실제 서버 진입점과 `/health`를 구현하고 실행 명령을 추가한다.
-3. 공통 계약에 맞춰 계획 저장·조회, 버전 관리, 시뮬레이션·비교 API를 구현한다.
-4. 인증과 환경변수 관리를 구성하고 LLM·외부 자산 조회 어댑터를 연결한다.
+- API: <http://localhost:3000>
+- 상태 확인: <http://localhost:3000/health>
+- Swagger UI: <http://localhost:3000/docs>
+- ReDoc: <http://localhost:3000/redoc>
+- OpenAPI JSON: <http://localhost:3000/openapi.json>
+- 종료: `Ctrl+C`
 
-조건 추출, 계산 도구 정의, 해설 생성과 수치 검증은 Server 내부 LLM 경계에 둔다. 모델과 SDK가 확정되기 전에는 빈 구현 파일을 만들지 않는다. 평가 기준은 [LLM 설계와 평가](../docs/llm-evaluation.md)를 따른다.
+API 루트인 <http://localhost:3000>으로 접속해도 Swagger UI로 이동한다. FastAPI 라우트에 요청·응답 Pydantic 모델과 설명을 추가하면 OpenAPI 스키마와 두 문서 화면에 자동 반영된다.
 
-Server 실행 스크립트는 선택한 프레임워크의 실제 진입점과 `/health`가 구현되는 작업에서 추가한다. 현재는 동작하지 않는 `dev:server` 명령을 만들지 않는다.
+기본 포트와 Client 출처를 바꾸려면 `.env.example`을 `.env`로 복사한 뒤 `PORT`, `CLIENT_ORIGIN`을 수정한다. `.env`와 비밀키는 Git에 커밋하지 않는다.
+
+## 테스트
+
+```bash
+docker compose run --build --rm api pytest
+```
+
+저장소 루트에서는 다음 명령도 동일하게 동작한다.
+
+```bash
+npm test --workspace Server
+```
+
+## 구조
+
+```text
+Server/
+├── app/
+│   └── main.py            FastAPI 진입점과 /health
+├── tests/
+│   └── test_health.py     상태 확인 API 테스트
+├── compose.yaml           개발 컨테이너, 볼륨, 포트, 상태 확인
+├── Dockerfile             Python 3.12 개발 이미지
+├── requirements.txt       런타임 의존성
+└── requirements-dev.txt   테스트 의존성
+```
+
+요청 검증과 단위 변환은 API 경계에서 수행하고, 금융 결과는 `../Engine`을 호출해 계산한다. API 초안은 `../docs/api-contract.md`, 계산 규칙은 `../docs/simulation-rules.md`, 화면 연결은 `../docs/FRONTEND_HANDOFF.md`를 참고한다.
+
+LLM과 외부 자산 조회는 장애가 발생해도 수동 시뮬레이션이 동작하도록 어댑터 경계로 분리한다. 실제 키와 인증정보는 서버 환경변수로만 관리하며 응답, 로그, LLM 입력에 포함하지 않는다.

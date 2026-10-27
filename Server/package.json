@@ -2,5 +2,9 @@
   "name": "@moneylife/server",
   "version": "0.1.0",
   "private": true,
-  "description": "머니 라이프 API·DB·LLM·외부 연동 서버 영역"
+  "description": "머니 라이프 FastAPI 서버",
+  "scripts": {
+    "dev": "docker compose up --build",
+    "test": "docker compose run --build --rm api pytest"
+  }
 }

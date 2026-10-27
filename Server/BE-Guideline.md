@@ -6,3 +6,4 @@
 - AI 또는 외부 API 장애에도 수동 시뮬레이션 흐름을 유지한다.
 - 구현 전 계약은 `docs/api-contract.md`, 계산 규칙은 `docs/simulation-rules.md`를 기준으로 한다.
 - 서버 프레임워크와 DB 방식이 확정되기 전에는 실행되지 않는 빈 라우트·마이그레이션 파일을 만들지 않는다.
+- API 테스트를 위한 Swagger는 ./docs로, static한 문서는 ./redoc을 통해 확인한다.

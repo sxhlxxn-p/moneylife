@@ -24,6 +24,14 @@ npm run dev:client
 
 브라우저에서 <http://localhost:5173>에 접속한다. 종료는 터미널에서 `Ctrl+C`를 누른다.
 
+FastAPI 개발 서버는 Docker가 실행 중인 상태에서 다음 명령으로 시작한다.
+
+```bash
+npm run dev:server
+```
+
+API는 <http://localhost:3000>, Swagger UI는 <http://localhost:3000/docs>에서 확인한다. 자세한 내용은 [Server README](Server/README.md)를 참고한다.
+
 구조 변경 전 정적 초안은 별도 명령으로 확인할 수 있다.
 
 ```bash
@@ -64,9 +72,9 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 ## 구현 상태
 
-현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. 실제 LLM, 토스증권 API, 사용자 인증, PostgreSQL과 Server API는 아직 연결되지 않았다.
+현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. `Server`에는 FastAPI 개발 환경과 상태 확인 API가 구성되어 있으며, 실제 LLM, 토스증권 API, 사용자 인증, PostgreSQL은 아직 연결되지 않았다.
 
-현재 실행은 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용한다. React·TypeScript 전환, 서버 프레임워크와 스키마 라이브러리 선택은 후속 합의 사항이다.
+현재 Client는 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용하고, Server는 Docker 기반 FastAPI를 사용한다. React·TypeScript 전환과 스키마 라이브러리 선택은 후속 합의 사항이다.
 
 ## 데이터와 비밀정보
 

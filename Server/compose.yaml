@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5173}
+    ports:
+      - "${PORT:-3000}:8000"
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+      interval: 60s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
