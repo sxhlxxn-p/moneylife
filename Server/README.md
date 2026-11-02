@@ -18,6 +18,7 @@ docker compose up --build
 
 - API: <http://localhost:3000>
 - 상태 확인: <http://localhost:3000/health>
+- PostgreSQL 연결 확인: <http://localhost:3000/health/db>
 - Swagger UI: <http://localhost:3000/docs>
 - ReDoc: <http://localhost:3000/redoc>
 - OpenAPI JSON: <http://localhost:3000/openapi.json>
@@ -25,7 +26,29 @@ docker compose up --build
 
 API 루트인 <http://localhost:3000>으로 접속해도 Swagger UI로 이동한다. FastAPI 라우트에 요청·응답 Pydantic 모델과 설명을 추가하면 OpenAPI 스키마와 두 문서 화면에 자동 반영된다.
 
-기본 포트와 Client 출처를 바꾸려면 `.env.example`을 `.env`로 복사한 뒤 `PORT`, `CLIENT_ORIGIN`을 수정한다. `.env`와 비밀키는 Git에 커밋하지 않는다.
+기본 포트와 Client 출처를 바꾸려면 `.env.example`을 `.env`로 복사한 뒤 `PORT`, `CLIENT_ORIGIN`을 수정한다. Compose는 PostgreSQL 컨테이너와 `postgres_data` 볼륨을 함께 실행하므로 컨테이너를 다시 만들어도 개발 데이터가 유지된다. `.env`와 비밀키는 Git에 커밋하지 않는다.
+
+## PostgreSQL
+
+FastAPI는 `DATABASE_URL`만 사용하므로 로컬 PostgreSQL과 AWS RDS 사이에 코드 변경이 필요 없다.
+
+```env
+# Docker Compose 개발 DB
+DATABASE_URL=postgresql+psycopg://moneylife:moneylife@db:5432/moneylife
+
+# AWS RDS 예시
+DATABASE_URL=postgresql+psycopg://USER:PASSWORD@RDS_ENDPOINT:5432/moneylife?sslmode=require
+```
+
+로컬에서는 `db`가 Compose 서비스 이름이다. 호스트 PC에서 DB 클라이언트로 접속할 때는 `localhost:5432`를 사용한다. 운영 자격 증명은 파일에 저장하지 않고 AWS Secrets Manager 등을 통해 ECS 환경변수로 주입한다.
+
+연결 확인 엔드포인트는 실제로 `SELECT 1`을 실행한다.
+
+```bash
+curl http://localhost:3000/health/db
+```
+
+정상이면 `200`과 `{"status":"ok","database":"postgresql"}`, 연결할 수 없으면 민감한 오류 내용을 노출하지 않고 `503`을 반환한다.
 
 ## 테스트
 
@@ -45,9 +68,10 @@ npm test --workspace Server
 Server/
 ├── app/
 │   └── main.py            FastAPI 진입점과 /health
+│   └── database.py        DATABASE_URL 기반 PostgreSQL 연결
 ├── tests/
 │   └── test_health.py     상태 확인 API 테스트
-├── compose.yaml           개발 컨테이너, 볼륨, 포트, 상태 확인
+├── compose.yaml           FastAPI와 PostgreSQL 개발 컨테이너
 ├── Dockerfile             Python 3.12 개발 이미지
 ├── requirements.txt       런타임 의존성
 └── requirements-dev.txt   테스트 의존성

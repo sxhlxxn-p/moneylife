@@ -1,13 +1,29 @@
 import os
+from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.database import check_database_connection, close_database_connection
 
 
 class HealthResponse(BaseModel):
     status: str
+
+
+class DatabaseHealthResponse(BaseModel):
+    status: str
+    database: str
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    yield
+    await close_database_connection()
 
 
 app = FastAPI(
@@ -21,6 +37,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
     openapi_tags=[
         {
             "name": "system",
@@ -53,3 +70,24 @@ async def root() -> RedirectResponse:
 )
 async def health() -> HealthResponse:
     return HealthResponse(status="ok")
+
+
+@app.get(
+    "/health/db",
+    tags=["system"],
+    summary="PostgreSQL 연결 상태 확인",
+    response_description="PostgreSQL 연결 상태",
+    response_model=DatabaseHealthResponse,
+    responses={503: {"model": DatabaseHealthResponse}},
+)
+async def database_health() -> DatabaseHealthResponse | JSONResponse:
+    try:
+        await check_database_connection()
+    except (SQLAlchemyError, RuntimeError):
+        response = DatabaseHealthResponse(
+            status="unavailable",
+            database="postgresql",
+        )
+        return JSONResponse(status_code=503, content=response.model_dump())
+
+    return DatabaseHealthResponse(status="ok", database="postgresql")
