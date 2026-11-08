@@ -60,3 +60,14 @@ class AIProposal(Base):
     prompt_version: Mapped[str] = mapped_column(String(64))
     applied_plan_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     applied_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+
+class AIExplanation(Base):
+    __tablename__ = "ai_explanations"
+
+    run_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    text: Mapped[str] = mapped_column(String(2000))
+    model: Mapped[str] = mapped_column(String(128))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    attempts: Mapped[int] = mapped_column(Integer)

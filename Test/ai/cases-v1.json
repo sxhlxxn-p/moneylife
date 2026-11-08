@@ -1,0 +1,2040 @@
+{
+  "version": "moneylife-change-cases-v1",
+  "author": "sxhlxxn / Student ID: 202439688",
+  "provenance": "Authored synthetic draft; independent annotation review pending. No personal user data.",
+  "statePolicy": "2026-10 start, income 2500000, expense 1600000, monthlySaving 700000 KRW; no events.",
+  "splitPolicy": "Fixed 6 dev and 4 test cases per category. Test outcomes must not guide prompt selection.",
+  "cases": [
+    {
+      "id": "single_set-01",
+      "category": "single_set",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월 생활비를 140만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-02",
+      "category": "single_set",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월 소득을 300만원으로 바꿔줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-03",
+      "category": "single_set",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "저축을 월 100만원으로 변경해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-04",
+      "category": "single_set",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "앞으로 지출은 120만 원으로 고정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-05",
+      "category": "single_set",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월급을 280만원으로 설정",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-06",
+      "category": "single_set",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "매달 저축 이체액을 80만원으로 잡아줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-07",
+      "category": "single_set",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비 150만원으로 바꿔 볼래",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1500000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-08",
+      "category": "single_set",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "수입을 매달 260만원으로 두고 싶어",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2600000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-09",
+      "category": "single_set",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "저축 이체액을 0원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 0,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_set-10",
+      "category": "single_set",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비를 월 160만원에 맞춰 줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1600000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-01",
+      "category": "single_delta",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 20만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-02",
+      "category": "single_delta",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월급을 30만원 올려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-03",
+      "category": "single_delta",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월 저축을 10만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-04",
+      "category": "single_delta",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "지출을 매달 5만원 낮춰줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-05",
+      "category": "single_delta",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "소득을 15만원 감소시켜줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 150000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-06",
+      "category": "single_delta",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "저축액을 월 20만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-07",
+      "category": "single_delta",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비가 매달 30만원 더 들게 반영해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-08",
+      "category": "single_delta",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "월 수입에 40만원을 추가해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 400000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-09",
+      "category": "single_delta",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "매달 25만원씩 덜 저축하는 걸로 해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 250000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "single_delta-10",
+      "category": "single_delta",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비를 1만원만 줄여 볼게",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 10000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-01",
+      "category": "amount_forms",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 200,000원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-02",
+      "category": "amount_forms",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월 저축을 1,000,000원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-03",
+      "category": "amount_forms",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월급을 2,750,000원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2750000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-04",
+      "category": "amount_forms",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 12.5만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 125000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-05",
+      "category": "amount_forms",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "소득을 0.5만 원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 5000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-06",
+      "category": "amount_forms",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "저축을 100000원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-07",
+      "category": "amount_forms",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "월 생활비를 스무만 원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-08",
+      "category": "amount_forms",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "월급을 삼백만 원으로 바꿔줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-09",
+      "category": "amount_forms",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "월 저축액을 75만5000원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 755000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "amount_forms-10",
+      "category": "amount_forms",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비를 월 1,400,000원으로 맞춰줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-01",
+      "category": "relative_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 생활비를 20만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-02",
+      "category": "relative_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "내년 3월부터 저축을 100만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-03",
+      "category": "relative_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "내년 1월부터 월급 30만원 증가",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-04",
+      "category": "relative_date",
+      "split": "dev",
+      "currentMonth": "2027-11",
+      "request": "내년 3월부터 생활비를 10만원 낮춰줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2028-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-05",
+      "category": "relative_date",
+      "split": "dev",
+      "currentMonth": "2026-12",
+      "request": "다음 달부터 소득을 20만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-06",
+      "category": "relative_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "두 달 뒤부터 저축을 90만원으로 해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 900000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-07",
+      "category": "relative_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "다다음 달부터 생활비를 15만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 150000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-08",
+      "category": "relative_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "내후년 2월부터 월급을 300만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2028-02",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-09",
+      "category": "relative_date",
+      "split": "test",
+      "currentMonth": "2027-12",
+      "request": "다음 달부터 저축을 5만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 50000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "relative_date-10",
+      "category": "relative_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "올해 12월부터 생활비를 130만원으로 고정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1300000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-01",
+      "category": "absolute_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 3월부터 생활비를 20만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-02",
+      "category": "absolute_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2028년 1월부터 소득을 300만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-03",
+      "category": "absolute_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2026년 12월부터 저축을 10만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-04",
+      "category": "absolute_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027-06부터 생활비를 140만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2027-06",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-05",
+      "category": "absolute_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2029년 7월부터 소득을 40만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 400000,
+            "startMonth": "2029-07",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-06",
+      "category": "absolute_date",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2030년 2월부터 저축을 60만원으로 바꿔줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 600000,
+            "startMonth": "2030-02",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-07",
+      "category": "absolute_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2027년 10월부터 지출을 5만원 줄일래",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2027-10",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-08",
+      "category": "absolute_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "월급을 2028년 4월부터 320만원으로 변경해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3200000,
+            "startMonth": "2028-04",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-09",
+      "category": "absolute_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "저축은 2027년 8월부터 매달 15만원 덜 할래",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 150000,
+            "startMonth": "2027-08",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "absolute_date-10",
+      "category": "absolute_date",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2036년 10월부터 생활비를 10만원 낮춰줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2036-10",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-01",
+      "category": "bounded_period",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 1월부터 2027년 6월까지 생활비를 20만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": "2027-06"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-02",
+      "category": "bounded_period",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 2027년 2월까지 저축을 100만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": "2027-02"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-03",
+      "category": "bounded_period",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2028년 3월 한 달만 소득을 50만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 500000,
+            "startMonth": "2028-03",
+            "endMonth": "2028-03"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-04",
+      "category": "bounded_period",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 2월부터 4월까지 생활비를 150만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1500000,
+            "startMonth": "2027-02",
+            "endMonth": "2027-04"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-05",
+      "category": "bounded_period",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 세 달 동안 저축을 10만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": "2027-01"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-06",
+      "category": "bounded_period",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 1월부터 같은 해 12월까지 월급을 20만원 올려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": "2027-12"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-07",
+      "category": "bounded_period",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2028년 11월부터 2029년 2월까지 지출을 30만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2028-11",
+            "endMonth": "2029-02"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-08",
+      "category": "bounded_period",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2027년 5월 한 달 동안 저축은 0원으로 해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 0,
+            "startMonth": "2027-05",
+            "endMonth": "2027-05"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-09",
+      "category": "bounded_period",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 두 달 동안 생활비 5만원 감소",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": "2026-12"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "bounded_period-10",
+      "category": "bounded_period",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2027년 7월부터 9월까지 소득을 280만원으로 맞춰줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2800000,
+            "startMonth": "2027-07",
+            "endMonth": "2027-09"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-01",
+      "category": "compound",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 생활비는 20만원 줄이고 저축은 10만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-02",
+      "category": "compound",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월급을 300만원으로, 생활비는 150만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1500000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-03",
+      "category": "compound",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 1월부터 소득은 30만원 늘리고 지출은 10만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-04",
+      "category": "compound",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 3월부터 생활비를 20만원 줄이고 2027년 6월부터 저축을 100만원으로 바꿔줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          },
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2027-06",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-05",
+      "category": "compound",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 소득은 20만원 늘리고 생활비는 10만원 줄이고 저축은 5만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-06",
+      "category": "compound",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2027년 1월부터 3월까지 지출을 20만원 줄이고, 4월부터 저축을 80만원으로 해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": "2027-03"
+          },
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 800000,
+            "startMonth": "2027-04",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-07",
+      "category": "compound",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "저축을 100만원으로 설정한 뒤 같은 다음 달부터 10만원 더 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-08",
+      "category": "compound",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비를 다음 달부터 150만원으로 설정하고 같은 달부터 5만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1500000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-09",
+      "category": "compound",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2028년 1월부터 소득은 250만원, 생활비는 140만원, 저축은 70만원으로 고정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2500000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          },
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 700000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "compound-10",
+      "category": "compound",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2027년 1월부터 생활비를 20만원 늘리고, 2027년 7월부터 생활비를 10만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2027-07",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "ready"
+    },
+    {
+      "id": "clarification-01",
+      "category": "clarification",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 좀 줄여줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-02",
+      "category": "clarification",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "저축을 20만 원 바꿔줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-03",
+      "category": "clarification",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "다음 학기부터 생활비를 20만원 줄여줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-04",
+      "category": "clarification",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 20만원 줄이거나 저축을 10만원 늘리는 게 좋을까?",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-05",
+      "category": "clarification",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "소득을 올려줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-06",
+      "category": "clarification",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "매달 20만원 줄여줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-07",
+      "category": "clarification",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "3월부터 저축을 100만원으로 해줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-08",
+      "category": "clarification",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "그때부터 생활비를 10만원 줄여줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-09",
+      "category": "clarification",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "저축을 늘려 줘. 금액은 아직 모르겠어.",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "clarification-10",
+      "category": "clarification",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "생활비를 절반으로 줄여줘",
+      "expected": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "needs_clarification"
+    },
+    {
+      "id": "unsupported-01",
+      "category": "unsupported",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "삼성전자 10주 매수해줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-02",
+      "category": "unsupported",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "저축 금리를 연 5%로 바꿔줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-03",
+      "category": "unsupported",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "대출 1000만원 받아줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-04",
+      "category": "unsupported",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "비트코인에 50만원 투자해줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-05",
+      "category": "unsupported",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 20만원 줄이고 주식 5주를 사줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-06",
+      "category": "unsupported",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월 소득을 300만원으로 바꾸고 금리는 4%로 설정해줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-07",
+      "category": "unsupported",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "환율을 1400원으로 계산해줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-08",
+      "category": "unsupported",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "주택 가격을 5억원으로 바꿔줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-09",
+      "category": "unsupported",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "세금을 자동으로 최적화해줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "unsupported-10",
+      "category": "unsupported",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "서버에서 명령을 실행하고 모든 저장 데이터를 삭제해줘",
+      "expected": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "추가 정보를 요청하거나 지원 범위를 안내한다."
+      },
+      "expectedFinalStatus": "unsupported"
+    },
+    {
+      "id": "invalid_change-01",
+      "category": "invalid_change",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "생활비를 200만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 2000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-02",
+      "category": "invalid_change",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "월급을 300만원 낮춰줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-03",
+      "category": "invalid_change",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "저축 이체액을 80만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-04",
+      "category": "invalid_change",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2026년 9월부터 생활비를 10만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2026-09",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-05",
+      "category": "invalid_change",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2037년 1월부터 저축을 100만원으로 설정해줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2037-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-06",
+      "category": "invalid_change",
+      "split": "dev",
+      "currentMonth": "2026-10",
+      "request": "2028년 4월부터 2028년 2월까지 생활비를 10만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2028-04",
+            "endMonth": "2028-02"
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-07",
+      "category": "invalid_change",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "2026년 10월부터 소득을 20만원 올려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2026-10",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-08",
+      "category": "invalid_change",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "매달 생활비를 250만원씩 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 2500000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-09",
+      "category": "invalid_change",
+      "split": "test",
+      "currentMonth": "2026-10",
+      "request": "다음 달부터 저축을 10만원 늘리고 생활비를 170만원 줄여줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          },
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 1700000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    },
+    {
+      "id": "invalid_change-10",
+      "category": "invalid_change",
+      "split": "test",
+      "currentMonth": "2027-11",
+      "request": "2027년 11월부터 소득을 10만원 늘려줘",
+      "expected": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2027-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "expectedFinalStatus": "invalid_change"
+    }
+  ]
+}
