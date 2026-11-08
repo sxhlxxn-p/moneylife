@@ -19,7 +19,10 @@
     "prototype": "node scripts/dev-server.cjs --prototype",
     "tree": "node scripts/print-tree.cjs",
     "test": "npm run test --workspace Test",
-    "check": "npm run check --workspaces --if-present && node --check prototype/app.js && node --check prototype/engine.js && node --check scripts/dev-server.cjs && node --check scripts/print-tree.cjs"
+    "check": "npm run check --workspaces --if-present && node --check prototype/app.js && node --check prototype/engine.js && node --check scripts/dev-server.cjs && node --check scripts/print-tree.cjs",
+    "demo:trading": "npm run demo:trading --workspace Engine"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

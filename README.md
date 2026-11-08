@@ -66,7 +66,7 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 ## 구현 상태
 
-현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. FastAPI의 계획 저장·목록·조회 API를 Client에 연결했다. DB는 Compose에서 PostgreSQL, Docker 없는 로컬 실행에서는 SQLite를 사용한다. 서버는 Node로 공통 계산 엔진을 실행하고 입력·버전·월별 결과를 불변 Run으로 저장한다. 실제 LLM·토스증권 API·모의 주식 투자와 계정 로그인은 아직 연결되지 않았다.
+현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. FastAPI의 계획 저장·목록·조회 API를 Client에 연결했다. DB는 Compose에서 PostgreSQL, Docker 없는 로컬 실행에서는 SQLite를 사용한다. 서버는 Node로 공통 계산 엔진을 실행하고 입력·버전·월별 결과를 불변 Run으로 저장한다. 단일 종목 모의투자 정산 모듈과 테스트 데모를 추가했다. 실제 LLM·토스증권 API·모의투자 화면/서버 연결과 계정 로그인은 아직 구현하지 않았다.
 
 현재 실행은 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용한다. 서버는 FastAPI·SQLAlchemy·Pydantic을 사용한다. React·TypeScript 전환은 후속 작업이다.
 
@@ -77,7 +77,7 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 - 필요한 변수 이름은 `.env.example`에 기록한다.
 - 실제 계좌·개인 식별 데이터는 `fixtures`와 `Test`에 넣지 않는다.
 
-모의 주식 투자 확장 범위는 [개발 명세](docs/paper-trading-plan.md)를 참고한다.
+`npm run demo:trading`으로 가상 가격 매수·매도 계산을 확인할 수 있다. 모의 주식 투자 확장 범위는 [개발 명세](docs/paper-trading-plan.md)를 참고한다.
 
 ## 협업
 
