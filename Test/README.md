@@ -15,3 +15,5 @@ npm test
 
 Server와 Client가 실제로 연결되면 이 폴더에 통합 테스트를 추가한다. Cypress 같은 도구는 선정된 뒤 실제 테스트와 함께 설치하며, 예제 테스트 폴더를 먼저 복사하지 않는다. AI 평가는 정상·모호·불가능·오류 사례와 기대 조건을 fixture로 분리한다.
 
+
+현재 `plan-state.test.cjs`는 원/만 원 왕복 변환 후 전체 계산 경로 재현과 12/22개월 목표 사례를 검증한다. API 영속성 테스트는 `Server/tests/test_plans.py`에 있으며 로컬 실행 방법은 `docs/first-integration.md`를 참고한다.

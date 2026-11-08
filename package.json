@@ -13,6 +13,8 @@
   "scripts": {
     "dev": "npm run dev:client",
     "dev:client": "npm run dev --workspace Client",
+    "dev:server": "npm run dev --workspace Server",
+    "dev:server:local": "python3 Server/run_local.py",
     "start": "npm run dev:client",
     "prototype": "node scripts/dev-server.cjs --prototype",
     "tree": "node scripts/print-tree.cjs",

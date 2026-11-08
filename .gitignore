@@ -7,5 +7,10 @@ coverage/
 .env.*
 !.env.example
 *.log
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.venv/
 .idea/
+.data/
 
