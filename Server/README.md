@@ -92,3 +92,9 @@ LLM과 외부 자산 조회는 장애가 발생해도 수동 시뮬레이션이 
 `POST /plans`, `GET /plans`, `GET /plans/{id}`를 구현했다. 현재 여정의 입력과 선택 기록을 새 스냅샷으로 저장하며, 게스트 세션 소유권을 검사한다. 브라우저는 Client 개발 서버의 `/api` 프록시를 사용한다.
 
 Docker가 없으면 가상환경에서 의존성을 설치한 뒤 루트의 `npm run dev:server:local`을 실행한다. 이 명령만 DATABASE_URL 미설정 시 SQLite `.data/dev.db`를 사용한다. Compose의 PostgreSQL 기본값은 유지한다. `aiosqlite`는 이 로컬 실행과 영속성 테스트용 드라이버다. 자세한 명령과 검증 범위는 [실행 안내](../docs/first-integration.md)를 따른다.
+
+## LLM 조건 변경 API
+
+`POST /ai/parse-change`는 본인 계획을 기준으로 구조화 추출·서버 검증을 수행한다. `POST /ai/proposals/{id}/apply`에서 명시적으로 확인하면 원본을 보존한 새 계획과 계산 결과를 저장한다. 모델은 금액을 계산하지 않는다. 결과 설명은 현재 정형 문장이다.
+
+`LLM_PROVIDER=openai`, `LLM_MODEL`, `OPENAI_API_KEY` 설정이 필요하다. Compose는 Server/.env, 로컬 Python 실행은 실행 터미널의 환경변수를 사용한다. 키 미설정 시 503이며 테스트 모형으로 자동 대체하지 않는다. [실행과 평가](../docs/llm-evaluation.md)를 참고한다. httpx는 실제 모델 HTTP 연결에 사용하는 런타임 의존성이다.

@@ -44,3 +44,19 @@ class Run(Base):
     input_snapshot: Mapped[dict] = mapped_column(JSON)
     monthly_results: Mapped[list] = mapped_column(JSON)
     summary: Mapped[dict] = mapped_column(JSON)
+
+
+class AIProposal(Base):
+    __tablename__ = "ai_proposals"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    base_plan_id: Mapped[str] = mapped_column(String(36))
+    expires_at: Mapped[int] = mapped_column(BigInteger)
+    message: Mapped[str] = mapped_column(String(2000))
+    intents: Mapped[list] = mapped_column(JSON)
+    candidate: Mapped[dict] = mapped_column(JSON)
+    model: Mapped[str] = mapped_column(String(128))
+    prompt_version: Mapped[str] = mapped_column(String(64))
+    applied_plan_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    applied_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
