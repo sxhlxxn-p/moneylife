@@ -10,6 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import check_database_connection, close_database_connection, initialize_database, database_kind
 from app.plans import router as plans_router
+from app.simulations import router as simulations_router
 
 
 class HealthResponse(BaseModel):
@@ -60,6 +61,7 @@ app.add_middleware(
 )
 
 app.include_router(plans_router)
+app.include_router(simulations_router)
 
 
 @app.exception_handler(SQLAlchemyError)

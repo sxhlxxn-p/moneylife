@@ -12,3 +12,11 @@
 .saved-plans{display:grid;gap:10px;margin:20px 0}.saved-plan{text-align:left;white-space:normal}
 button:disabled{opacity:.55;cursor:wait}
 @media(max-width:700px){.server-tools{align-items:stretch;flex-direction:column}.server-tools .buttonrow{flex-wrap:wrap}}
+
+/* Saved calculation results. Author: sxhlxxn / Student ID: 202439688. */
+.run-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.run-summary>div{padding:16px;border-radius:12px;background:#f5f2fb;overflow-wrap:anywhere}
+.run-summary small,.run-summary strong{display:block}.run-summary small{font-size:11px;color:#81718f;margin-bottom:8px}.run-summary strong{font-size:17px;color:#514264}
+.run-details summary{cursor:pointer;font-size:13px}.run-table-scroll{max-height:320px;overflow:auto;margin-top:12px}
+.run-table-scroll table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}.run-table-scroll th,.run-table-scroll td{padding:8px;text-align:right;border-bottom:1px solid #e8e3ee}.run-table-scroll th{background:#f6f3fa;position:sticky;top:0}
+@media(max-width:450px){.run-summary{grid-template-columns:1fr}.server-tools .buttonrow{gap:6px}}

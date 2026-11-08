@@ -1,6 +1,6 @@
 """Plan snapshots and guest sessions. Author: sxhlxxn / 202439688."""
 
-from sqlalchemy import JSON, BigInteger, Integer, String
+from sqlalchemy import JSON, BigInteger, Integer, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -27,3 +27,20 @@ class Plan(Base):
     goal_basis: Mapped[str] = mapped_column(String(24), default="net_assets")
     created_at: Mapped[int] = mapped_column(BigInteger)
     state: Mapped[dict] = mapped_column(JSON)
+
+
+class Run(Base):
+    __tablename__ = "simulation_runs"
+    __table_args__ = (UniqueConstraint("owner_id", "request_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    plan_id: Mapped[str] = mapped_column(String(36), index=True)
+    plan_version: Mapped[int] = mapped_column(Integer, default=1)
+    engine_version: Mapped[str] = mapped_column(String(64))
+    months: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[int] = mapped_column(BigInteger)
+    input_snapshot: Mapped[dict] = mapped_column(JSON)
+    monthly_results: Mapped[list] = mapped_column(JSON)
+    summary: Mapped[dict] = mapped_column(JSON)
