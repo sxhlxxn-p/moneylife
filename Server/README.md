@@ -72,7 +72,7 @@ Server/
 ├── tests/
 │   └── test_health.py     상태 확인 API 테스트
 ├── compose.yaml           FastAPI와 PostgreSQL 개발 컨테이너
-├── Dockerfile             Python 3.12 개발 이미지
+├── Dockerfile             Python 3.12 + Node 계산 런타임
 ├── requirements.txt       런타임 의존성
 └── requirements-dev.txt   테스트 의존성
 ```
@@ -80,6 +80,12 @@ Server/
 요청 검증과 단위 변환은 API 경계에서 수행하고, 금융 결과는 `../Engine`을 호출해 계산한다. API 초안은 `../docs/api-contract.md`, 계산 규칙은 `../docs/simulation-rules.md`, 화면 연결은 `../docs/FRONTEND_HANDOFF.md`를 참고한다.
 
 LLM과 외부 자산 조회는 장애가 발생해도 수동 시뮬레이션이 동작하도록 어댑터 경계로 분리한다. 실제 키와 인증정보는 서버 환경변수로만 관리하며 응답, 로그, LLM 입력에 포함하지 않는다.
+
+## 서버 계산 결과
+
+`POST /simulations`는 저장된 본인 계획으로 공통 JS 엔진을 실행한다. `GET /simulations?planId=...`와 `GET /simulations/{id}`는 저장된 Run을 조회한다. 입력 스냅샷·버전·월별 결과·요약을 보존하고 같은 requestId의 중복 저장을 방지한다. `app/engine.py`가 시간 제한과 결과 검증, `app/simulations.py`가 소유권과 저장을 담당한다.
+
+호스트 실행·테스트는 Node와 루트 `npm ci` 설치가 필요하다. Dockerfile은 루트 build context에서 Node와 decimal.js를 함께 포함한다. 이자 반올림과 실패 처리는 [서버 계산 계약](../Shared/simulation-contract.md)을 따른다. Docker/PostgreSQL 실환경 검증은 아직 남아 있다.
 
 ## 계획 저장 API와 Docker 없는 실행
 

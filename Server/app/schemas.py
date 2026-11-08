@@ -102,3 +102,56 @@ class PlanSummary(StrictModel):
 
 class PlanDetail(PlanSummary):
     state: GameState
+
+
+class SimulationCreate(StrictModel):
+    planId: UUID
+    requestId: UUID
+    months: Annotated[int, Field(strict=True, ge=1, le=120)] = 120
+
+
+CalculatedMoney = Annotated[int, Field(strict=True, ge=0, le=9_007_199_254_740_991)]
+NetAssets = Annotated[int, Field(strict=True, ge=-9_007_199_254_740_991, le=9_007_199_254_740_991)]
+
+
+class MonthlyResult(StrictModel):
+    month: Month
+    cash: CalculatedMoney
+    saved: CalculatedMoney
+    unpaid: CalculatedMoney
+    total: NetAssets
+    income: CalculatedMoney
+    expense: CalculatedMoney
+    short: CalculatedMoney
+
+
+class RunMetrics(StrictModel):
+    goalMonth: Month | None
+    finalNetAssets: NetAssets
+    finalCash: CalculatedMoney
+    finalSaved: CalculatedMoney
+    firstShortageMonth: Month | None
+    shortageMonths: Annotated[int, Field(strict=True, ge=0, le=120)]
+    unmetTotal: CalculatedMoney
+
+
+class EngineResult(StrictModel):
+    engineVersion: Literal["cash-savings-krw-v1"]
+    monthlyResults: list[MonthlyResult] = Field(min_length=2, max_length=121)
+    summary: RunMetrics
+
+
+class RunSummary(StrictModel):
+    id: UUID
+    planId: UUID
+    requestId: UUID
+    planVersion: Literal[1]
+    engineVersion: str
+    months: int
+    createdAt: int
+    summary: RunMetrics
+
+
+class RunDetail(RunSummary):
+    inputSnapshot: dict
+    monthlyResults: list[MonthlyResult]

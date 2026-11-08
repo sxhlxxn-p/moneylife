@@ -5,6 +5,9 @@
   "description": "머니 라이프 독립 금융 계산 엔진",
   "main": "src/index.js",
   "scripts": {
-    "check": "node --check src/index.js"
+    "check": "node --check src/index.js && node --check src/snapshot.cjs && node --check src/runner.cjs"
+  },
+  "dependencies": {
+    "decimal.js": "^10.6.0"
   }
 }

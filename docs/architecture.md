@@ -64,4 +64,4 @@ LLM은 `Server` 내부에서 계산 결과를 설명하되 금융 수치를 직�
 
 ## 첫 통합 이후 상태
 
-Client는 `/api/plans` 프록시로 FastAPI에 현재 여정의 스냅샷을 저장·조회한다. Server는 SQLAlchemy로 Plan과 GuestSession을 저장한다. Compose는 PostgreSQL이며, `dev:server:local`은 명시적인 SQLite 개발 경로다. Engine은 아직 JS로 브라우저에서 실행한다. 서버 계산과 Run 저장은 다음 작업이다. 위의 프레임워크 미정·Server 문서만 존재한다는 설명은 초기 상태 기록이며, 현재 구현 상태는 이 항목을 기준으로 한다.
+Client는 `/api/plans` 프록시로 FastAPI에 현재 여정의 스냅샷을 저장·조회한다. Server는 SQLAlchemy로 Plan과 GuestSession을 저장한다. Compose는 PostgreSQL이며, `dev:server:local`은 명시적인 SQLite 개발 경로다. Engine은 JS로 브라우저 미리보기와 서버 Node 실행에 함께 사용한다. 서버는 원 단위 반올림을 적용해 입력 스냅샷·월별 결과·요약을 Run으로 저장한다. Shared의 계획·서버 계산 계약을 사용한다. 위의 프레임워크 미정·Server 문서만 존재한다는 설명은 초기 상태 기록이며, 현재 구현 상태는 이 항목을 기준으로 한다.

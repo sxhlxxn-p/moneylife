@@ -2,7 +2,7 @@
 
 현재 소득·지출·자산과 목표를 입력하고 생애 이벤트와 조건 변경에 따라 10년의 금융 경로를 비교하는 웹 서비스로 계획해두었습니다. 현재 기술 스택인 HTML·CSS·JavaScript client와 Node.js 개발 서버를 유지하면서 Notion 기획의 workspace 반영 진행하려고 합니다. 
 
-첫 통합 실행 방법: [계획 저장과 복원](docs/first-integration.md).
+첫 통합 실행 방법: [계획 저장·서버 계산·결과 조회](docs/first-integration.md).
 
 ## 시작 안내
 
@@ -66,16 +66,18 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 ## 구현 상태
 
-현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. FastAPI의 계획 저장·목록·조회 API를 Client에 연결했다. DB는 Compose에서 PostgreSQL, Docker 없는 로컬 실행에서는 SQLite를 사용한다. 실제 LLM·토스증권 API·계정 로그인과 서버 계산 실행은 아직 연결되지 않았다.
+현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. FastAPI의 계획 저장·목록·조회 API를 Client에 연결했다. DB는 Compose에서 PostgreSQL, Docker 없는 로컬 실행에서는 SQLite를 사용한다. 서버는 Node로 공통 계산 엔진을 실행하고 입력·버전·월별 결과를 불변 Run으로 저장한다. 실제 LLM·토스증권 API·모의 주식 투자와 계정 로그인은 아직 연결되지 않았다.
 
-현재 실행은 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용한다. React·TypeScript 전환, 서버 프레임워크와 스키마 라이브러리 선택은 후속 합의 사항이다.
+현재 실행은 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용한다. 서버는 FastAPI·SQLAlchemy·Pydantic을 사용한다. React·TypeScript 전환은 후속 작업이다.
 
 ## 데이터와 비밀정보
 
-- 현재 프로토타입 금액 단위는 만 원이며, 공통 API 계약에서는 정수 원 단위로 통일할 예정이다.
+- 현재 프로토타입 금액 단위는 만 원이며, 공통 API와 서버 계산은 정수 원 단위를 사용한다.
 - 실제 키와 토큰은 `.env`에만 두고 Git에 올리지 않는다.
 - 필요한 변수 이름은 `.env.example`에 기록한다.
 - 실제 계좌·개인 식별 데이터는 `fixtures`와 `Test`에 넣지 않는다.
+
+모의 주식 투자 확장 범위는 [개발 명세](docs/paper-trading-plan.md)를 참고한다.
 
 ## 협업
 

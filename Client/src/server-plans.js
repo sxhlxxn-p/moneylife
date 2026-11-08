@@ -8,11 +8,11 @@ function setPlanBusy(busy) {
   for (const button of document.querySelectorAll('[data-plan-action]')) button.disabled = busy;
 }
 
-async function planRequest(path, options = {}) {
+async function apiRequest(resource, path, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    const response = await fetch('/api/plans' + path, {
+    const response = await fetch('/api/' + resource + path, {
       ...options,
       credentials: 'same-origin',
       headers: {'Content-Type': 'application/json'},
@@ -21,7 +21,7 @@ async function planRequest(path, options = {}) {
     if (!response.ok) {
       if (response.status === 401) throw new Error('저장 세션이 만료됐어요. 현재 여정은 이 기기에 남아 있어요.');
       if (response.status === 422) throw new Error('입력이나 이벤트 적용 후 금액·기간을 확인해주세요.');
-      if (response.status === 404) throw new Error('계획을 찾을 수 없어요. 현재 여정은 유지됩니다.');
+      if (response.status === 404) throw new Error('저장된 계획이나 계산 결과를 찾을 수 없어요.');
       throw new Error('서버에 연결하지 못했어요. 현재 여정은 이 기기에 남아 있어요.');
     }
     return await response.json();
@@ -34,10 +34,14 @@ async function planRequest(path, options = {}) {
   }
 }
 
+function planRequest(path, options) { return apiRequest('plans', path, options); }
+function simulationRequest(path, options) { return apiRequest('simulations', path, options); }
+
 async function saveServerPlan() {
   if (serverPlanBusy) return;
   stop();
   setPlanBusy(true);
+  let planSaved = false;
   try {
     const state = MoneyLifePlanState.encode({start, month, baseSaving, baseRate, mods, rateMods, logs, events});
     const plan = await planRequest('', {
@@ -45,12 +49,19 @@ async function saveServerPlan() {
       body: JSON.stringify({schemaVersion: 1, goalBasis: 'net_assets', parentPlanId: serverPlanId, state})
     });
     serverPlanId = plan.id;
+    planSaved = true;
     try { localStorage.setItem('money-life-server-plan', plan.id); } catch {}
-    $('serverstatus').textContent = `${state.month}개월 시점 서버 저장 완료`;
-    toast('현재 시점의 새 사본을 서버에 저장했어요.');
+    $('serverstatus').textContent = '계획을 저장했어요. 서버에서 계산 중이에요.';
+    await simulationRequest('', {
+      method: 'POST',
+      body: JSON.stringify({planId: plan.id, requestId: crypto.randomUUID(), months: 120})
+    });
+    $('serverstatus').textContent = `${state.month}개월 시점 서버 저장 완료 · 계산 결과 보관`;
+    toast('여정과 서버 계산 결과를 새 사본으로 저장했어요.');
   } catch (error) {
-    $('serverstatus').textContent = error.message;
-    toast(error.message);
+    const message = planSaved ? '계획은 저장됐지만 계산을 완료하지 못했어요. 저장한 여정은 유지됩니다.' : error.message;
+    $('serverstatus').textContent = message;
+    toast(message);
   } finally {
     setPlanBusy(false);
   }
@@ -116,6 +127,57 @@ async function loadServerPlan(id) {
     render();
     $('serverstatus').textContent = `${month}개월 시점 서버에서 불러옴`;
     toast('저장된 조건과 선택 기록을 불러왔어요.');
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    setPlanBusy(false);
+  }
+}
+
+
+async function openServerResult() {
+  if (serverPlanBusy) return;
+  if (!serverPlanId) {
+    toast('먼저 서버 계산·저장을 누르거나 저장한 여정을 불러와주세요.');
+    return;
+  }
+  stop();
+  setPlanBusy(true);
+  try {
+    const runs = await simulationRequest('?planId=' + encodeURIComponent(serverPlanId) + '&limit=1');
+    if (!runs.length) {
+      toast('이 여정에는 계산 결과가 없어요. 서버 계산·저장을 눌러주세요.');
+      return;
+    }
+    const run = await simulationRequest('/' + encodeURIComponent(runs[0].id));
+    show('<h2>서버 계산 결과</h2><p id="runstatus"></p><div id="runsummary" class="run-summary"></div><details class="run-details"><summary>월별 자산 상세 보기</summary><div class="run-table-scroll"><table><thead><tr><th>경과 월</th><th>현금</th><th>저축</th><th>누적 미충족액</th><th>총자산</th></tr></thead><tbody id="runmonths"></tbody></table></div></details>');
+    $('runstatus').textContent = `저장한 조건으로 ${run.months}개월을 계산한 결과입니다. 이자는 매월 원 단위로 반올림합니다. 현재 화면의 미리보기와 소액 차이가 날 수 있어요.`;
+    const currency = value => value.toLocaleString('ko-KR') + '원';
+    const goal = run.summary.goalMonth;
+    const metrics = [
+      ['목표 최초 달성', goal === null ? '기간 내 미달성' : goal === 0 ? '시작 시점' : goal + '개월차'],
+      ['기간 말 총자산', currency(run.summary.finalNetAssets)],
+      ['현금 부족 기간', run.summary.shortageMonths + '개월'],
+      ['누적 미충족액', currency(run.summary.unmetTotal)]
+    ];
+    for (const [label, value] of metrics) {
+      const card = document.createElement('div');
+      const caption = document.createElement('small');
+      const amount = document.createElement('strong');
+      caption.textContent = label;
+      amount.textContent = value;
+      card.append(caption, amount);
+      $('runsummary').append(card);
+    }
+    for (const row of run.monthlyResults) {
+      const tr = document.createElement('tr');
+      for (const value of [row.month + '개월', currency(row.cash), currency(row.saved), currency(row.unpaid), currency(row.total)]) {
+        const td = document.createElement('td');
+        td.textContent = value;
+        tr.append(td);
+      }
+      $('runmonths').append(tr);
+    }
   } catch (error) {
     toast(error.message);
   } finally {
