@@ -1,6 +1,6 @@
 # API 명세 초안
 
-현재 Server API는 미구현이며 아래 계약은 Client·Server 통합을 위한 기준 초안이다.
+계획 스냅샷 생성·목록·조회 API는 구현했다. 계산 실행·비교·LLM API는 후속 구현 대상이다. 이번 통합 계약은 `../Shared/plan-contract.md`, 실행 안내는 `first-integration.md`를 참고한다.
 
 ## 데이터 경계
 
@@ -13,7 +13,7 @@
 
 ## 엔드포인트 초안
 
-- `POST /plans`, `GET /plans/{id}`
+- 구현: `POST /plans`, `GET /plans?limit=20&offset=0`, `GET /plans/{id}`
 - `POST /plans/{id}/branches`
 - `POST /simulations`, `GET /simulations/{id}`
 - `POST /comparisons`

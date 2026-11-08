@@ -80,3 +80,9 @@ Server/
 요청 검증과 단위 변환은 API 경계에서 수행하고, 금융 결과는 `../Engine`을 호출해 계산한다. API 초안은 `../docs/api-contract.md`, 계산 규칙은 `../docs/simulation-rules.md`, 화면 연결은 `../docs/FRONTEND_HANDOFF.md`를 참고한다.
 
 LLM과 외부 자산 조회는 장애가 발생해도 수동 시뮬레이션이 동작하도록 어댑터 경계로 분리한다. 실제 키와 인증정보는 서버 환경변수로만 관리하며 응답, 로그, LLM 입력에 포함하지 않는다.
+
+## 계획 저장 API와 Docker 없는 실행
+
+`POST /plans`, `GET /plans`, `GET /plans/{id}`를 구현했다. 현재 여정의 입력과 선택 기록을 새 스냅샷으로 저장하며, 게스트 세션 소유권을 검사한다. 브라우저는 Client 개발 서버의 `/api` 프록시를 사용한다.
+
+Docker가 없으면 가상환경에서 의존성을 설치한 뒤 루트의 `npm run dev:server:local`을 실행한다. 이 명령만 DATABASE_URL 미설정 시 SQLite `.data/dev.db`를 사용한다. Compose의 PostgreSQL 기본값은 유지한다. `aiosqlite`는 이 로컬 실행과 영속성 테스트용 드라이버다. 자세한 명령과 검증 범위는 [실행 안내](../docs/first-integration.md)를 따른다.

@@ -61,3 +61,7 @@ LLM은 `Server` 내부에서 계산 결과를 설명하되 금융 수치를 직�
 4. PostgreSQL 초기화와 테스트 명령 확정
 5. 배포 방식과 환경변수 이름 검토
 
+
+## 첫 통합 이후 상태
+
+Client는 `/api/plans` 프록시로 FastAPI에 현재 여정의 스냅샷을 저장·조회한다. Server는 SQLAlchemy로 Plan과 GuestSession을 저장한다. Compose는 PostgreSQL이며, `dev:server:local`은 명시적인 SQLite 개발 경로다. Engine은 아직 JS로 브라우저에서 실행한다. 서버 계산과 Run 저장은 다음 작업이다. 위의 프레임워크 미정·Server 문서만 존재한다는 설명은 초기 상태 기록이며, 현재 구현 상태는 이 항목을 기준으로 한다.

@@ -2,13 +2,14 @@ import os
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.database import check_database_connection, close_database_connection
+from app.database import check_database_connection, close_database_connection, initialize_database, database_kind
+from app.plans import router as plans_router
 
 
 class HealthResponse(BaseModel):
@@ -22,8 +23,11 @@ class DatabaseHealthResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    yield
-    await close_database_connection()
+    await initialize_database()
+    try:
+        yield
+    finally:
+        await close_database_connection()
 
 
 app = FastAPI(
@@ -54,6 +58,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(plans_router)
+
+
+@app.exception_handler(SQLAlchemyError)
+async def database_error(_: Request, __: SQLAlchemyError) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"detail": "DATABASE_UNAVAILABLE"})
 
 
 @app.get("/", include_in_schema=False)
@@ -86,8 +97,8 @@ async def database_health() -> DatabaseHealthResponse | JSONResponse:
     except (SQLAlchemyError, RuntimeError):
         response = DatabaseHealthResponse(
             status="unavailable",
-            database="postgresql",
+            database=database_kind(),
         )
         return JSONResponse(status_code=503, content=response.model_dump())
 
-    return DatabaseHealthResponse(status="ok", database="postgresql")
+    return DatabaseHealthResponse(status="ok", database=database_kind())
