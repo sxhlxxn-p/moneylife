@@ -2,7 +2,7 @@
 from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
-from pydantic import Field
+from pydantic import Field, field_validator
 from app.schemas import (StrictModel, GameState, CalculatedMoney, NetAssets,
                          Month, MonthlyResult, RunMetrics, EngineResult)
 
@@ -205,3 +205,30 @@ class OrderPreviewDetail(OrderPreviewValues):
     quantity: Quantity
     month: Month
     executionMonth: Month
+
+class PaperExplainCreate(StrictModel):
+    useAI: Literal[True]
+
+    @field_validator('useAI', mode='before')
+    @classmethod
+    def explicit_ai_request(cls, value):
+        if value is not True:
+            raise ValueError('Explicit AI request required')
+        return value
+
+class ExplanationSection(StrictModel):
+    id: Literal['comparison', 'portfolio', 'pnl', 'goal', 'liquidity', 'orders', 'assumptions', 'valuation']
+    title: str
+    text: str
+
+class PaperExplainDetail(StrictModel):
+    runId: UUID
+    paperPlanId: UUID
+    throughMonth: Month
+    sections: list[ExplanationSection] = Field(min_length=4, max_length=7)
+    source: Literal['template', 'llm-ranked']
+    attempts: Annotated[int, Field(strict=True, ge=0, le=2)]
+    fallbackReason: str | None
+    cached: bool
+    promptVersion: str
+    verifiedFacts: Literal[True]

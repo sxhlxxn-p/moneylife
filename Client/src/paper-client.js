@@ -4,6 +4,7 @@ const PaperTrading = (() => {
   const referenceKey = 'money-life-paper-plan';
   const pendingKey = 'money-life-paper-pending';
   let current = null;
+  const explanations = new Map();
   let sources = [];
   let selectedSeriesId = null;
   let pending = null;
@@ -120,7 +121,7 @@ const PaperTrading = (() => {
       node('p', `현재 순자산 차이 ${signed(comparison.finalAssetsDifference)} · 투자 ${won(final.total)} / 비투자 ${won(baseline.summary.finalNetAssets)}`),
       node('p', `목표 최초 달성: 투자 ${goal(invested.summary.goalMonth)} / 비투자 ${goal(baseline.summary.goalMonth)}`),
       node('p', `현금 부족: 투자 ${invested.summary.shortageMonths}개월 / 비투자 ${baseline.summary.shortageMonths}개월 · 투자 계획 미충족 지출 ${won(final.unpaid)}`));
-    root.append(compare);
+    root.append(compare, explanationPanel(run.id));
     const tableBox = node('details', undefined, 'paper-history');
     tableBox.append(node('summary', `체결·거부 기록 ${invested.executions.length}건`));
     const scroll = node('div', undefined, 'run-table-scroll');
@@ -135,6 +136,51 @@ const PaperTrading = (() => {
       body.append(row);
     }
     table.append(body); scroll.append(table); tableBox.append(scroll); root.append(tableBox);
+  }
+  function explanationPanel(runId) {
+    const section = node('section', undefined, 'paper-explanation');
+    section.setAttribute('aria-label', '투자 결과 해설');
+    section.append(node('h4', '이 결과는 어떻게 읽을까요?'),
+      node('p', '저장된 실행 결과의 숫자와 방향을 연결해 설명해요. 기본 해설은 외부 AI를 호출하지 않아요.', 'paper-caption'));
+    const actions = node('div', undefined, 'paper-toolbar');
+    const body = node('div', undefined, 'paper-explanation-facts');
+    const status = node('p', '', 'paper-caption'); status.setAttribute('role', 'status');
+    function display(result) {
+      body.replaceChildren();
+      for (const fact of result.sections) {
+        const card = node('article');
+        card.append(node('h5', fact.title), node('p', fact.text)); body.append(card);
+      }
+      if (result.source === 'llm-ranked') {
+        status.textContent = 'AI가 선택·정렬한 지표 해설 · 문장과 수치는 서버 계산 결과에 연결했어요.' + (result.cached ? ' 저장된 선택을 다시 불러왔어요.' : '');
+      } else {
+        status.textContent = result.fallbackReason === 'LLM_NOT_CONFIGURED'
+          ? 'AI 연결 설정 전이라 기본 계산 지표 해설을 표시했어요.'
+          : result.fallbackReason ? 'AI 선택을 확인하지 못해 기본 계산 지표 해설로 표시했어요.'
+          : '기본 계산 지표 해설 · LLM이 작성한 문장이 아닙니다.';
+      }
+    }
+    async function explain(useAI) {
+      if (!available() || !current || current.run.id !== runId) return;
+      setPlanBusy(true); status.textContent = useAI ? 'AI가 읽기 순서를 정리하는 중이에요.' : '저장된 결과를 읽는 중이에요.';
+      try {
+        const result = await apiRequest('paper-runs', '/' + encodeURIComponent(runId) + '/explanation',
+          useAI ? {method: 'POST', timeoutMs: 25000, body: JSON.stringify({useAI: true})} : {});
+        if (!current || current.run.id !== runId) return;
+        explanations.set(runId, result);
+        if (explanations.size > 20) explanations.delete(explanations.keys().next().value);
+        if (section.isConnected) display(result);
+      } catch (error) {
+        if (section.isConnected) status.textContent = error.message + ' 저장된 투자 결과와 주문은 유지됩니다.';
+      } finally { setPlanBusy(false); }
+    }
+    actions.append(button('기본 해설 보기', () => explain(false), Boolean(pending)),
+      button('AI로 핵심 지표 정리', () => explain(true), Boolean(pending)));
+    section.append(actions,
+      node('p', 'AI 버튼을 누르면 이 실행의 해설용 금융 지표 문장이 외부 AI에 전송돼요. 이름·계좌·가격 원본은 전송하지 않아요. AI는 사실의 선택과 읽기 순서만 정합니다.', 'paper-explanation-notice'),
+      status, body);
+    if (explanations.has(runId)) display(explanations.get(runId));
+    return section;
   }
   function chart(invested, baseline) {
     const wrap = node('figure', undefined, 'paper-chart');

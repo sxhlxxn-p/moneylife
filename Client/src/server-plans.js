@@ -32,6 +32,7 @@ async function apiRequest(resource, path, options = {}) {
           REQUEST_ID_CONFLICT: '요청 번호가 다른 내용에 사용됐어요. 저장한 투자 연습을 확인해주세요.',
           MARKET_CATALOG_INVALID: '등록된 가격 자료의 형식을 확인해주세요. 기존 저장 결과는 유지됩니다.',
           MARKET_CATALOG_LIMIT: '등록된 가격 자료 수를 확인해주세요.',
+          EXPLANATION_INPUT_INVALID: '저장된 결과의 지표를 확인하지 못해 해설을 표시할 수 없어요.',
           ORDER_VALUE_TOO_LARGE: '참고 거래대금이 계산 범위를 넘었어요. 수량을 줄여주세요.',
           ORDER_LIMIT_EXCEEDED: '이 계획의 주문 수가 한도에 도달했어요.',
           ENGINE_OUTPUT_INVALID: '계산 결과를 확인하지 못했어요. 같은 요청을 다시 확인해주세요.',
