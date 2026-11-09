@@ -13,7 +13,7 @@ const PaperTrading = (() => {
     reference = localStorage.getItem(referenceKey);
     const saved = JSON.parse(localStorage.getItem(pendingKey));
     // Only replay the three allowed commands, never arbitrary stored URLs.
-    if (saved && ['create', 'orders', 'advance', 'cancel'].includes(saved.action) &&
+    if (saved && ['create', 'orders', 'advance', 'cancel', 'conditions'].includes(saved.action) &&
         typeof saved.body?.requestId === 'string' &&
         (saved.action === 'create' || /^[a-f0-9-]{36}$/.test(saved.parentId)) &&
         (saved.action !== 'cancel' || /^[a-f0-9-]{36}$/.test(saved.orderId))) pending = saved;
@@ -57,6 +57,7 @@ const PaperTrading = (() => {
     const controls = node('div', undefined, 'paper-toolbar');
     controls.append(button('새 투자 연습', () => setup(), Boolean(pending)),
       button('저장한 투자 연습', () => list(), Boolean(pending)));
+    if (current) controls.append(button('생활 조건 변경', editConditions, Boolean(pending) || current.plan.month >= current.plan.source.lastMonth));
     root.append(controls);
     if (pending) {
       const box = node('div', undefined, 'paper-warning');
@@ -75,6 +76,7 @@ const PaperTrading = (() => {
     const position = final.investment;
     const heading = node('div', undefined, 'paper-heading');
     heading.append(node('h3', plan.name), node('span', `${plan.month} / ${plan.source.lastMonth}개월 · 가격 기준 ${marketDate(plan.source, plan.month)}`, 'paper-date'));
+    if (plan.action === 'conditions') root.append(node('p', '생활 조건을 바꾼 사본이에요. 새 조건은 다음 달부터 반영되며 지금까지의 자산과 거래 기록은 유지됩니다.', 'paper-status'));
     root.append(heading, node('p', `${plan.source.symbol} · ${dataLabel(plan.source)} · 수수료·세율 0 가정`, 'paper-caption'));
     if (plan.source.dataKind === 'historical-market') {
       const provenance = node('div', undefined, 'paper-provenance');
@@ -334,6 +336,81 @@ const PaperTrading = (() => {
       if (container.isConnected && !$('overlay').classList.contains('hidden')) container.querySelector('button')?.focus();
     }
   }
+  async function editConditions() {
+    if (!available() || !current) return;
+    const planId = current.plan.id;
+    const source = current.plan.source;
+    setPlanBusy(true);
+    show('<div id="paperconditions"><div class="eyebrow">생활 조건 변경</div><h2>다음 달 조건을 확인하고 있어요</h2><p role="status">저장된 조건을 불러옵니다. 아직 변경하지 않았어요.</p></div>');
+    const container = $('paperconditions');
+    try {
+      const data = await apiRequest('paper-plans', '/' + encodeURIComponent(planId) + '/conditions');
+      if (!container.isConnected || $('overlay').classList.contains('hidden')) return;
+      if (!data.canEdit) {
+        container.replaceChildren(node('h2', '이 사본은 마지막 달이에요'), node('p', '새 투자 연습을 시작하거나 이전 시점을 불러와 조건을 바꿀 수 있어요.'), button('돌아가기', closeModal));
+        return;
+      }
+      const fields = [['income', '월 소득'], ['expense', '월 생활비'], ['monthlySaving', '월 저축 이체액']];
+      const draft = {...data.values};
+      function form() {
+        container.replaceChildren(node('div', '생활 조건 변경', 'eyebrow'), node('h2', '다음 달부터 어떻게 바꿀까요?'),
+          node('p', `적용 구간: ${data.appliesFrom}~${data.appliesThrough}개월차 · 주가 기준 ${marketDate(source, data.appliesFrom)}부터. 금액은 원 단위예요.`));
+        const grid = node('div', undefined, 'fields');
+        for (const [field, title] of fields) {
+          const label = node('label', title + ' · 원'); label.htmlFor = 'papercondition-' + field;
+          const input = node('input'); input.type = 'number'; input.id = label.htmlFor;
+          input.min = '0'; input.step = '1'; input.inputMode = 'numeric'; input.value = String(draft[field]);
+          input.dataset.planAction = 'paper-condition-input';
+          label.append(input); grid.append(label);
+        }
+        container.append(grid, node('p', '바꾼 항목만 지원 기간 마지막 달까지 입력 금액으로 설정해요. 해당 항목에 예약된 미래 변동도 이 금액에 맞춰 조정합니다. 나머지 항목·일회성 지출·보유 주식·대기 주문은 유지돼요.', 'paper-caption'));
+        const error = node('p', '', 'paper-condition-error'); error.id = 'papercondition-error'; error.setAttribute('role', 'status'); container.append(error);
+        const actions = node('div', undefined, 'modalactions');
+        actions.append(button('변경 없이 닫기', closeModal), button('변경 내용 확인', () => {
+          if (!available()) return;
+          const values = {};
+          for (const [field, title] of fields) {
+            const input = $('papercondition-' + field);
+            const value = Number(input.value);
+            if (input.value.trim() === '' || !Number.isSafeInteger(value) || value < 0 || (value !== data.values[field] && value > 10000000000)) {
+              error.textContent = title + '은 0~100억원의 정수 원으로 입력해주세요.'; input.focus(); return;
+            }
+            draft[field] = value;
+            if (value !== data.values[field]) values[field] = value;
+          }
+          if (!Object.keys(values).length) { error.textContent = '바꿀 금액을 한 항목 이상 입력해주세요.'; return; }
+          review(values);
+        }, false, true));
+        container.append(actions);
+      }
+      function review(values) {
+        container.replaceChildren(node('div', '변경 전 확인', 'eyebrow'), node('h2', '이 조건으로 새 사본을 만들까요?'),
+          node('p', `${data.appliesFrom}~${data.appliesThrough}개월차에 반영해요. 지금까지의 자산과 거래 결과는 바뀌지 않아요.`));
+        const grid = node('div', undefined, 'paper-review-grid');
+        for (const [field, title] of fields) {
+          if (!(field in values)) continue;
+          const card = node('div'); card.append(node('small', title), node('strong', won(data.values[field]) + ' → ' + won(values[field]))); grid.append(card);
+        }
+        container.append(grid, node('p', '새 조건의 자산 변화는 다음 달로 진행하면 확인할 수 있어요. 이 화면은 미래 주가나 수익을 계산하지 않습니다. 기존 사본은 저장 목록에 남아요.', 'paper-caption'));
+        const actions = node('div', undefined, 'modalactions');
+        actions.append(button('다시 수정', () => { form(); container.querySelector('input')?.focus(); }),
+          button('다음 달부터 적용', () => {
+            if (!available()) return;
+            if (!current || current.plan.id !== planId || data.paperPlanId !== planId) {
+              closeModal(); message('투자 사본이 바뀌었어요. 조건을 다시 확인해주세요.'); return;
+            }
+            closeModal(); command('conditions', {values});
+          }, false, true));
+        container.append(actions); actions.querySelector('button')?.focus();
+      }
+      form();
+    } catch (error) {
+      if (container.isConnected && !$('overlay').classList.contains('hidden')) container.replaceChildren(node('h2', '조건을 불러오지 못했어요'), node('p', error.message), button('돌아가기', closeModal));
+    } finally {
+      setPlanBusy(false);
+      if (container.isConnected && !$('overlay').classList.contains('hidden')) container.querySelector('input, button')?.focus();
+    }
+  }
   function reviewCancellation(order) {
     if (!available() || !current) return;
     const planId = current.plan.id;
@@ -373,7 +450,7 @@ const PaperTrading = (() => {
       // Store the returned reference before clearing the recoverable command.
       remember(result);
       localStorage.removeItem(pendingKey); pending = null;
-      message(request.action === 'cancel' ? '대기 주문을 취소한 새 사본을 저장했어요. 이전 기록은 유지됩니다.' : request.action === 'orders' ? '주문을 예약했어요. 다음 달로 진행하면 체결 여부를 확인할 수 있어요.' : request.action === 'advance' ? '월 진행 결과와 체결 기록을 저장했어요.' : '투자 연습을 시작했어요. 모든 금액은 원 단위입니다.');
+      message(request.action === 'conditions' ? '생활 조건을 변경한 새 사본을 저장했어요. 다음 달부터 반영됩니다.' : request.action === 'cancel' ? '대기 주문을 취소한 새 사본을 저장했어요. 이전 기록은 유지됩니다.' : request.action === 'orders' ? '주문을 예약했어요. 다음 달로 진행하면 체결 여부를 확인할 수 있어요.' : request.action === 'advance' ? '월 진행 결과와 체결 기록을 저장했어요.' : '투자 연습을 시작했어요. 모든 금액은 원 단위입니다.');
       $('paperentry-status').textContent = `${result.plan.name} · ${result.plan.month}개월차 저장됨`;
     } catch (error) {
       // A definite validation failure can be corrected. Uncertain transport/server failures keep the ID.
@@ -391,7 +468,7 @@ const PaperTrading = (() => {
       const box = node('div', undefined, 'saved-plans');
       box.append(node('h3', '저장한 투자 연습'), node('p', '주문·월 진행마다 보관된 시점이에요. 이전 시점에서 다른 선택을 시작할 수 있어요.'));
       if (!plans.length) box.append(node('p', '저장된 투자 연습이 없어요.'));
-      for (const plan of plans) box.append(button(`${plan.name} · ${plan.month}개월${plan.action === 'cancel' ? ' · 주문 취소' : ''} · ${new Date(plan.createdAt / 1000).toLocaleString('ko-KR')}`, () => load(plan.id)));
+      for (const plan of plans) box.append(button(`${plan.name} · ${plan.month}개월${plan.action === 'cancel' ? ' · 주문 취소' : plan.action === 'conditions' ? ' · 생활 조건 변경' : ''} · ${new Date(plan.createdAt / 1000).toLocaleString('ko-KR')}`, () => load(plan.id)));
       const pages = node('div', undefined, 'paper-toolbar');
       if (offset) pages.append(button('이전 목록', () => list(Math.max(0, offset - 20))));
       if (plans.length === 20) pages.append(button('다음 목록', () => list(offset + 20)));

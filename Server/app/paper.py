@@ -1,5 +1,6 @@
 """Immutable guest paper-trading snapshots. Author: sxhlxxn / 202439688."""
 from copy import deepcopy
+from pydantic import ValidationError
 import time
 from uuid import UUID, uuid4
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
@@ -7,13 +8,15 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
+from app.ai_changes import effective, build_candidate, month_name, month_number
+from app.ai_schemas import ChangeIntent
 from app.models import PaperPlan, PaperRun
 from app.plans import get_owner, owned_plan
 from app.market import load_series, source, catalog_sources
 from app.investment_engine import calculate_investment, calculate_order_preview
 from app.paper_schemas import (PaperCreate, PaperOrderCreate, PaperAdvance, PaperCancel,
     PaperSummary, PaperDetail, PaperRunDetail, PaperBundle, MarketSource, MarketView,
-    OrderPreviewCreate, OrderPreviewDetail)
+    OrderPreviewCreate, OrderPreviewDetail, PaperConditionsCreate, PaperConditionsDetail)
 
 router = APIRouter(tags=['paper-trading'])
 
@@ -32,7 +35,7 @@ async def stored_run(plan: PaperPlan, session: AsyncSession) -> PaperRun:
 def detail(plan: PaperPlan, run: PaperRun, *, include_state=True) -> dict:
     action = plan.command.get('kind')
     result = {'id': plan.id, 'parentPaperPlanId': plan.parent_id,
-        'action': action if action in ('create', 'order', 'advance', 'cancel') else None,
+        'action': action if action in ('create', 'order', 'advance', 'cancel', 'conditions') else None,
         'financialPlanId': plan.financial_plan_id, 'name': plan.state['initial']['name'],
         'month': plan.state['month'], 'source': source(plan.market_snapshot),
         'runId': run.id, 'createdAt': plan.created_at}
@@ -224,3 +227,45 @@ async def cancel_order(plan_id: UUID, order_id: UUID, payload: PaperCancel, resp
     orders = [o for o in parent.orders if o['id'] != str(order_id)]
     return await save(owner, str(payload.requestId), command, parent.financial_plan_id,
                       parent.id, parent.state, orders, parent.market_snapshot, session)
+
+
+@router.get('/paper-plans/{plan_id}/conditions', response_model=PaperConditionsDetail)
+async def read_conditions(plan_id: UUID, response: Response,
+                          owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+    response.headers['Cache-Control'] = 'no-store'
+    plan = await owned_paper(str(plan_id), owner, session)
+    can_edit = plan.state['month'] < plan.market_snapshot['lastMonth']
+    applies_from = plan.state['month'] + 1 if can_edit else None
+    return {'paperPlanId': plan.id, 'month': plan.state['month'], 'canEdit': can_edit,
+        'appliesFrom': applies_from, 'appliesThrough': plan.market_snapshot['lastMonth'],
+        'values': {field: effective(plan.state, field, applies_from if can_edit else plan.state['month'])
+                   for field in ('income', 'expense', 'monthlySaving')}}
+
+
+@router.post('/paper-plans/{plan_id}/conditions', response_model=PaperBundle, status_code=201)
+async def change_conditions(plan_id: UUID, payload: PaperConditionsCreate, response: Response,
+                            owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+    response.headers['Cache-Control'] = 'no-store'
+    values = payload.values.model_dump(exclude_unset=True)
+    command = {'kind': 'conditions', 'parentId': str(plan_id), 'values': values}
+    prior = await existing(owner, str(payload.requestId), command, session)
+    if prior is not None:
+        return prior
+    parent = await owned_paper(str(plan_id), owner, session)
+    begin, end = parent.state['month'] + 1, parent.market_snapshot['lastMonth']
+    if begin > end:
+        raise HTTPException(409, 'SERIES_PERIOD_EXCEEDED')
+    changed = {field: value for field, value in values.items()
+               if any(effective(parent.state, field, month) != value for month in range(begin, end + 1))}
+    if not changed:
+        raise HTTPException(409, 'CONDITIONS_UNCHANGED')
+    start = month_number(parent.state['startMonth'])
+    intents = [ChangeIntent(field=field, operation='set', amount=value,
+                           startMonth=month_name(start + begin), endMonth=month_name(start + end))
+               for field, value in changed.items()]
+    try:
+        state, _ = build_candidate(parent.state, intents)
+    except (ValidationError, ValueError):
+        raise HTTPException(422, 'CONDITIONS_INVALID') from None
+    return await save(owner, str(payload.requestId), command, parent.financial_plan_id,
+                      parent.id, state, parent.orders, parent.market_snapshot, session)
