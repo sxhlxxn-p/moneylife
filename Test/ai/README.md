@@ -12,7 +12,7 @@
 .venv/bin/python Test/ai/evaluate.py --mode rules --split dev --output .data/ai-evaluation/rules-dev.json
 ```
 
-모델 연결 후 먼저 개발 문장 하나로 실제 연결을 확인한다. API를 실행하는 환경과 동일하게 OPENAI_API_KEY, LLM_MODEL, LLM_PROVIDER=openai를 설정한다. 아래 명령은 실제 외부 API 호출을 발생시킨다.
+모델 연결 후 먼저 개발 문장 하나로 실제 연결을 확인한다. API와 동일하게 Server/.env 또는 환경변수의 OPENAI_API_KEY, LLM_MODEL, LLM_PROVIDER=openai를 읽는다. `npm run setup:llm`과 `npm run check:llm -- --live`로 먼저 설정·연결을 확인할 수 있다. 아래 명령은 실제 외부 API 호출을 발생시킨다.
 
 ```bash
 .venv/bin/python Test/ai/evaluate.py --mode structured --split dev --case-id single_set-01 --repetitions 1 --output .data/ai-evaluation/smoke.json
@@ -49,3 +49,5 @@ wrongApplications는 오프라인에서 서버 검증에 통과했지만 정답�
 `reports/rules-dev-v1.json`: 개발 60건을 3회 실행한 규칙 기준선이다. 46/60건 완전 일치(76.7%), ready 정답의 조건 일치 34/48건(70.8%), 검증 통과한 잘못된 변경 0건이다. 복합·기간 요청의 지원 범위가 좁아 많은 요청을 재질문으로 돌렸다. 개발 세트에서 보수적 거부 규칙을 보완했으므로 최종 일반화 성능이 아니다.
 
 실제 LLM은 키와 모델이 없어 호출하지 않았다. 규칙 결과와 모의 HTTP 테스트를 LLM 성능으로 해석하지 않는다. 최종 평가 40건의 모델 결과도 아직 없다.
+
+저장된 rules-dev-v1 보고서는 해당 커밋에서의 기준선이다. 이후 검증/연결 코드가 바뀌었으면 최신 코드에서 개발 보고서를 다시 생성한 뒤 최종 평가 설정으로 사용한다. 해시가 다른 과거 보고서는 의도적으로 거부한다.

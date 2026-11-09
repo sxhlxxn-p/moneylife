@@ -8,6 +8,7 @@ import httpx
 from pydantic import ValidationError
 
 from app.ai_schemas import Extraction
+from app.settings import configuration_status
 
 
 PROMPT_VERSION = 'plan-change-v1'
@@ -43,7 +44,9 @@ def schema(output_type=Extraction):
 async def request_raw(message: str, context: dict, *, structured: bool = True) -> dict:
     key = os.getenv('OPENAI_API_KEY')
     model = os.getenv('LLM_MODEL')
-    if not key or not model or os.getenv('LLM_PROVIDER', 'openai') != 'openai':
+    if not configuration_status()['providerSupported']:
+        raise HTTPException(503, detail='LLM_PROVIDER_UNSUPPORTED')
+    if configuration_status()['missing']:
         raise HTTPException(503, detail='LLM_NOT_CONFIGURED')
     body = {
         'model': model, 'store': False, 'max_output_tokens': 2500,
@@ -60,7 +63,9 @@ async def request_raw(message: str, context: dict, *, structured: bool = True) -
 async def call_response(body: dict, timeout: int = 20, prompt_version: str = PROMPT_VERSION) -> dict:
     key = os.getenv('OPENAI_API_KEY')
     model = os.getenv('LLM_MODEL')
-    if not key or not model or os.getenv('LLM_PROVIDER', 'openai') != 'openai':
+    if not configuration_status()['providerSupported']:
+        raise HTTPException(503, detail='LLM_PROVIDER_UNSUPPORTED')
+    if not key or not key.strip() or not model or not model.strip():
         raise HTTPException(503, detail='LLM_NOT_CONFIGURED')
     started = time.perf_counter()
     try:
@@ -68,6 +73,10 @@ async def call_response(body: dict, timeout: int = 20, prompt_version: str = PRO
             response = await client.post('https://api.openai.com/v1/responses', json=body,
                                          headers={'Authorization': f'Bearer {key}'})
         response.raise_for_status()
+    except httpx.HTTPStatusError as error:
+        raise HTTPException(503, detail=provider_error(error.response)) from None
+    except httpx.TimeoutException:
+        raise HTTPException(503, detail='LLM_TIMEOUT') from None
     except httpx.HTTPError:
         raise HTTPException(503, detail='LLM_UNAVAILABLE') from None
     try:
@@ -83,6 +92,28 @@ async def call_response(body: dict, timeout: int = 20, prompt_version: str = PRO
                 'usage': data.get('usage'), 'model': model, 'promptVersion': prompt_version}
     except (ValidationError, ValueError, KeyError, TypeError, AttributeError):
         raise HTTPException(502, detail='MODEL_OUTPUT_INVALID') from None
+
+
+def provider_error(response):
+    # Never return provider messages: they can contain request details or credentials.
+    try:
+        error = response.json().get('error', {})
+        codes = {error.get('code'), error.get('type')}
+    except (ValueError, TypeError, AttributeError):
+        codes = set()
+    if response.status_code == 401:
+        return 'LLM_AUTHENTICATION_FAILED'
+    if 'model_not_found' in codes or response.status_code == 404:
+        return 'LLM_MODEL_UNAVAILABLE'
+    if response.status_code == 403:
+        return 'LLM_ACCESS_DENIED'
+    if response.status_code == 429:
+        quota = {'insufficient_quota', 'credit_balance_exhausted', 'project_spend_limit_exceeded',
+                 'organization_spend_limit_exceeded', 'organization_usage_limit_exceeded'}
+        return 'LLM_QUOTA_EXCEEDED' if codes & quota else 'LLM_RATE_LIMITED'
+    if response.status_code == 400:
+        return 'LLM_REQUEST_INVALID'
+    return 'LLM_UNAVAILABLE'
 
 
 def parse_extraction(text: str) -> Extraction:

@@ -206,4 +206,4 @@ def test_provider_adapter_uses_schema_and_handles_failures(monkeypatch, mode):
     else:
         with pytest.raises(HTTPException) as error:
             asyncio.run(llm.extract('테스트', {}))
-        assert error.value.detail == {'refusal': 'LLM_REFUSED', 'unavailable': 'LLM_UNAVAILABLE'}.get(mode, 'MODEL_OUTPUT_INVALID')
+        assert error.value.detail == {'refusal': 'LLM_REFUSED', 'unavailable': 'LLM_RATE_LIMITED'}.get(mode, 'MODEL_OUTPUT_INVALID')
