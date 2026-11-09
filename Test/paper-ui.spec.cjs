@@ -1,8 +1,8 @@
 // Real browser/API integration. Author: sxhlxxn / Student ID: 202439688.
 const {test, before, after} = require('node:test');
 const assert = require('node:assert/strict');
-const {spawn} = require('node:child_process');
-const {mkdtemp, rm} = require('node:fs/promises');
+const {spawn, spawnSync} = require('node:child_process');
+const {mkdtemp, rm, writeFile} = require('node:fs/promises');
 const {existsSync} = require('node:fs');
 const {tmpdir} = require('node:os');
 const path = require('node:path');
@@ -24,8 +24,16 @@ before(async () => {
   temporary = await mkdtemp(path.join(tmpdir(), 'moneylife-ui-'));
   const venv = path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
   const python = process.env.PYTHON_BIN || (existsSync(venv) ? venv : 'python3');
+  const marketDirectory = path.join(temporary, 'market');
+  const csv = path.join(temporary, 'test-daily.csv');
+  await writeFile(csv, 'date,close,volume\n2024-01-31,10000,100\n2024-02-29,12000,100\n2024-03-29,9000,100\n');
+  const imported = spawnSync(python, ['Server/scripts/import_market.py', '--csv', csv,
+    '--series-id', 'ui-history-test-v1', '--symbol', '000001', '--label', '통합테스트 전용 가상 입력',
+    '--start-month', '2024-01', '--end-month', '2024-03', '--source-url', 'https://example.org/test-data',
+    '--provider', 'Browser Test', '--usage-scope', 'project', '--directory', marketDirectory], {cwd: root, encoding: 'utf8'});
+  assert.equal(imported.status, 0, imported.stderr);
   const api = spawn(python, ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', String(apiPort)], {
-    cwd: path.join(root, 'Server'), env: {...process.env, DATABASE_URL: `sqlite+aiosqlite:///${path.join(temporary, 'test.db')}`, CLIENT_ORIGIN: url}, stdio: 'pipe'});
+    cwd: path.join(root, 'Server'), env: {...process.env, DATABASE_URL: `sqlite+aiosqlite:///${path.join(temporary, 'test.db')}`, CLIENT_ORIGIN: url, MARKET_SERIES_DIR: marketDirectory}, stdio: 'pipe'});
   children.push(api);
   const client = spawn(process.execPath, ['scripts/dev-server.cjs'], {cwd: root,
     env: {...process.env, PORT: String(port), API_BASE_URL: `http://127.0.0.1:${apiPort}`}, stdio: 'pipe'});
@@ -141,7 +149,7 @@ test('모바일 입력·거부 안내·기간 종료 및 가상 데이터 표시
   await clickCommand(page, '다음 달로 +1개월', 'advance');
   await page.locator('.paper-history summary').click();
   assert.match(await page.locator('.paper-history').innerText(), /거부.*현금 부족/s);
-  assert.match(await page.locator('.paper-lab-head').innerText(), /가상 가격.*실제 거래·시세 미연결/s);
+  assert.match(await page.locator('.paper-lab-head').innerText(), /실제 주문 미연결/s);
   const dimensions = await page.evaluate(() => ({width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth}));
   assert.ok(dimensions.scroll <= dimensions.width, 'No horizontal page overflow');
   if (process.env.UI_SCREENSHOT_DIR) await page.evaluate(() => document.fonts.ready);
@@ -190,4 +198,37 @@ test('모의투자 이후 기존 여정 저장·계산 결과·AI 오류 안내 
   await page.getByRole('button', {name: '질문 보내기', exact: true}).click();
   await page.waitForFunction(() => document.getElementById('serverstatus').textContent.includes('LLM API 키'));
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), false);
+});
+test('등록 가격 선택·과거 월 표시·출처와 이전 시점 복원', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await page.getByLabel('사용할 가격 데이터').selectOption('ui-history-test-v1');
+  assert.match(await page.locator('.paper-setup').innerText(), /2024-01~2024-03/);
+  await demo(page);
+  assert.match(await page.locator('.paper-date').innerText(), /2024년 1월/);
+  assert.match(await page.locator('.paper-provenance').innerText(), /Browser Test/);
+  assert.equal(await page.getByRole('link', {name: '가격 출처 확인'}).getAttribute('href'), 'https://example.org/test-data');
+  await page.getByLabel('주문 수량 · 주').fill('2');
+  await clickCommand(page, '매수 예약', 'orders');
+  assert.match(await page.locator('.paper-orders').innerText(), /2024년 2월/);
+  const result = await clickCommand(page, '다음 달로 +1개월', 'advance');
+  assert.equal(result.run.result.invested.executions[0].price, 12000);
+  await page.locator('.paper-history summary').click();
+  assert.match(await page.locator('.paper-history').innerText(), /2024년 2월/);
+  assert.match(await page.locator('.paper-date').innerText(), /1 \/ 2개월/);
+  await clickCommand(page, '다음 달로 +1개월', 'advance');
+  assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), true);
+  await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
+  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.locator('.paper-provenance').waitFor();
+  assert.match(await page.locator('.paper-date').innerText(), /2024년 3월/);
+});
+test('가격 목록 오류에도 저장된 원본으로 복원·월 진행', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
+  await page.route('**/api/market/series', route => route.fulfill({status: 503, contentType: 'application/json', body: JSON.stringify({detail: 'MARKET_CATALOG_INVALID'})}));
+  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.waitForFunction(() => document.getElementById('paperstatus').textContent.includes('저장된 가격으로 진행'));
+  const result = await clickCommand(page, '다음 달로 +1개월', 'advance');
+  assert.equal(result.plan.month, 1);
 });

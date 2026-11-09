@@ -120,3 +120,41 @@ Docker가 없으면 가상환경에서 의존성을 설치한 뒤 루트의 `npm
 ```
 
 시연은 실제 종목과 무관한 `TEST-KRW`의 가상 가격(0~4개월)과 수수료·세율 0을 사용한다. 현재 월 이후 가격은 API에 노출하지 않으며 투자 시작 시 가격 원본과 해시를 DB 내부에 고정한다. 실제 주가 공급자 연결, 다중 종목, 주문 취소와 투자 화면 연결은 후속 작업이다. 신규 `paper_plans`, `paper_runs` 테이블은 서버 시작 시 생성된다. 기존 테이블 변경이나 별도 패키지 설치는 없다.
+
+## 과거 주가 가져오기·등록
+
+외부 API 호출은 투자 화면에서 직접 실행하지 않는다. 운영자가 로컬 수집 스크립트로 자료를 가져오고 정규화한 가격 파일을 서버에 등록한다. 새 Python 의존성은 없다. 실제 토큰 조회는 아직 검증하지 않았으며 기본 실행은 가상 가격을 유지한다.
+
+CSV 형식(값은 형식 설명용 가상 예시):
+
+```csv
+date,close,volume
+2024-01-31,10000,100
+2024-02-29,12000,100
+```
+
+이미 사용할 수 있는 원화 일봉 CSV를 프로젝트 루트에서 등록한다. `source-url`은 데이터 원본의 공개 HTTPS 주소이며 인증정보나 query를 포함하지 않는다.
+
+```bash
+.venv/bin/python Server/scripts/import_market.py \
+  --csv /absolute/path/daily.csv \
+  --series-id stock-history-v1 --symbol 005930 \
+  --label '과거 주가 재생' --provider '자료 제공처' \
+  --source-url https://example.org/dataset \
+  --start-month 2024-01 --end-month 2024-12
+```
+
+기본은 `private` 파일로 저장되어 화면에 나오지 않는다. 프로젝트에서 사용자에게 표시할 수 있는 자료에만 `--usage-scope project`를 붙인다. 기본 위치는 `.data/market`이다. 기존 ID는 덮어쓰지 않으며 자료가 바뀌면 새 ID로 등록한다. 화면을 다시 열거나 새로고침하면 목록이 갱신된다. 원본 파일을 제거해도 이미 시작한 계획은 DB의 고정 가격을 사용한다.
+
+토스 조회는 승인된 **액세스 토큰**을 서버 환경변수 `TOSS_ACCESS_TOKEN` 또는 로컬 `Server/.env`에 두고 실행한다. LLM API 키와는 별개다. 토큰을 명령 인자·브라우저·Git에 넣지 않는다. 토큰 발급은 공식 인증 문서를 따른다. 공유 서비스의 시세 표시 이용 범위는 별도로 확인해야 하며, 기본 private를 바꾸지 않고 수집 동작부터 확인할 수 있다.
+
+```bash
+.venv/bin/python Server/scripts/import_market.py \
+  --toss --series-id toss-history-v1 --symbol 005930 \
+  --label '토스 과거 일봉 수집' \
+  --start-month 2024-01 --end-month 2024-12
+```
+
+읽기 전용 `GET /api/v1/candles`만 호출한다. KRW·수정주가 미적용 일봉을 최대 32페이지까지 읽는다. 요청 오류·인증 실패·429·잘못된 응답에서는 파일을 만들지 않는다. 중간 월 누락은 거래 불가로 보존하고, 월 0 가격이 없거나 진행 중인 달·잘못된 가격·상충하는 같은 날짜 데이터는 등록하지 않는다. 분할·배당이 없는 기간으로 시연 범위를 제한한다.
+
+Docker Compose는 호스트 `.data/market`을 읽기 전용으로 마운트한다. 자체 가격 폴더는 서버 실행 환경의 `MARKET_SERIES_DIR`로 지정한다. Docker 실행 검증은 이번 확인 범위에 포함하지 않았다. 세부 정책은 [과거 주가 계약](../Shared/historical-market-contract.md)을 따른다.

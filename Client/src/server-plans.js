@@ -30,6 +30,8 @@ async function apiRequest(resource, path, options = {}) {
           INSUFFICIENT_SHARES: '현재 보유 주식에서 이미 예약한 매도 수량을 제외한 수량만 팔 수 있어요.',
           SERIES_PERIOD_EXCEEDED: '가상 가격이 지원하는 마지막 달이에요. 새 투자 연습을 시작해주세요.',
           REQUEST_ID_CONFLICT: '요청 번호가 다른 내용에 사용됐어요. 저장한 투자 연습을 확인해주세요.',
+          MARKET_CATALOG_INVALID: '등록된 가격 자료의 형식을 확인해주세요. 기존 저장 결과는 유지됩니다.',
+          MARKET_CATALOG_LIMIT: '등록된 가격 자료 수를 확인해주세요.',
           ORDER_LIMIT_EXCEEDED: '이 계획의 주문 수가 한도에 도달했어요.',
           ENGINE_OUTPUT_INVALID: '계산 결과를 확인하지 못했어요. 같은 요청을 다시 확인해주세요.',
           ENGINE_UNAVAILABLE: '계산 서버를 사용할 수 없어요. 같은 요청으로 다시 확인할 수 있어요.',
