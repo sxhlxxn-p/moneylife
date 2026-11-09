@@ -9,16 +9,29 @@ function setPlanBusy(busy) {
 }
 
 async function apiRequest(resource, path, options = {}) {
+  const {timeoutMs = 10000, ...fetchOptions} = options;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetch('/api/' + resource + path, {
-      ...options,
+      ...fetchOptions,
       credentials: 'same-origin',
       headers: {'Content-Type': 'application/json'},
       signal: controller.signal
     });
     if (!response.ok) {
+      if (resource === 'ai') {
+        const body = await response.json();
+        const messages = {
+          LLM_NOT_CONFIGURED: '서버에 LLM API 키와 모델을 설정해야 해요. 현재 여정은 유지됩니다.',
+          LLM_UNAVAILABLE: 'AI 서버가 응답하지 않아요. 잠시 후 다시 요청해주세요.',
+          LLM_REFUSED: '이 요청을 해석하지 못했어요. 바꿀 조건을 다시 입력해주세요.',
+          MODEL_OUTPUT_INVALID: 'AI 응답 형식이 올바르지 않아 적용하지 않았어요.',
+          PROPOSAL_EXPIRED: '변경안이 만료됐어요. 다시 요청해주세요.',
+          SIMULATION_FINISHED: '진행이 끝났어요. 새로운 여정에서 요청해주세요.'
+        };
+        if (messages[body.detail]) throw new Error(messages[body.detail]);
+      }
       if (response.status === 401) throw new Error('저장 세션이 만료됐어요. 현재 여정은 이 기기에 남아 있어요.');
       if (response.status === 422) throw new Error('입력이나 이벤트 적용 후 금액·기간을 확인해주세요.');
       if (response.status === 404) throw new Error('저장된 계획이나 계산 결과를 찾을 수 없어요.');
@@ -107,31 +120,35 @@ async function loadServerPlan(id) {
   setPlanBusy(true);
   try {
     const plan = await planRequest('/' + encodeURIComponent(id));
-    const game = MoneyLifePlanState.decode(plan);
-    // Do not replace active state until the complete snapshot has been decoded.
-    start = game.start;
-    month = game.month;
-    baseSaving = game.baseSaving;
-    baseRate = game.baseRate;
-    saving = game.saving;
-    rate = game.rate;
-    mods = game.mods;
-    rateMods = game.rateMods;
-    logs = game.logs;
-    events = new Set(game.events);
-    serverPlanId = plan.id;
-    try { localStorage.setItem('money-life-server-plan', plan.id); } catch {}
-    $('worldtitle').textContent = '저장한 여정에서 다시 시작해요';
-    $('worlddesc').textContent = '이 시점의 조건과 선택 기록을 불러왔어요.';
-    closeModal();
-    render();
-    $('serverstatus').textContent = `${month}개월 시점 서버에서 불러옴`;
+    restoreServerPlan(plan);
     toast('저장된 조건과 선택 기록을 불러왔어요.');
   } catch (error) {
     toast(error.message);
   } finally {
     setPlanBusy(false);
   }
+}
+
+function restoreServerPlan(plan) {
+  const game = MoneyLifePlanState.decode(plan);
+  // Do not replace active state until the complete snapshot has been decoded.
+  start = game.start;
+  month = game.month;
+  baseSaving = game.baseSaving;
+  baseRate = game.baseRate;
+  saving = game.saving;
+  rate = game.rate;
+  mods = game.mods;
+  rateMods = game.rateMods;
+  logs = game.logs;
+  events = new Set(game.events);
+  serverPlanId = plan.id;
+  try { localStorage.setItem('money-life-server-plan', plan.id); } catch {}
+  $('worldtitle').textContent = '저장한 여정에서 다시 시작해요';
+  $('worlddesc').textContent = '이 시점의 조건과 선택 기록을 불러왔어요.';
+  closeModal();
+  render();
+  $('serverstatus').textContent = `${month}개월 시점 서버에서 불러옴`;
 }
 
 

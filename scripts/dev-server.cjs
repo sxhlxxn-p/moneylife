@@ -20,6 +20,7 @@ const routes = new Map(prototypeMode ? [
   ['/app.js', 'Client/src/app.js'],
   ['/plan-state.js', 'Client/src/plan-state.js'],
   ['/server-plans.js', 'Client/src/server-plans.js'],
+  ['/ai-client.js', 'Client/src/ai-client.js'],
   ['/engine.js', 'Engine/src/index.js']
 ]);
 http.createServer(async (req,res) => {
@@ -37,7 +38,7 @@ http.createServer(async (req,res) => {
         res.writeHead(reply.statusCode, {...reply.headers, 'cache-control': 'no-store'});
         reply.pipe(res);
       });
-      upstream.setTimeout(15000, () => upstream.destroy());
+      upstream.setTimeout(35000, () => upstream.destroy());
       upstream.on('error', () => {
         if (!res.headersSent) res.writeHead(503, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({detail: 'API_UNAVAILABLE'}));

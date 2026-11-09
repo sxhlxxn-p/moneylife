@@ -66,7 +66,7 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 
 ## 구현 상태
 
-현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. FastAPI의 계획 저장·목록·조회 API를 Client에 연결했다. DB는 Compose에서 PostgreSQL, Docker 없는 로컬 실행에서는 SQLite를 사용한다. 서버는 Node로 공통 계산 엔진을 실행하고 입력·버전·월별 결과를 불변 Run으로 저장한다. 단일 종목 모의투자 정산 모듈과 테스트 데모를 추가했다. 실제 LLM·토스증권 API·모의투자 화면/서버 연결과 계정 로그인은 아직 구현하지 않았다.
+현재 `Client`에는 예시 데이터, 월별 계산, 이벤트 선택, 자산·계획 비교와 로컬 저장이 구현되어 있다. FastAPI의 계획 저장·목록·조회 API를 Client에 연결했다. DB는 Compose에서 PostgreSQL, Docker 없는 로컬 실행에서는 SQLite를 사용한다. 서버는 Node로 공통 계산 엔진을 실행하고 입력·버전·월별 결과를 불변 Run으로 저장한다. 단일 종목 모의투자 정산 모듈과 테스트 데모를 추가했다. LLM 조건 변경 어댑터·서버 검증·사용자 승인·계산 결과 비교를 연결했다. 실제 모델 호출은 API 키와 모델 설정 후 확인해야 한다. 토스증권 API·모의투자 화면/서버 연결과 계정 로그인은 아직 구현하지 않았다.
 
 현재 실행은 HTML·CSS·JavaScript와 Node.js 개발 서버를 사용한다. 서버는 FastAPI·SQLAlchemy·Pydantic을 사용한다. React·TypeScript 전환은 후속 작업이다.
 
@@ -84,3 +84,4 @@ CONTRIBUTING.md         브랜치·PR·영역별 협업 규칙
 리포지토리 관리는 수현([@sxhlxxn-p](https://github.com/sxhlxxn-p))으로 두었습니다. 리뷰어를 정하기 어렵거나 영역 간 조율이 필요하면 제게 호출해주세요.
 
 기능 작업은 개인 브랜치에서 진행하고 PR을 통해 `main`에 반영해주세요. 일반 변경은 최소 1명의 리뷰 승인을 받고, 다른 workspace와 겹치지 않는 간단한 작업이나 동작에 영향이 없는 문서 변경은 리뷰어 없이 셀프 머지해주시면 됩니다. PR의 Assignees는 본인으로 지정. 설치한 모듈과 실행 방법은 문서로 남겨주세요. 전체 작업 방식은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따라주시면 됩니다.
+LLM 설정과 현재 검증 범위: [LLM 실행·평가 안내](docs/llm-evaluation.md).
