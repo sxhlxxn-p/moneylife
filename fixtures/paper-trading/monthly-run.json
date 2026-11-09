@@ -1,0 +1,39 @@
+{
+  "dataKind": "synthetic-test-only",
+  "description": "실제 종목·가격과 무관한 월별 금융·모의투자 검증 데이터",
+  "months": 4,
+  "state": {
+    "initial": {"cash": 1000000, "saved": 0, "income": 200000, "expense": 100000, "target": 1250000},
+    "monthlySaving": 50000,
+    "annualRate": 0,
+    "changes": [],
+    "rateChanges": []
+  },
+  "investment": {
+    "symbol": "TEST-KRW",
+    "priceSeriesId": "synthetic-monthly-v1",
+    "costs": {"feeBps": 0, "sellTaxBps": 0},
+    "prices": [
+      {"month": 0, "price": 9500, "tradable": true},
+      {"month": 1, "price": 10000, "tradable": true},
+      {"month": 2, "price": 12000, "tradable": true},
+      {"month": 3, "price": 9000, "tradable": true},
+      {"month": 4, "price": 11000, "tradable": true}
+    ],
+    "orders": [
+      {"id": "buy-1", "symbol": "TEST-KRW", "side": "buy", "quantity": 50, "submittedMonth": 0},
+      {"id": "sell-1", "symbol": "TEST-KRW", "side": "sell", "quantity": 20, "submittedMonth": 2},
+      {"id": "sell-2", "symbol": "TEST-KRW", "side": "sell", "quantity": 30, "submittedMonth": 3}
+    ]
+  },
+  "expected": {
+    "totals": [1000000, 1100000, 1300000, 1250000, 1410000],
+    "cash": [1000000, 550000, 600000, 830000, 1210000],
+    "saved": [0, 50000, 100000, 150000, 200000],
+    "quantity": [0, 50, 50, 30, 0],
+    "finalRealizedPnl": 10000,
+    "finalAssetsDifference": 10000,
+    "baselineGoalMonth": 3,
+    "investmentGoalMonth": 2
+  }
+}

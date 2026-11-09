@@ -89,3 +89,5 @@ LLM 설정과 현재 검증 범위: [LLM 실행·평가 안내](docs/llm-evaluat
 조건 추출 100건 비교 실행기와 개발 세트 규칙 기준선은 [평가 안내](Test/ai/README.md)에 있다. AI 설명은 엔진 지표를 참조한 문장으로 생성하고 검증 실패 시 정형 설명을 유지한다. 실제 모델의 추출·설명 성능은 API 키와 모델 연결 후 평가해야 한다.
 
 실제 LLM 연결 준비는 가상환경에서 `npm run setup:llm` 후 `npm run check:llm -- --live`로 확인한다. 설정·진단 명령은 키를 출력하지 않는다. 상세 순서는 [LLM 실행 안내](docs/llm-evaluation.md)를 따른다.
+
+`npm run demo:monthly-trading`으로 가상 가격 기반 월별 금융·모의투자 연결과 투자 없는 계획 비교를 확인한다. 계산 엔진 단계이며 주문 UI·저장 API·실제 시세는 다음 연결 범위다.

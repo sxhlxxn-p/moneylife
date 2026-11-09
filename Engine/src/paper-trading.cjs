@@ -26,8 +26,10 @@ function validateAccount(account) {
   identifier(account.symbol);
   for (const key of ['initialCash', 'cash', 'quantity', 'costBasis', 'feesPaid', 'taxesPaid']) integer(account[key]);
   integer(account.realizedPnl, -Number.MAX_SAFE_INTEGER);
+  integer(account.netCashFlow ?? 0, -Number.MAX_SAFE_INTEGER);
   if (!Array.isArray(account.executions) || (account.quantity === 0 && account.costBasis !== 0) ||
-      !new Decimal(account.cash).plus(account.costBasis).equals(new Decimal(account.initialCash).plus(account.realizedPnl))) {
+      !new Decimal(account.cash).plus(account.costBasis).equals(new Decimal(account.initialCash)
+        .plus(account.netCashFlow ?? 0).plus(account.realizedPnl))) {
     fail('INVALID_ACCOUNT');
   }
 }
@@ -35,7 +37,18 @@ function validateAccount(account) {
 function createAccount({symbol, cash}) {
   const initialCash = integer(cash);
   return {symbol: identifier(symbol), initialCash, cash: initialCash, quantity: 0,
-    costBasis: 0, realizedPnl: 0, feesPaid: 0, taxesPaid: 0, executions: []};
+    costBasis: 0, realizedPnl: 0, netCashFlow: 0, feesPaid: 0, taxesPaid: 0, executions: []};
+}
+
+function applyCashFlow(account, delta) {
+  validateAccount(account);
+  integer(delta, -Number.MAX_SAFE_INTEGER);
+  const cash = won(new Decimal(account.cash).plus(delta));
+  if (cash < 0) fail('INSUFFICIENT_CASH_FLOW');
+  const next = {...account, cash,
+    netCashFlow: won(new Decimal(account.netCashFlow ?? 0).plus(delta))};
+  validateAccount(next);
+  return next;
 }
 
 function validPrice(quote) {
@@ -113,4 +126,4 @@ function valueAccount(account, quote) {
     feesPaid: account.feesPaid, taxesPaid: account.taxesPaid};
 }
 
-module.exports = {createAccount, executeOrder, valueAccount};
+module.exports = {createAccount, executeOrder, valueAccount, applyCashFlow};
