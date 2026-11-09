@@ -1,0 +1,4259 @@
+{
+  "createdAt": "2026-11-08T14:05:51.018879+00:00",
+  "datasetVersion": "moneylife-change-cases-v1",
+  "split": "dev",
+  "uniqueCases": 60,
+  "repetitions": 3,
+  "configuration": {
+    "evaluationVersion": "change-eval-v1",
+    "datasetSha256": "227bae5133099a1588544e889ca0abbf96cd5c91590a45879c41dc3f9d8718f0",
+    "codeSha256": "255fbfd26f5896df084a0944cea505b3ea7751a514065af9c2f8157bd578755a",
+    "mode": "rules",
+    "model": null,
+    "promptVersion": "plan-change-v1",
+    "maxOutputTokens": null,
+    "sampling": "deterministic"
+  },
+  "summary": {
+    "attempts": 180,
+    "rawExactRate": 0.7666666666666667,
+    "readyConditionExactRate": 0.7083333333333334,
+    "finalExactRate": 0.7666666666666667,
+    "wrongApplications": 0,
+    "appliedCount": 87,
+    "wrongApplicationRateOfApplied": 0.0,
+    "clarificationRecall": 1.0,
+    "errors": 0,
+    "meanLatencyMs": 0.10743888888888888,
+    "p95LatencyMs": 0.237,
+    "inputTokens": null,
+    "outputTokens": null,
+    "costUsd": null
+  },
+  "byCategory": {
+    "absolute_date": {
+      "attempts": 18,
+      "rawExactRate": 1.0,
+      "readyConditionExactRate": 1.0,
+      "finalExactRate": 1.0,
+      "wrongApplications": 0,
+      "appliedCount": 18,
+      "wrongApplicationRateOfApplied": 0.0,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.20555555555555557,
+      "p95LatencyMs": 0.537,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "amount_forms": {
+      "attempts": 18,
+      "rawExactRate": 1.0,
+      "readyConditionExactRate": 1.0,
+      "finalExactRate": 1.0,
+      "wrongApplications": 0,
+      "appliedCount": 18,
+      "wrongApplicationRateOfApplied": 0.0,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.15383333333333335,
+      "p95LatencyMs": 0.375,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "bounded_period": {
+      "attempts": 18,
+      "rawExactRate": 0.0,
+      "readyConditionExactRate": 0.0,
+      "finalExactRate": 0.0,
+      "wrongApplications": 0,
+      "appliedCount": 0,
+      "wrongApplicationRateOfApplied": null,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.04544444444444444,
+      "p95LatencyMs": 0.084,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "clarification": {
+      "attempts": 18,
+      "rawExactRate": 1.0,
+      "readyConditionExactRate": null,
+      "finalExactRate": 1.0,
+      "wrongApplications": 0,
+      "appliedCount": 0,
+      "wrongApplicationRateOfApplied": null,
+      "clarificationRecall": 1.0,
+      "errors": 0,
+      "meanLatencyMs": 0.03777777777777778,
+      "p95LatencyMs": 0.082,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "compound": {
+      "attempts": 18,
+      "rawExactRate": 0.0,
+      "readyConditionExactRate": 0.0,
+      "finalExactRate": 0.0,
+      "wrongApplications": 0,
+      "appliedCount": 0,
+      "wrongApplicationRateOfApplied": null,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.04088888888888889,
+      "p95LatencyMs": 0.114,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "invalid_change": {
+      "attempts": 18,
+      "rawExactRate": 0.8333333333333334,
+      "readyConditionExactRate": 0.8333333333333334,
+      "finalExactRate": 0.8333333333333334,
+      "wrongApplications": 0,
+      "appliedCount": 0,
+      "wrongApplicationRateOfApplied": null,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.08872222222222222,
+      "p95LatencyMs": 0.232,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "relative_date": {
+      "attempts": 18,
+      "rawExactRate": 0.8333333333333334,
+      "readyConditionExactRate": 0.8333333333333334,
+      "finalExactRate": 0.8333333333333334,
+      "wrongApplications": 0,
+      "appliedCount": 15,
+      "wrongApplicationRateOfApplied": 0.0,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.13872222222222222,
+      "p95LatencyMs": 0.338,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "single_delta": {
+      "attempts": 18,
+      "rawExactRate": 1.0,
+      "readyConditionExactRate": 1.0,
+      "finalExactRate": 1.0,
+      "wrongApplications": 0,
+      "appliedCount": 18,
+      "wrongApplicationRateOfApplied": 0.0,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.1453888888888889,
+      "p95LatencyMs": 0.239,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "single_set": {
+      "attempts": 18,
+      "rawExactRate": 1.0,
+      "readyConditionExactRate": 1.0,
+      "finalExactRate": 1.0,
+      "wrongApplications": 0,
+      "appliedCount": 18,
+      "wrongApplicationRateOfApplied": 0.0,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.19261111111111112,
+      "p95LatencyMs": 1.134,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "unsupported": {
+      "attempts": 18,
+      "rawExactRate": 1.0,
+      "readyConditionExactRate": null,
+      "finalExactRate": 1.0,
+      "wrongApplications": 0,
+      "appliedCount": 0,
+      "wrongApplicationRateOfApplied": null,
+      "clarificationRecall": null,
+      "errors": 0,
+      "meanLatencyMs": 0.025444444444444447,
+      "p95LatencyMs": 0.031,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    }
+  },
+  "attempts": [
+    {
+      "caseId": "single_set-01",
+      "category": "single_set",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 1.134
+    },
+    {
+      "caseId": "single_set-02",
+      "category": "single_set",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.144
+    },
+    {
+      "caseId": "single_set-03",
+      "category": "single_set",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.179
+    },
+    {
+      "caseId": "single_set-04",
+      "category": "single_set",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.13
+    },
+    {
+      "caseId": "single_set-05",
+      "category": "single_set",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.115
+    },
+    {
+      "caseId": "single_set-06",
+      "category": "single_set",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.111
+    },
+    {
+      "caseId": "single_delta-01",
+      "category": "single_delta",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.239
+    },
+    {
+      "caseId": "single_delta-02",
+      "category": "single_delta",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.225
+    },
+    {
+      "caseId": "single_delta-03",
+      "category": "single_delta",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.163
+    },
+    {
+      "caseId": "single_delta-04",
+      "category": "single_delta",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.123
+    },
+    {
+      "caseId": "single_delta-05",
+      "category": "single_delta",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 150000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.116
+    },
+    {
+      "caseId": "single_delta-06",
+      "category": "single_delta",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.109
+    },
+    {
+      "caseId": "amount_forms-01",
+      "category": "amount_forms",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.113
+    },
+    {
+      "caseId": "amount_forms-02",
+      "category": "amount_forms",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.105
+    },
+    {
+      "caseId": "amount_forms-03",
+      "category": "amount_forms",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2750000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.135
+    },
+    {
+      "caseId": "amount_forms-04",
+      "category": "amount_forms",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 125000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.115
+    },
+    {
+      "caseId": "amount_forms-05",
+      "category": "amount_forms",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 5000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.175
+    },
+    {
+      "caseId": "amount_forms-06",
+      "category": "amount_forms",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.251
+    },
+    {
+      "caseId": "relative_date-01",
+      "category": "relative_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.272
+    },
+    {
+      "caseId": "relative_date-02",
+      "category": "relative_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.152
+    },
+    {
+      "caseId": "relative_date-03",
+      "category": "relative_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.137
+    },
+    {
+      "caseId": "relative_date-04",
+      "category": "relative_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2028-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.162
+    },
+    {
+      "caseId": "relative_date-05",
+      "category": "relative_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.338
+    },
+    {
+      "caseId": "relative_date-06",
+      "category": "relative_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.059
+    },
+    {
+      "caseId": "absolute_date-01",
+      "category": "absolute_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.154
+    },
+    {
+      "caseId": "absolute_date-02",
+      "category": "absolute_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.217
+    },
+    {
+      "caseId": "absolute_date-03",
+      "category": "absolute_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.226
+    },
+    {
+      "caseId": "absolute_date-04",
+      "category": "absolute_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2027-06",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.134
+    },
+    {
+      "caseId": "absolute_date-05",
+      "category": "absolute_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 400000,
+            "startMonth": "2029-07",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.195
+    },
+    {
+      "caseId": "absolute_date-06",
+      "category": "absolute_date",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 600000,
+            "startMonth": "2030-02",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.139
+    },
+    {
+      "caseId": "bounded_period-01",
+      "category": "bounded_period",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.054
+    },
+    {
+      "caseId": "bounded_period-02",
+      "category": "bounded_period",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.046
+    },
+    {
+      "caseId": "bounded_period-03",
+      "category": "bounded_period",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.033
+    },
+    {
+      "caseId": "bounded_period-04",
+      "category": "bounded_period",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.038
+    },
+    {
+      "caseId": "bounded_period-05",
+      "category": "bounded_period",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.036
+    },
+    {
+      "caseId": "bounded_period-06",
+      "category": "bounded_period",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.041
+    },
+    {
+      "caseId": "compound-01",
+      "category": "compound",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "compound-02",
+      "category": "compound",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.034
+    },
+    {
+      "caseId": "compound-03",
+      "category": "compound",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.034
+    },
+    {
+      "caseId": "compound-04",
+      "category": "compound",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "compound-05",
+      "category": "compound",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.085
+    },
+    {
+      "caseId": "compound-06",
+      "category": "compound",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.043
+    },
+    {
+      "caseId": "clarification-01",
+      "category": "clarification",
+      "repetition": 1,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.03
+    },
+    {
+      "caseId": "clarification-02",
+      "category": "clarification",
+      "repetition": 1,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.031
+    },
+    {
+      "caseId": "clarification-03",
+      "category": "clarification",
+      "repetition": 1,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.036
+    },
+    {
+      "caseId": "clarification-04",
+      "category": "clarification",
+      "repetition": 1,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "clarification-05",
+      "category": "clarification",
+      "repetition": 1,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.032
+    },
+    {
+      "caseId": "clarification-06",
+      "category": "clarification",
+      "repetition": 1,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.033
+    },
+    {
+      "caseId": "unsupported-01",
+      "category": "unsupported",
+      "repetition": 1,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.03
+    },
+    {
+      "caseId": "unsupported-02",
+      "category": "unsupported",
+      "repetition": 1,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.029
+    },
+    {
+      "caseId": "unsupported-03",
+      "category": "unsupported",
+      "repetition": 1,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.03
+    },
+    {
+      "caseId": "unsupported-04",
+      "category": "unsupported",
+      "repetition": 1,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.031
+    },
+    {
+      "caseId": "unsupported-05",
+      "category": "unsupported",
+      "repetition": 1,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.029
+    },
+    {
+      "caseId": "unsupported-06",
+      "category": "unsupported",
+      "repetition": 1,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.029
+    },
+    {
+      "caseId": "invalid_change-01",
+      "category": "invalid_change",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 2000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.084
+    },
+    {
+      "caseId": "invalid_change-02",
+      "category": "invalid_change",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.073
+    },
+    {
+      "caseId": "invalid_change-03",
+      "category": "invalid_change",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.232
+    },
+    {
+      "caseId": "invalid_change-04",
+      "category": "invalid_change",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2026-09",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.139
+    },
+    {
+      "caseId": "invalid_change-05",
+      "category": "invalid_change",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2037-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.076
+    },
+    {
+      "caseId": "invalid_change-06",
+      "category": "invalid_change",
+      "repetition": 1,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.037
+    },
+    {
+      "caseId": "single_set-01",
+      "category": "single_set",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.126
+    },
+    {
+      "caseId": "single_set-02",
+      "category": "single_set",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.114
+    },
+    {
+      "caseId": "single_set-03",
+      "category": "single_set",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.109
+    },
+    {
+      "caseId": "single_set-04",
+      "category": "single_set",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.11
+    },
+    {
+      "caseId": "single_set-05",
+      "category": "single_set",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.107
+    },
+    {
+      "caseId": "single_set-06",
+      "category": "single_set",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.108
+    },
+    {
+      "caseId": "single_delta-01",
+      "category": "single_delta",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.111
+    },
+    {
+      "caseId": "single_delta-02",
+      "category": "single_delta",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.207
+    },
+    {
+      "caseId": "single_delta-03",
+      "category": "single_delta",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.168
+    },
+    {
+      "caseId": "single_delta-04",
+      "category": "single_delta",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.152
+    },
+    {
+      "caseId": "single_delta-05",
+      "category": "single_delta",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 150000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.136
+    },
+    {
+      "caseId": "single_delta-06",
+      "category": "single_delta",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.132
+    },
+    {
+      "caseId": "amount_forms-01",
+      "category": "amount_forms",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.137
+    },
+    {
+      "caseId": "amount_forms-02",
+      "category": "amount_forms",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.166
+    },
+    {
+      "caseId": "amount_forms-03",
+      "category": "amount_forms",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2750000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.137
+    },
+    {
+      "caseId": "amount_forms-04",
+      "category": "amount_forms",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 125000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.142
+    },
+    {
+      "caseId": "amount_forms-05",
+      "category": "amount_forms",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 5000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.147
+    },
+    {
+      "caseId": "amount_forms-06",
+      "category": "amount_forms",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.132
+    },
+    {
+      "caseId": "relative_date-01",
+      "category": "relative_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.116
+    },
+    {
+      "caseId": "relative_date-02",
+      "category": "relative_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.107
+    },
+    {
+      "caseId": "relative_date-03",
+      "category": "relative_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.158
+    },
+    {
+      "caseId": "relative_date-04",
+      "category": "relative_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2028-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.145
+    },
+    {
+      "caseId": "relative_date-05",
+      "category": "relative_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.134
+    },
+    {
+      "caseId": "relative_date-06",
+      "category": "relative_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.04
+    },
+    {
+      "caseId": "absolute_date-01",
+      "category": "absolute_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.138
+    },
+    {
+      "caseId": "absolute_date-02",
+      "category": "absolute_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.106
+    },
+    {
+      "caseId": "absolute_date-03",
+      "category": "absolute_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.107
+    },
+    {
+      "caseId": "absolute_date-04",
+      "category": "absolute_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2027-06",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.537
+    },
+    {
+      "caseId": "absolute_date-05",
+      "category": "absolute_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 400000,
+            "startMonth": "2029-07",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.266
+    },
+    {
+      "caseId": "absolute_date-06",
+      "category": "absolute_date",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 600000,
+            "startMonth": "2030-02",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.409
+    },
+    {
+      "caseId": "bounded_period-01",
+      "category": "bounded_period",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.052
+    },
+    {
+      "caseId": "bounded_period-02",
+      "category": "bounded_period",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.077
+    },
+    {
+      "caseId": "bounded_period-03",
+      "category": "bounded_period",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.047
+    },
+    {
+      "caseId": "bounded_period-04",
+      "category": "bounded_period",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.031
+    },
+    {
+      "caseId": "bounded_period-05",
+      "category": "bounded_period",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.028
+    },
+    {
+      "caseId": "bounded_period-06",
+      "category": "bounded_period",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "compound-01",
+      "category": "compound",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.027
+    },
+    {
+      "caseId": "compound-02",
+      "category": "compound",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.025
+    },
+    {
+      "caseId": "compound-03",
+      "category": "compound",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.026
+    },
+    {
+      "caseId": "compound-04",
+      "category": "compound",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.027
+    },
+    {
+      "caseId": "compound-05",
+      "category": "compound",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.028
+    },
+    {
+      "caseId": "compound-06",
+      "category": "compound",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.027
+    },
+    {
+      "caseId": "clarification-01",
+      "category": "clarification",
+      "repetition": 2,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.031
+    },
+    {
+      "caseId": "clarification-02",
+      "category": "clarification",
+      "repetition": 2,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.037
+    },
+    {
+      "caseId": "clarification-03",
+      "category": "clarification",
+      "repetition": 2,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.043
+    },
+    {
+      "caseId": "clarification-04",
+      "category": "clarification",
+      "repetition": 2,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "clarification-05",
+      "category": "clarification",
+      "repetition": 2,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.03
+    },
+    {
+      "caseId": "clarification-06",
+      "category": "clarification",
+      "repetition": 2,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.03
+    },
+    {
+      "caseId": "unsupported-01",
+      "category": "unsupported",
+      "repetition": 2,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.03
+    },
+    {
+      "caseId": "unsupported-02",
+      "category": "unsupported",
+      "repetition": 2,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.025
+    },
+    {
+      "caseId": "unsupported-03",
+      "category": "unsupported",
+      "repetition": 2,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.025
+    },
+    {
+      "caseId": "unsupported-04",
+      "category": "unsupported",
+      "repetition": 2,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.022
+    },
+    {
+      "caseId": "unsupported-05",
+      "category": "unsupported",
+      "repetition": 2,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.024
+    },
+    {
+      "caseId": "unsupported-06",
+      "category": "unsupported",
+      "repetition": 2,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.022
+    },
+    {
+      "caseId": "invalid_change-01",
+      "category": "invalid_change",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 2000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.082
+    },
+    {
+      "caseId": "invalid_change-02",
+      "category": "invalid_change",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.078
+    },
+    {
+      "caseId": "invalid_change-03",
+      "category": "invalid_change",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.075
+    },
+    {
+      "caseId": "invalid_change-04",
+      "category": "invalid_change",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2026-09",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.192
+    },
+    {
+      "caseId": "invalid_change-05",
+      "category": "invalid_change",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2037-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.077
+    },
+    {
+      "caseId": "invalid_change-06",
+      "category": "invalid_change",
+      "repetition": 2,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.037
+    },
+    {
+      "caseId": "single_set-01",
+      "category": "single_set",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.142
+    },
+    {
+      "caseId": "single_set-02",
+      "category": "single_set",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.237
+    },
+    {
+      "caseId": "single_set-03",
+      "category": "single_set",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.124
+    },
+    {
+      "caseId": "single_set-04",
+      "category": "single_set",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.196
+    },
+    {
+      "caseId": "single_set-05",
+      "category": "single_set",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.169
+    },
+    {
+      "caseId": "single_set-06",
+      "category": "single_set",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.112
+    },
+    {
+      "caseId": "single_delta-01",
+      "category": "single_delta",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.114
+    },
+    {
+      "caseId": "single_delta-02",
+      "category": "single_delta",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.113
+    },
+    {
+      "caseId": "single_delta-03",
+      "category": "single_delta",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.106
+    },
+    {
+      "caseId": "single_delta-04",
+      "category": "single_delta",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 50000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.145
+    },
+    {
+      "caseId": "single_delta-05",
+      "category": "single_delta",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 150000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.11
+    },
+    {
+      "caseId": "single_delta-06",
+      "category": "single_delta",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.148
+    },
+    {
+      "caseId": "amount_forms-01",
+      "category": "amount_forms",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.115
+    },
+    {
+      "caseId": "amount_forms-02",
+      "category": "amount_forms",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.108
+    },
+    {
+      "caseId": "amount_forms-03",
+      "category": "amount_forms",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 2750000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.107
+    },
+    {
+      "caseId": "amount_forms-04",
+      "category": "amount_forms",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 125000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.375
+    },
+    {
+      "caseId": "amount_forms-05",
+      "category": "amount_forms",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 5000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.147
+    },
+    {
+      "caseId": "amount_forms-06",
+      "category": "amount_forms",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.162
+    },
+    {
+      "caseId": "relative_date-01",
+      "category": "relative_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.116
+    },
+    {
+      "caseId": "relative_date-02",
+      "category": "relative_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.109
+    },
+    {
+      "caseId": "relative_date-03",
+      "category": "relative_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 300000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.111
+    },
+    {
+      "caseId": "relative_date-04",
+      "category": "relative_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2028-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.108
+    },
+    {
+      "caseId": "relative_date-05",
+      "category": "relative_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 200000,
+            "startMonth": "2027-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.193
+    },
+    {
+      "caseId": "relative_date-06",
+      "category": "relative_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.04
+    },
+    {
+      "caseId": "absolute_date-01",
+      "category": "absolute_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 200000,
+            "startMonth": "2027-03",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.125
+    },
+    {
+      "caseId": "absolute_date-02",
+      "category": "absolute_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "set",
+            "amount": 3000000,
+            "startMonth": "2028-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.186
+    },
+    {
+      "caseId": "absolute_date-03",
+      "category": "absolute_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "add",
+            "amount": 100000,
+            "startMonth": "2026-12",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.184
+    },
+    {
+      "caseId": "absolute_date-04",
+      "category": "absolute_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "set",
+            "amount": 1400000,
+            "startMonth": "2027-06",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.173
+    },
+    {
+      "caseId": "absolute_date-05",
+      "category": "absolute_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "add",
+            "amount": 400000,
+            "startMonth": "2029-07",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.227
+    },
+    {
+      "caseId": "absolute_date-06",
+      "category": "absolute_date",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "ready",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 600000,
+            "startMonth": "2030-02",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.177
+    },
+    {
+      "caseId": "bounded_period-01",
+      "category": "bounded_period",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.052
+    },
+    {
+      "caseId": "bounded_period-02",
+      "category": "bounded_period",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.084
+    },
+    {
+      "caseId": "bounded_period-03",
+      "category": "bounded_period",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.049
+    },
+    {
+      "caseId": "bounded_period-04",
+      "category": "bounded_period",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.037
+    },
+    {
+      "caseId": "bounded_period-05",
+      "category": "bounded_period",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.036
+    },
+    {
+      "caseId": "bounded_period-06",
+      "category": "bounded_period",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.042
+    },
+    {
+      "caseId": "compound-01",
+      "category": "compound",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "compound-02",
+      "category": "compound",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.033
+    },
+    {
+      "caseId": "compound-03",
+      "category": "compound",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.034
+    },
+    {
+      "caseId": "compound-04",
+      "category": "compound",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.114
+    },
+    {
+      "caseId": "compound-05",
+      "category": "compound",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.048
+    },
+    {
+      "caseId": "compound-06",
+      "category": "compound",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "ready",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.046
+    },
+    {
+      "caseId": "clarification-01",
+      "category": "clarification",
+      "repetition": 3,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.032
+    },
+    {
+      "caseId": "clarification-02",
+      "category": "clarification",
+      "repetition": 3,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.036
+    },
+    {
+      "caseId": "clarification-03",
+      "category": "clarification",
+      "repetition": 3,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.082
+    },
+    {
+      "caseId": "clarification-04",
+      "category": "clarification",
+      "repetition": 3,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.066
+    },
+    {
+      "caseId": "clarification-05",
+      "category": "clarification",
+      "repetition": 3,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.035
+    },
+    {
+      "caseId": "clarification-06",
+      "category": "clarification",
+      "repetition": 3,
+      "expectedStatus": "needs_clarification",
+      "expectedFinalStatus": "needs_clarification",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.026
+    },
+    {
+      "caseId": "unsupported-01",
+      "category": "unsupported",
+      "repetition": 3,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.022
+    },
+    {
+      "caseId": "unsupported-02",
+      "category": "unsupported",
+      "repetition": 3,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.022
+    },
+    {
+      "caseId": "unsupported-03",
+      "category": "unsupported",
+      "repetition": 3,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.021
+    },
+    {
+      "caseId": "unsupported-04",
+      "category": "unsupported",
+      "repetition": 3,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.021
+    },
+    {
+      "caseId": "unsupported-05",
+      "category": "unsupported",
+      "repetition": 3,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.022
+    },
+    {
+      "caseId": "unsupported-06",
+      "category": "unsupported",
+      "repetition": 3,
+      "expectedStatus": "unsupported",
+      "expectedFinalStatus": "unsupported",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "unsupported",
+      "prediction": {
+        "status": "unsupported",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.024
+    },
+    {
+      "caseId": "invalid_change-01",
+      "category": "invalid_change",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 2000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.132
+    },
+    {
+      "caseId": "invalid_change-02",
+      "category": "invalid_change",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "income",
+            "operation": "subtract",
+            "amount": 3000000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.07
+    },
+    {
+      "caseId": "invalid_change-03",
+      "category": "invalid_change",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "subtract",
+            "amount": 800000,
+            "startMonth": "2026-11",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.061
+    },
+    {
+      "caseId": "invalid_change-04",
+      "category": "invalid_change",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "expense",
+            "operation": "subtract",
+            "amount": 100000,
+            "startMonth": "2026-09",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.061
+    },
+    {
+      "caseId": "invalid_change-05",
+      "category": "invalid_change",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": true,
+      "finalExact": true,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "invalid_change",
+      "prediction": {
+        "status": "ready",
+        "changes": [
+          {
+            "field": "monthlySaving",
+            "operation": "set",
+            "amount": 1000000,
+            "startMonth": "2037-01",
+            "endMonth": null
+          }
+        ],
+        "question": null
+      },
+      "latencyMs": 0.058
+    },
+    {
+      "caseId": "invalid_change-06",
+      "category": "invalid_change",
+      "repetition": 3,
+      "expectedStatus": "ready",
+      "expectedFinalStatus": "invalid_change",
+      "rawExact": false,
+      "finalExact": false,
+      "wrongApplication": false,
+      "usage": null,
+      "finalStatus": "needs_clarification",
+      "prediction": {
+        "status": "needs_clarification",
+        "changes": [],
+        "question": "지원 항목의 금액과 적용 연월을 확인해주세요."
+      },
+      "latencyMs": 0.033
+    }
+  ],
+  "limitations": [
+    "Authored draft cases; not independently annotated.",
+    "Repeated attempts share cases; they are not independent samples.",
+    "No external model result exists for rules mode.",
+    "Dollar cost is unknown; token counts use provider usage when supplied."
+  ]
+}

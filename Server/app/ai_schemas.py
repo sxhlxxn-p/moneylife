@@ -37,6 +37,18 @@ class ApplyChange(StrictModel):
         return value
 
 
+class ExplainRequest(StrictModel):
+    runId: UUID
+
+
+class ExplainResult(StrictModel):
+    text: str
+    source: Literal['template', 'llm']
+    attempts: int
+    fallbackReason: str | None
+    verifiedNumbers: Literal[True]
+
+
 class Comparison(StrictModel):
     baseGoalMonth: int | None
     candidateGoalMonth: int | None

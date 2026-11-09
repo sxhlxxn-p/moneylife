@@ -49,9 +49,25 @@ async function applyAIProposal(id, snapshot) {
     const result = await apiRequest('ai', '/proposals/' + encodeURIComponent(id) + '/apply', {
       method: 'POST', timeoutMs: 35000, body: JSON.stringify({confirmed: true})});
     restoreServerPlan(result.plan);
-    show('<h2>새 계획을 계산했어요</h2><p id="aiexplanation"></p><p>원본과 새 계획은 저장한 여정에서 각각 불러올 수 있어요. 상세 수치는 계산 결과에서 확인하세요.</p>');
+    show('<h2>새 계획을 계산했어요</h2><p id="aiexplanation"></p><p id="aiexplanationsource">계산 결과를 넣은 정형 설명입니다.</p><div class="modalactions"><button id="explainai" class="btn" data-plan-action="explain">AI 설명 보기</button></div><p>원본과 새 계획은 저장한 여정에서 각각 불러올 수 있어요. 상세 수치는 계산 결과에서 확인하세요.</p>');
     $('aiexplanation').textContent = result.explanation;
+    $('explainai').addEventListener('click', () => explainAIRun(result.run.id));
     $('serverstatus').textContent = 'AI 변경안 적용 · 새 계획과 서버 계산 결과 저장 완료';
+  } catch (error) { toast(error.message); }
+  finally { setPlanBusy(false); }
+}
+
+async function explainAIRun(runId) {
+  if (serverPlanBusy) return;
+  setPlanBusy(true);
+  try {
+    const result = await apiRequest('ai', '/explain', {method: 'POST', timeoutMs: 35000,
+      body: JSON.stringify({runId})});
+    if (!$('aiexplanation') || !$('aiexplanationsource')) return;
+    $('aiexplanation').textContent = result.text;
+    $('aiexplanationsource').textContent = result.source === 'llm'
+      ? 'AI가 설명을 작성하고 서버가 계산 지표를 연결했어요.'
+      : 'AI 설명을 생성하지 못해 정형 설명을 유지했어요.';
   } catch (error) { toast(error.message); }
   finally { setPlanBusy(false); }
 }

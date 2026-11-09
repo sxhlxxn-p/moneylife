@@ -17,3 +17,5 @@ Server와 Client가 실제로 연결되면 이 폴더에 통합 테스트를 추
 
 
 현재 `plan-state.test.cjs`는 원/만 원 왕복 변환 후 전체 계산 경로 재현과 12/22개월 목표 사례를 검증한다. API 영속성 테스트는 `Server/tests/test_plans.py`에 있으며 로컬 실행 방법은 `docs/first-integration.md`를 참고한다.
+
+자연어 조건 변경의 100건 평가 데이터와 실행 방법은 [AI 평가](ai/README.md)를 따른다. 단위 테스트는 외부 모델을 호출하지 않으며 실제 모델 평가는 별도 명령이다.

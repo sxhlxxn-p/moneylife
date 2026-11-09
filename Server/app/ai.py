@@ -6,19 +6,52 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import ValidationError
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import llm
+from app import ai_explanation
 from app.ai_changes import build_candidate, model_context
-from app.ai_schemas import ApplyChange, ApplyResult, ParseChange, ProposalResponse
+from app.ai_schemas import ApplyChange, ApplyResult, ParseChange, ProposalResponse, ExplainRequest, ExplainResult
 from app.database import get_session
 from app.engine import calculate
-from app.models import AIProposal, Plan, Run
+from app.models import AIProposal, AIExplanation, Plan, Run
 from app.plans import get_owner, owned_plan, summary as plan_summary
 from app.simulations import detail as run_detail
 
 
 router = APIRouter(prefix='/ai', tags=['ai'])
+
+
+@router.post('/explain', response_model=ExplainResult)
+async def explain(payload: ExplainRequest, response: Response,
+                  owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+    response.headers['Cache-Control'] = 'no-store'
+    run = await session.scalar(select(Run).where(Run.id == str(payload.runId), Run.owner_id == owner))
+    if run is None:
+        raise HTTPException(404, detail='RUN_NOT_FOUND')
+    if 'aiComparison' not in run.input_snapshot:
+        raise HTTPException(422, detail='COMPARISON_REQUIRED')
+    def stored(row):
+        return {'text': row.text, 'source': 'llm', 'attempts': row.attempts,
+                'fallbackReason': None, 'verifiedNumbers': True}
+    cached = await session.get(AIExplanation, run.id)
+    if cached:
+        return stored(cached)
+    result = await ai_explanation.generate(run.input_snapshot['aiComparison'], run.input_snapshot['aiExplanation'])
+    if result['source'] == 'llm':
+        session.add(AIExplanation(run_id=run.id, owner_id=owner, text=result['text'],
+                    model=os.environ['LLM_MODEL'], prompt_version=ai_explanation.PROMPT_VERSION,
+                    attempts=result['attempts']))
+        try:
+            await session.commit()
+        except IntegrityError:
+            await session.rollback()
+            cached = await session.get(AIExplanation, run.id)
+            if cached is None:
+                raise
+            return stored(cached)
+    return result
 
 
 @router.post('/parse-change', response_model=ProposalResponse)
