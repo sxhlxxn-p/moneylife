@@ -19,3 +19,19 @@ Server와 Client가 실제로 연결되면 이 폴더에 통합 테스트를 추
 현재 `plan-state.test.cjs`는 원/만 원 왕복 변환 후 전체 계산 경로 재현과 12/22개월 목표 사례를 검증한다. API 영속성 테스트는 `Server/tests/test_plans.py`에 있으며 로컬 실행 방법은 `docs/first-integration.md`를 참고한다.
 
 자연어 조건 변경의 100건 평가 데이터와 실행 방법은 [AI 평가](ai/README.md)를 따른다. 단위 테스트는 외부 모델을 호출하지 않으며 실제 모델 평가는 별도 명령이다.
+
+## 실제 브라우저 통합 테스트
+
+투자 화면은 Playwright Chromium으로 테스트한다. Playwright는 Test workspace의 개발 의존성이며 앱 실행에는 사용하지 않는다. Node 20 이상, Python 가상환경과 `Server/requirements-dev.txt` 설치가 필요하다.
+
+프로젝트 루트에서 실행한다.
+
+```bash
+npm install
+npx playwright install chromium
+npm run test:ui
+```
+
+테스트가 임시 SQLite DB, API 서버(3017), Client 서버(5187)를 자동으로 실행하고 종료한다. 실제 계좌·외부 LLM API는 호출하지 않는다. Python은 기본적으로 루트 `.venv`를 사용한다. 별도 환경은 `PYTHON_BIN`, 사용 중인 포트는 `UI_TEST_PORT`·`UI_TEST_API_PORT`로 지정한다. 이미 설치된 호환 Chromium은 `UI_BROWSER_PATH`로 지정할 수 있다. 화면 캡처가 필요하면 존재하는 폴더를 `UI_SCREENSHOT_DIR`에 지정한다.
+
+검증 범위: 개인 조건 사본·본편 보존, 주문·월 진행·손익·비투자 비교, 저장 목록·새로고침 복원, 서버에서 처리한 응답 유실 후 동일 요청 재확인, 모바일 가로 넘침·오류 안내, 기간 제한, 기존 계획 저장·AI 오류 처리 회귀.
