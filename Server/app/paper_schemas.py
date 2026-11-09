@@ -2,9 +2,9 @@
 from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from app.schemas import (StrictModel, GameState, CalculatedMoney, NetAssets,
-                         Month, MonthlyResult, RunMetrics, EngineResult)
+                         Month, MonthlyResult, RunMetrics, EngineResult, Money)
 
 Quantity = Annotated[int, Field(strict=True, ge=1, le=1_000_000_000)]
 
@@ -150,7 +150,7 @@ class PaperCancel(StrictModel):
     requestId: UUID
 
 class PaperSummary(StrictModel):
-    action: Literal['create', 'order', 'advance', 'cancel'] | None = None
+    action: Literal['create', 'order', 'advance', 'cancel', 'conditions'] | None = None
     id: UUID
     parentPaperPlanId: UUID | None
     financialPlanId: UUID
@@ -236,3 +236,32 @@ class PaperExplainDetail(StrictModel):
     cached: bool
     promptVersion: str
     verifiedFacts: Literal[True]
+
+
+class PaperConditionValues(StrictModel):
+    income: Money | None = None
+    expense: Money | None = None
+    monthlySaving: Money | None = None
+
+    @model_validator(mode='after')
+    def selected_values(self):
+        if not self.model_fields_set or any(getattr(self, field) is None for field in self.model_fields_set):
+            raise ValueError('At least one non-null condition is required')
+        return self
+
+class PaperConditionsCreate(StrictModel):
+    requestId: UUID
+    values: PaperConditionValues
+
+class EffectivePaperConditions(StrictModel):
+    income: CalculatedMoney
+    expense: CalculatedMoney
+    monthlySaving: CalculatedMoney
+
+class PaperConditionsDetail(StrictModel):
+    paperPlanId: UUID
+    month: Month
+    canEdit: bool
+    appliesFrom: Month | None
+    appliesThrough: Month
+    values: EffectivePaperConditions

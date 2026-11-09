@@ -44,3 +44,6 @@ button:disabled{opacity:.55;cursor:wait}
 
 /* Pending cancellation controls. Author: sxhlxxn / Student ID: 202439688. */
 .paper-pending-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #e9e3f1}.paper-pending-row:last-child{border-bottom:0}.paper-pending-row p{min-width:0;overflow-wrap:anywhere}.paper-pending-row .btn{flex-shrink:0;background:#fff}#papercancelreview h2{font-size:23px}@media(max-width:450px){.paper-pending-row{align-items:flex-start;gap:8px}.paper-pending-row .btn{padding:8px 10px}#papercancelreview h2{font-size:21px}}
+
+/* Financial condition review. Author: sxhlxxn / Student ID: 202439688. */
+#paperconditions h2{font-size:23px}#paperconditions .fields label{font-size:12px}#paperconditions .fields input{font-size:14px}#paperconditions .paper-review-grid strong{font-size:15px}.paper-condition-error{color:#ad5b55!important;min-height:22px}@media(max-width:450px){#paperconditions h2{font-size:21px}#paperconditions .fields{grid-template-columns:1fr;gap:12px}#paperconditions .paper-review-grid{grid-template-columns:1fr}}

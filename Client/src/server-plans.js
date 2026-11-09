@@ -34,6 +34,8 @@ async function apiRequest(resource, path, options = {}) {
           MARKET_CATALOG_LIMIT: '등록된 가격 자료 수를 확인해주세요.',
           EXPLANATION_INPUT_INVALID: '저장된 결과의 지표를 확인하지 못해 해설을 표시할 수 없어요.',
           ORDER_VALUE_TOO_LARGE: '참고 거래대금이 계산 범위를 넘었어요. 수량을 줄여주세요.',
+          CONDITIONS_UNCHANGED: '적용 기간의 조건이 이미 같은 금액이에요. 변경할 항목을 확인해주세요.',
+          CONDITIONS_INVALID: '변경할 금액·기간이나 저장된 조건 기록의 크기를 확인해주세요. 현재 사본은 유지됩니다.',
           ORDER_NOT_FOUND: '이 투자 사본에서 해당 주문을 찾을 수 없어요.',
           ORDER_ALREADY_PROCESSED: '이미 체결되거나 거부된 주문은 취소할 수 없어요.',
           ORDER_LIMIT_EXCEEDED: '이 계획의 주문 수가 한도에 도달했어요.',
