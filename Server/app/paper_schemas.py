@@ -146,7 +146,11 @@ class PaperEngineComparison(StrictModel):
     invested: InvestmentEngineResult
     comparison: Comparison
 
+class PaperCancel(StrictModel):
+    requestId: UUID
+
 class PaperSummary(StrictModel):
+    action: Literal['create', 'order', 'advance', 'cancel'] | None = None
     id: UUID
     parentPaperPlanId: UUID | None
     financialPlanId: UUID

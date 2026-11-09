@@ -11,7 +11,7 @@ from app.models import PaperPlan, PaperRun
 from app.plans import get_owner, owned_plan
 from app.market import load_series, source, catalog_sources
 from app.investment_engine import calculate_investment, calculate_order_preview
-from app.paper_schemas import (PaperCreate, PaperOrderCreate, PaperAdvance,
+from app.paper_schemas import (PaperCreate, PaperOrderCreate, PaperAdvance, PaperCancel,
     PaperSummary, PaperDetail, PaperRunDetail, PaperBundle, MarketSource, MarketView,
     OrderPreviewCreate, OrderPreviewDetail)
 
@@ -30,7 +30,9 @@ async def stored_run(plan: PaperPlan, session: AsyncSession) -> PaperRun:
     return run
 
 def detail(plan: PaperPlan, run: PaperRun, *, include_state=True) -> dict:
+    action = plan.command.get('kind')
     result = {'id': plan.id, 'parentPaperPlanId': plan.parent_id,
+        'action': action if action in ('create', 'order', 'advance', 'cancel') else None,
         'financialPlanId': plan.financial_plan_id, 'name': plan.state['initial']['name'],
         'month': plan.state['month'], 'source': source(plan.market_snapshot),
         'runId': run.id, 'createdAt': plan.created_at}
@@ -201,3 +203,24 @@ async def preview_order(plan_id: UUID, payload: OrderPreviewCreate, response: Re
     return {**values.model_dump(mode='json'), 'paperPlanId': plan.id,
         'symbol': plan.market_snapshot['symbol'], 'side': payload.side, 'quantity': payload.quantity,
         'month': plan.state['month'], 'executionMonth': plan.state['month'] + 1}
+
+
+@router.post('/paper-plans/{plan_id}/orders/{order_id}/cancel', response_model=PaperBundle, status_code=201)
+async def cancel_order(plan_id: UUID, order_id: UUID, payload: PaperCancel, response: Response,
+                       owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+    response.headers['Cache-Control'] = 'no-store'
+    command = {'kind': 'cancel', 'parentId': str(plan_id), 'orderId': str(order_id)}
+    prior = await existing(owner, str(payload.requestId), command, session)
+    if prior is not None:
+        return prior
+    parent = await owned_paper(str(plan_id), owner, session)
+    selected = next((o for o in parent.orders if o['id'] == str(order_id)), None)
+    if selected is None:
+        raise HTTPException(404, 'ORDER_NOT_FOUND')
+    run = await stored_run(parent, session)
+    pending_ids = {o['id'] for o in run.result['invested']['pendingOrders']}
+    if selected['submittedMonth'] != parent.state['month'] or str(order_id) not in pending_ids:
+        raise HTTPException(409, 'ORDER_ALREADY_PROCESSED')
+    orders = [o for o in parent.orders if o['id'] != str(order_id)]
+    return await save(owner, str(payload.requestId), command, parent.financial_plan_id,
+                      parent.id, parent.state, orders, parent.market_snapshot, session)
