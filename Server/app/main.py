@@ -12,6 +12,7 @@ from app.database import check_database_connection, close_database_connection, i
 from app.plans import router as plans_router
 from app.simulations import router as simulations_router
 from app.ai import router as ai_router
+from app.paper import router as paper_router
 
 
 class HealthResponse(BaseModel):
@@ -64,6 +65,7 @@ app.add_middleware(
 app.include_router(plans_router)
 app.include_router(simulations_router)
 app.include_router(ai_router)
+app.include_router(paper_router)
 
 
 @app.exception_handler(SQLAlchemyError)

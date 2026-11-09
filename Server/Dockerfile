@@ -29,6 +29,7 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 COPY Server/app ./app
 COPY Server/tests ./tests
 COPY Engine /app/Engine
+COPY fixtures /app/fixtures
 
 EXPOSE 8000
 

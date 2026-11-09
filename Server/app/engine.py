@@ -17,7 +17,7 @@ ENGINE_TIMEOUT = 5
 slots = asyncio.Semaphore(4)
 
 
-async def calculate(state: dict, months: int) -> EngineResult:
+async def run_engine(payload: dict, max_output: int = 1_000_000) -> bytes:
     node = shutil.which(os.getenv("NODE_BINARY", "node"))
     if not node or not RUNNER.is_file():
         raise HTTPException(status_code=503, detail="ENGINE_UNAVAILABLE")
@@ -31,7 +31,7 @@ async def calculate(state: dict, months: int) -> EngineResult:
             raise HTTPException(status_code=503, detail="ENGINE_UNAVAILABLE") from None
         try:
             stdout, _ = await asyncio.wait_for(
-                process.communicate(json.dumps({"state": state, "months": months}).encode()),
+                process.communicate(json.dumps(payload, ensure_ascii=False).encode()),
                 timeout=ENGINE_TIMEOUT,
             )
         except (TimeoutError, asyncio.CancelledError) as error:
@@ -41,8 +41,13 @@ async def calculate(state: dict, months: int) -> EngineResult:
             if isinstance(error, asyncio.CancelledError):
                 raise
             raise HTTPException(status_code=503, detail="ENGINE_TIMEOUT") from None
-    if process.returncode != 0 or len(stdout) > 1_000_000:
+    if process.returncode != 0 or len(stdout) > max_output:
         raise HTTPException(status_code=503, detail="ENGINE_ERROR")
+    return stdout
+
+
+async def calculate(state: dict, months: int) -> EngineResult:
+    stdout = await run_engine({"state": state, "months": months})
     try:
         result = EngineResult.model_validate_json(stdout)
         if len(result.monthlyResults) != months + 1:

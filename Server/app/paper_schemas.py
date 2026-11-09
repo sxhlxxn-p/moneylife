@@ -1,0 +1,163 @@
+"""Paper trading API contracts. Author: sxhlxxn / 202439688."""
+from typing import Annotated, Literal
+from uuid import UUID
+from pydantic import Field
+from app.schemas import (StrictModel, GameState, CalculatedMoney, NetAssets,
+                         Month, MonthlyResult, RunMetrics, EngineResult)
+
+Quantity = Annotated[int, Field(strict=True, ge=1, le=1_000_000_000)]
+
+class PaperCreate(StrictModel):
+    requestId: UUID
+    planId: UUID
+    priceSeriesId: str = Field(min_length=1, max_length=64)
+
+class PaperOrderCreate(StrictModel):
+    requestId: UUID
+    side: Literal['buy', 'sell']
+    quantity: Quantity
+
+class PaperAdvance(StrictModel):
+    requestId: UUID
+    months: Annotated[int, Field(strict=True, ge=1, le=12)] = 1
+
+class MarketSource(StrictModel):
+    priceSeriesId: str
+    symbol: str
+    label: str
+    dataKind: Literal['synthetic-test-only']
+    priceDataHash: str
+    lastMonth: Month
+
+class Price(StrictModel):
+    month: Month
+    price: Annotated[int, Field(strict=True, ge=1, le=9_007_199_254_740_991)] | None
+    tradable: bool
+
+class MarketView(StrictModel):
+    source: MarketSource
+    throughMonth: Month
+    prices: list[Price]
+
+class OrderIntent(StrictModel):
+    id: str
+    symbol: str
+    side: Literal['buy', 'sell']
+    quantity: CalculatedMoney
+
+class OrderRecord(OrderIntent):
+    submittedMonth: Month
+
+class FilledTrade(StrictModel):
+    order: OrderIntent
+    status: Literal['filled']
+    price: CalculatedMoney
+    gross: CalculatedMoney
+    fee: CalculatedMoney
+    tax: CalculatedMoney
+    feeBps: Annotated[int, Field(strict=True, ge=0, le=10000)]
+    sellTaxBps: Annotated[int, Field(strict=True, ge=0, le=10000)]
+    cashDelta: NetAssets
+    removedCost: CalculatedMoney
+    realizedPnl: NetAssets
+    cashAfter: CalculatedMoney
+    quantityAfter: CalculatedMoney
+    costBasisAfter: CalculatedMoney
+
+class RejectedTrade(StrictModel):
+    order: OrderIntent
+    status: Literal['rejected']
+    reason: Literal['SYMBOL_MISMATCH', 'PRICE_UNAVAILABLE', 'NOT_TRADABLE',
+                    'INSUFFICIENT_CASH', 'INSUFFICIENT_SHARES', 'COST_EXCEEDS_PROCEEDS']
+
+class FilledExecution(FilledTrade):
+    submittedMonth: Month
+    executionMonth: Month
+
+class RejectedExecution(RejectedTrade):
+    submittedMonth: Month
+    executionMonth: Month
+
+Trade = Annotated[FilledTrade | RejectedTrade, Field(discriminator='status')]
+Execution = Annotated[FilledExecution | RejectedExecution, Field(discriminator='status')]
+
+class Position(StrictModel):
+    quantity: CalculatedMoney
+    costBasis: CalculatedMoney
+    averageCost: str | None
+    marketValue: CalculatedMoney
+    realizedPnl: NetAssets
+    unrealizedPnl: NetAssets
+    feesPaid: CalculatedMoney
+    taxesPaid: CalculatedMoney
+    price: CalculatedMoney | None
+    priceMonth: Month | None
+    stale: bool
+
+class InvestmentMonth(MonthlyResult):
+    investment: Position
+
+class InvestmentMetrics(RunMetrics):
+    finalInvestmentValue: CalculatedMoney
+    finalRealizedPnl: NetAssets
+    finalUnrealizedPnl: NetAssets
+
+class InvestmentAccount(StrictModel):
+    symbol: str
+    initialCash: CalculatedMoney
+    cash: CalculatedMoney
+    quantity: CalculatedMoney
+    costBasis: CalculatedMoney
+    realizedPnl: NetAssets
+    netCashFlow: NetAssets
+    feesPaid: CalculatedMoney
+    taxesPaid: CalculatedMoney
+    executions: list[Trade] = Field(max_length=1000)
+
+class InvestmentEngineResult(StrictModel):
+    engineVersion: Literal['monthly-investment-krw-v2']
+    priceSeriesId: str
+    monthlyResults: list[InvestmentMonth] = Field(min_length=1, max_length=121)
+    summary: InvestmentMetrics
+    executions: list[Execution] = Field(max_length=1000)
+    pendingOrders: list[OrderRecord] = Field(max_length=1000)
+    account: InvestmentAccount
+
+class BaselineResult(EngineResult):
+    monthlyResults: list[MonthlyResult] = Field(min_length=1, max_length=121)
+
+class Comparison(StrictModel):
+    finalAssetsDifference: NetAssets
+    goalMonthDifference: Annotated[int, Field(strict=True, ge=-120, le=120)] | None
+    shortageMonthsDifference: Annotated[int, Field(strict=True, ge=-120, le=120)]
+
+class PaperEngineComparison(StrictModel):
+    baseline: BaselineResult
+    invested: InvestmentEngineResult
+    comparison: Comparison
+
+class PaperSummary(StrictModel):
+    id: UUID
+    parentPaperPlanId: UUID | None
+    financialPlanId: UUID
+    name: str
+    month: Month
+    source: MarketSource
+    runId: UUID
+    createdAt: int
+
+class PaperDetail(PaperSummary):
+    state: GameState
+    orders: list[OrderRecord]
+
+class PaperRunDetail(StrictModel):
+    id: UUID
+    paperPlanId: UUID
+    engineVersion: str
+    createdAt: int
+    source: MarketSource
+    result: PaperEngineComparison
+
+class PaperBundle(StrictModel):
+    plan: PaperDetail
+    run: PaperRunDetail
