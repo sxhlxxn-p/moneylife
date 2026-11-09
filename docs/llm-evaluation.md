@@ -14,11 +14,25 @@
 
 ## 설정과 실행
 
-`httpx`를 개발 전용에서 서버 런타임 의존성으로 이동했다. `pip install -r Server/requirements-dev.txt`로 갱신하고 루트 `npm ci`로 엔진 의존성을 준비한다.
+`httpx`를 개발 전용에서 서버 런타임 의존성으로 이동했다. 로컬 설정 로드를 위해 python-dotenv를 명시적 런타임 의존성으로 추가했다. `pip install -r Server/requirements-dev.txt`로 갱신하고 루트 `npm ci`로 엔진 의존성을 준비한다.
 
 Compose는 `Server/.env`에서 `LLM_PROVIDER=openai`, `LLM_MODEL`, `OPENAI_API_KEY`를 읽는다. 실제 값을 Git에 올리지 않는다. 모델은 Responses API의 strict JSON Schema 출력을 지원하는 모델 ID로 설정한다. 특정 모델을 임의로 기본 선택하지 않는다.
 
-Docker 없는 `run_local.py`는 .env를 자동으로 읽지 않는다. API를 실행하는 터미널에서 세 변수를 환경변수로 설정한 뒤 실행한다. 키는 채팅·명령 이력·코드에 붙여넣지 말고 사용하는 개발 환경의 비밀정보 설정으로 주입한다. 키나 모델이 없으면 LLM_NOT_CONFIGURED를 반환하고 수동 기능은 그대로 쓸 수 있다.
+로컬 서버와 평가/진단 도구는 `Server/.env`에서 LLM_PROVIDER·LLM_MODEL·OPENAI_API_KEY만 자동으로 읽는다. 기존 셸/배포 환경변수는 덮어쓰지 않으며 비어 있는 환경변수도 명시적 설정으로 취급한다. DB 주소 등 다른 .env 설정은 이 로더로 읽지 않아 SQLite 로컬 기본 동작을 유지한다. 키나 모델이 없으면 LLM_NOT_CONFIGURED를 반환하고 수동 기능은 그대로 쓸 수 있다.
+
+저장소 루트의 터미널에서:
+
+```bash
+source .venv/bin/activate
+pip install -r Server/requirements-dev.txt
+npm run setup:llm
+npm run check:llm
+npm run check:llm -- --live
+```
+
+setup 명령은 모델 ID를 입력받고 키는 화면에 표시하지 않는다. 기존 Server/.env의 다른 항목을 보존하며 파일 권한 600으로 저장한다. 모델을 임의로 선택하지 않는다. 설정 저장 후 이미 실행 중인 API 서버는 재시작한다. 기본 check는 설정 유무만 확인하고 외부 요청을 하지 않는다. `--live`만 가상 요청 한 건을 외부 모델에 보내 해석 결과까지 검사한다. 이 한 건 통과는 100건 성능 평가를 대신하지 않는다. 키가 없으면 --live도 요청을 보내지 않는다. 키를 채팅으로 전달할 필요는 없다.
+
+배포 환경의 변수가 있으면 파일보다 우선한다. 파일을 바꿨는데 계속 이전 설정을 사용하면 실행 프로세스의 환경변수와 재시작 여부를 확인한다.
 
 실행 순서:
 
@@ -60,3 +74,16 @@ LLM에는 요청 원문과 기준/다음/최종 연월만 전송한다. 프로�
 검증된 설명에는 source=llm, 대체에는 source=template과 fallbackReason을 반환한다. verifiedNumbers는 정해진 지표 참조·수치 형식 검사와 서버 값 연결을 뜻한다. 원인에 관한 서술이나 모든 자연어 표현의 의미 정확성을 증명하는 지표가 아니다. 실제 모델 설명의 의미 검수와 자유 설명 대비 실험은 남아 있다.
 
 실제 외부 모델 호출은 아직 없다. 테스트 대역으로 직접 숫자 생성 → 재요청 → 지표 연결 성공, 계속 실패 시 대체, 별도 저장·재조회·소유권을 확인했다. Chromium에서도 AI 설명 버튼과 수치 연결, 모바일 가로 넘침 없음을 확인했다.
+
+## 연결 오류 진단
+
+- LLM_AUTHENTICATION_FAILED: 키 인증 확인.
+- LLM_ACCESS_DENIED: 해당 API/지역 등 접근 권한 확인. 특정 원인으로 단정하지 않는다.
+- LLM_MODEL_UNAVAILABLE: 모델 ID와 접근 가능 여부 확인.
+- LLM_QUOTA_EXCEEDED: 크레딧/사용 한도 확인. 재요청만으로 해결되지 않는다.
+- LLM_RATE_LIMITED: 요청 속도를 낮추고 나중에 다시 확인.
+- LLM_TIMEOUT / LLM_UNAVAILABLE: 연결 시간 초과/일시 장애.
+- LLM_REQUEST_INVALID: 모델과 요청 형식의 호환성 확인. 코드 문제일 수도 있다.
+- LLM_SMOKE_MISMATCH: API 응답은 왔지만 가상 문장의 기대 조건과 불일치.
+
+키나 제공자 오류 메시지 원문은 진단 출력·브라우저 응답에 포함하지 않는다. 공식 오류 분류 참고: https://developers.openai.com/api/docs/guides/error-codes (2026-11-09 확인). 실제 인증/모델 실패는 테스트 HTTP 응답으로 분류를 확인했으며 실제 제공자 연결 성공은 아직 없다.

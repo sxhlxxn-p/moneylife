@@ -20,7 +20,9 @@
     "tree": "node scripts/print-tree.cjs",
     "test": "npm run test --workspace Test",
     "check": "npm run check --workspaces --if-present && node --check prototype/app.js && node --check prototype/engine.js && node --check scripts/dev-server.cjs && node --check scripts/print-tree.cjs",
-    "demo:trading": "npm run demo:trading --workspace Engine"
+    "demo:trading": "npm run demo:trading --workspace Engine",
+    "setup:llm": "python3 Server/scripts/setup_llm.py",
+    "check:llm": "python3 Server/scripts/check_llm.py"
   },
   "engines": {
     "node": ">=18"

@@ -24,6 +24,14 @@ async function apiRequest(resource, path, options = {}) {
         const body = await response.json();
         const messages = {
           LLM_NOT_CONFIGURED: '서버에 LLM API 키와 모델을 설정해야 해요. 현재 여정은 유지됩니다.',
+          LLM_AUTHENTICATION_FAILED: '서버의 LLM API 키 인증을 확인해주세요. 현재 여정은 유지됩니다.',
+          LLM_ACCESS_DENIED: '설정한 키의 API 접근 권한을 확인해주세요.',
+          LLM_MODEL_UNAVAILABLE: '서버의 모델 ID와 모델 접근 권한을 확인해주세요.',
+          LLM_PROVIDER_UNSUPPORTED: '서버의 LLM 공급자 설정을 확인해주세요.',
+          LLM_QUOTA_EXCEEDED: '모델 제공자의 크레딧·사용 한도를 확인해주세요.',
+          LLM_RATE_LIMITED: 'AI 요청이 많아요. 잠시 후 다시 요청해주세요.',
+          LLM_TIMEOUT: 'AI 응답 시간이 초과됐어요. 현재 여정은 유지됩니다.',
+          LLM_REQUEST_INVALID: '모델이 요청 설정을 받지 못했어요. 서버의 모델·출력 형식을 확인해주세요.',
           LLM_UNAVAILABLE: 'AI 서버가 응답하지 않아요. 잠시 후 다시 요청해주세요.',
           LLM_REFUSED: '이 요청을 해석하지 못했어요. 바꿀 조건을 다시 입력해주세요.',
           MODEL_OUTPUT_INVALID: 'AI 응답 형식이 올바르지 않아 적용하지 않았어요.',

@@ -97,6 +97,8 @@ Docker가 없으면 가상환경에서 의존성을 설치한 뒤 루트의 `npm
 
 `POST /ai/parse-change`는 본인 계획을 기준으로 구조화 추출·서버 검증을 수행한다. `POST /ai/proposals/{id}/apply`에서 명시적으로 확인하면 원본을 보존한 새 계획과 계산 결과를 저장한다. 모델은 금액을 계산하지 않는다. 결과 설명은 현재 정형 문장이다.
 
-`LLM_PROVIDER=openai`, `LLM_MODEL`, `OPENAI_API_KEY` 설정이 필요하다. Compose는 Server/.env, 로컬 Python 실행은 실행 터미널의 환경변수를 사용한다. 키 미설정 시 503이며 테스트 모형으로 자동 대체하지 않는다. [실행과 평가](../docs/llm-evaluation.md)를 참고한다. httpx는 실제 모델 HTTP 연결에 사용하는 런타임 의존성이다.
+`LLM_PROVIDER=openai`, `LLM_MODEL`, `OPENAI_API_KEY` 설정이 필요하다. Compose는 Server/.env를 사용하며 로컬 Python·평가 도구도 해당 파일의 LLM 설정만 읽는다. 기존 환경변수가 파일보다 우선한다. 키 미설정 시 503이며 테스트 모형으로 자동 대체하지 않는다. [실행과 평가](../docs/llm-evaluation.md)를 참고한다. httpx는 실제 모델 HTTP 연결에 사용하는 런타임 의존성이다.
 
 `POST /ai/explain`는 비교가 저장된 본인 Run의 지표 연결 설명을 생성한다. 검증 실패 후 한 번 재요청하고 계속 실패하면 정형 설명을 유지한다. 성공한 설명은 Run과 별도로 보관한다. 조건 추출 100건 평가 실행기는 `Test/ai/README.md`를 참고한다.
+
+로컬 연결 준비: 가상환경 활성화 및 의존성 설치 후 루트에서 `npm run setup:llm` → `npm run check:llm -- --live`. 키는 숨김 입력으로 받고 기존 DB 설정은 보존한다. 서버 재시작이 필요하다. 실제 모델/인증/한도 오류를 진단 코드로 구분한다.
