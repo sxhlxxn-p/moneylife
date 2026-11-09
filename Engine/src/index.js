@@ -5,7 +5,7 @@ const GameEngine = {
   },
 
   simulate({initial, changes = [], rateChanges = [], monthlySaving = 70,
-    annualRate = 3, months = 120, calculateInterest = null}) {
+    annualRate = 3, months = 120, calculateInterest = null, processInvestment = null}) {
     let cash = initial.cash;
     let saved = initial.saved;
     let unpaid = 0;
@@ -33,11 +33,17 @@ const GameEngine = {
       const short = Math.max(0, -beforeTransfer);
       unpaid += short;
       cash = Math.max(0, beforeTransfer);
+      let investment;
+      if (processInvestment) {
+        const result = processInvestment({month, cash});
+        cash = result.cash;
+        investment = result.investment;
+      }
       const transfer = Math.min(saving, cash);
       cash -= transfer;
       saved += transfer;
-      results.push({cash, saved, unpaid, total: cash + saved - unpaid,
-        income, expense: expense + once, short});
+      results.push({cash, saved, unpaid, total: cash + saved + (investment?.marketValue ?? 0) - unpaid,
+        income, expense: expense + once, short, ...(investment ? {investment} : {})});
     }
     return results;
   }

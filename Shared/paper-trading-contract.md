@@ -27,3 +27,7 @@
 체결/거부 기록을 `account.executions`에 보존한다. 같은 ID와 동일 주문을 다시 호출하면 새 거래를 만들지 않고 기존 기록을 돌려준다. 이후 가격·비용이 달라져도 재체결하지 않는다. 같은 ID에 다른 주문 내용은 `ORDER_ID_CONFLICT` 예외다. 거부 주문을 수정하거나 다시 시도하려면 새 ID를 사용한다. 재시도 계좌 상태와 기록의 영속화·동시 요청 처리는 다음 서버 통합 범위다.
 
 평가는 수량이 0이면 가격 없이 가능하다. 주식을 보유한 상태에서 유효 가격이 없으면 `PRICE_UNAVAILABLE` 예외로, 다른 종목 가격이면 `SYMBOL_MISMATCH` 예외로 실패한다. 거래 정지 여부는 체결만 제한하며 유효한 가격의 평가 자체를 막지 않는다. 직전 가격 사용·가격 지연 표시는 다음 데이터 계층에서 명시적으로 처리한다.
+
+## 월별 현금 연결 확장
+
+`applyCashFlow(account, delta)`는 비거래 현금 유입/유출을 추적한다. 계좌의 netCashFlow 기본값은 0이며 해당 필드가 없는 기존 계좌도 읽는다. 확장 불변식은 cash + costBasis = initialCash + netCashFlow + realizedPnl이다. 현금 이상 유출은 거부하며 원본을 변경하지 않는다. 월별 통합은 [v2 계약](monthly-investment-contract.md)을 따른다.
