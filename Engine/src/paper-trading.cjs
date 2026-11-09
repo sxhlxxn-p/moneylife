@@ -55,6 +55,19 @@ function validPrice(quote) {
   return quote && Number.isSafeInteger(quote.price) && quote.price > 0;
 }
 
+function calculateOrderAmounts(side, quantity, price, costs = {}) {
+  if (!['buy', 'sell'].includes(side)) fail('INVALID_SIDE');
+  integer(quantity, 1); integer(price, 1);
+  const feeBps = integer(costs.feeBps ?? 0);
+  const sellTaxBps = integer(costs.sellTaxBps ?? 0);
+  if (feeBps > 10000 || sellTaxBps > 10000) fail('INVALID_COST_RATE');
+  const gross = won(new Decimal(price).times(quantity));
+  const fee = won(new Decimal(gross).times(feeBps).div(10000));
+  const tax = side === 'sell' ? won(new Decimal(gross).times(sellTaxBps).div(10000)) : 0;
+  const cashDelta = side === 'buy' ? -won(new Decimal(gross).plus(fee)) : won(new Decimal(gross).minus(fee).minus(tax));
+  return {gross, fee, tax, cashDelta};
+}
+
 function executeOrder(account, order, quote, costs = {}) {
   validateAccount(account);
   if (!order || typeof order !== 'object') fail('INVALID_ORDER');
@@ -79,18 +92,16 @@ function executeOrder(account, order, quote, costs = {}) {
   if (!validPrice(quote)) return rejected('PRICE_UNAVAILABLE');
   if (quote.tradable !== true) return rejected('NOT_TRADABLE');
 
-  const gross = won(new Decimal(quote.price).times(intent.quantity));
-  const fee = won(new Decimal(gross).times(feeBps).div(10000));
-  const tax = intent.side === 'sell' ? won(new Decimal(gross).times(sellTaxBps).div(10000)) : 0;
+  const {gross, fee, tax, cashDelta: quotedCashDelta} = calculateOrderAmounts(intent.side, intent.quantity, quote.price, {feeBps, sellTaxBps});
   let cashDelta, costDelta, realizedDelta = 0;
   if (intent.side === 'buy') {
-    const payment = won(new Decimal(gross).plus(fee));
+    const payment = -quotedCashDelta;
     if (payment > account.cash) return rejected('INSUFFICIENT_CASH');
     cashDelta = -payment;
     costDelta = payment;
   } else {
     if (intent.quantity > account.quantity) return rejected('INSUFFICIENT_SHARES');
-    cashDelta = won(new Decimal(gross).minus(fee).minus(tax));
+    cashDelta = quotedCashDelta;
     if (cashDelta < 0) return rejected('COST_EXCEEDS_PROCEEDS');
     const removedCost = intent.quantity === account.quantity ? account.costBasis :
       won(new Decimal(account.costBasis).times(intent.quantity).div(account.quantity));
@@ -126,4 +137,4 @@ function valueAccount(account, quote) {
     feesPaid: account.feesPaid, taxesPaid: account.taxesPaid};
 }
 
-module.exports = {createAccount, executeOrder, valueAccount, applyCashFlow};
+module.exports = {calculateOrderAmounts, createAccount, executeOrder, valueAccount, applyCashFlow};

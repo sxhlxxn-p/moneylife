@@ -85,3 +85,35 @@ async def calculate_investment(state: dict, investment: dict, months: int) -> Pa
         return result
     except (ValidationError, ValueError):
         raise HTTPException(503, 'ENGINE_OUTPUT_INVALID') from None
+
+async def calculate_order_preview(state: dict, investment: dict, order: dict):
+    from app.paper_schemas import OrderPreviewValues
+    month = state['month']
+    # Remove future prices at the process boundary as well as inside the pure engine.
+    visible = {**investment, 'prices': [q for q in investment['prices'] if q['month'] <= month]}
+    output = await run_engine({'mode': 'order-preview', 'state': state, 'investment': visible,
+                              'months': month, 'order': order}, max_output=100_000)
+    try:
+        result = OrderPreviewValues.model_validate_json(output)
+        known = [q for q in visible['prices'] if q['price'] is not None]
+        latest = max(known, key=lambda q: q['month']) if known else None
+        if (result.referencePrice, result.referencePriceMonth, result.staleReference) != (
+            latest['price'] if latest else None, latest['month'] if latest else None,
+            latest is None or latest['month'] != month):
+            raise ValueError('Unknown reference price')
+        if latest is None:
+            if any(getattr(result, k) is not None for k in ('referenceGross', 'referenceFee', 'referenceTax', 'referenceCashChange', 'estimatedNextCash', 'estimatedNextSaved')) or result.estimatedStatus != 'unavailable':
+                raise ValueError('Invented price estimate')
+        else:
+            gross = latest['price'] * order['quantity']
+            costs = investment['costs']
+            fee = (gross * costs.get('feeBps', 0) + 5000) // 10000
+            tax = (gross * costs.get('sellTaxBps', 0) + 5000) // 10000 if order['side'] == 'sell' else 0
+            delta = -gross - fee if order['side'] == 'buy' else gross - fee - tax
+            if (result.referenceGross, result.referenceFee, result.referenceTax, result.referenceCashChange) != (gross, fee, tax, delta):
+                raise ValueError('Incorrect reference amount')
+        if result.availableSellQuantity != result.currentQuantity - result.reservedSellQuantity:
+            raise ValueError('Incorrect available shares')
+        return result
+    except (ValidationError, ValueError):
+        raise HTTPException(503, 'ENGINE_OUTPUT_INVALID') from None

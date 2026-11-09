@@ -71,6 +71,7 @@ async function demo(page) {
 async function clickCommand(page, name, action) {
   const response = page.waitForResponse(r => r.url().endsWith('/' + action) && r.request().method() === 'POST');
   await page.getByRole('button', {name, exact: true}).click();
+  if (action === 'orders') await page.getByRole('button', {name: '예약 확정', exact: true}).click();
   const result = await response; assert.equal(result.status(), 201);
   const body = await result.json();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), body.plan.id);
@@ -122,6 +123,7 @@ test('응답 유실 후 새로고침·동일 요청 재확인으로 주문 중�
   });
   await page.getByLabel('주문 수량 · 주').fill('10');
   await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '예약 확정', exact: true}).click();
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).waitFor();
   await page.waitForFunction(() => !document.querySelector('[data-plan-action="paper-open"]').disabled);
   assert.ok(accepted);
@@ -168,6 +170,7 @@ test('개인 조건 사본·저장된 매도 예약 초과·다른 화면과 버
   await page.getByLabel('주문 수량 · 주').fill('5');
   await page.getByRole('button', {name: '매도 예약', exact: true}).click();
   await page.waitForFunction(() => document.getElementById('paperstatus').textContent.includes('이미 예약한'));
+  await page.getByRole('button', {name: '돌아가기', exact: true}).click();
   assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-pending')), null);
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), false);
   if (process.env.UI_SCREENSHOT_DIR) await page.evaluate(() => document.fonts.ready);
@@ -231,4 +234,72 @@ test('가격 목록 오류에도 저장된 원본으로 복원·월 진행', {ti
   await page.waitForFunction(() => document.getElementById('paperstatus').textContent.includes('저장된 가격으로 진행'));
   const result = await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(result.plan.month, 1);
+});
+test('주문 확인·취소·Escape·새로고침은 예약을 만들지 않는다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  const originalId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  let orders = 0;
+  page.on('request', request => { if (request.method() === 'POST' && request.url().endsWith('/orders')) orders++; });
+  await page.getByLabel('주문 수량 · 주').fill('50');
+  await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '예약 확정', exact: true}).waitFor();
+  assert.match(await page.locator('#paperreview').innerText(), /475,000원/);
+  assert.match(await page.locator('#paperreview').innerText(), /575,000원/);
+  assert.match(await page.locator('#paperreview').innerText(), /다음 달 실제 가격으로 다시 판단/);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-pending')), null);
+  await page.getByRole('button', {name: '수량 다시 수정', exact: true}).click();
+  assert.equal(orders, 0);
+  assert.equal(await page.getByLabel('주문 수량 · 주').inputValue(), '50');
+  await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '예약 확정', exact: true}).waitFor();
+  await page.keyboard.press('Escape');
+  assert.equal(orders, 0);
+  await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '예약 확정', exact: true}).waitFor();
+  await page.reload();
+  assert.equal(orders, 0);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), originalId);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-pending')), null);
+});
+test('모바일 확인 화면에서 수량을 고정하고 확정 후에만 예약한다', {timeout: 30000}, async t => {
+  const page = await pageFor(t, {width: 390, height: 844});
+  await demo(page);
+  await page.getByLabel('주문 수량 · 주').fill('1000');
+  await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '예약 확정', exact: true}).waitFor();
+  assert.match(await page.locator('#paperreview').innerText(), /현금이 부족해/);
+  // A changed background input must not silently change the reviewed order.
+  await page.evaluate(() => { document.getElementById('paperquantity').value = '1'; });
+  const dimensions = await page.evaluate(() => ({width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth}));
+  assert.ok(dimensions.scroll <= dimensions.width);
+  if (process.env.UI_SCREENSHOT_DIR) {
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'order-review-mobile.png')});
+  }
+  const response = page.waitForResponse(r => r.url().endsWith('/orders') && r.request().method() === 'POST');
+  await page.getByRole('button', {name: '예약 확정', exact: true}).click();
+  const saved = await (await response).json();
+  assert.equal(saved.plan.orders[0].quantity, 1000);
+});
+test('확인 요청 실패나 확인 화면을 닫은 뒤 늦은 응답은 주문을 만들지 않는다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  let orders = 0;
+  page.on('request', request => { if (request.url().endsWith('/orders') && request.method() === 'POST') orders++; });
+  await page.route('**/order-preview', route => route.fulfill({status: 503, contentType: 'application/json', body: JSON.stringify({detail: 'ENGINE_UNAVAILABLE'})}));
+  await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '돌아가기', exact: true}).click();
+  assert.equal(orders, 0);
+  await page.unroute('**/order-preview');
+  let release;
+  const hold = new Promise(resolve => { release = resolve; });
+  await page.route('**/order-preview', async route => { const response = await route.fetch(); await hold; await route.fulfill({response}); });
+  await page.getByRole('button', {name: '매수 예약', exact: true}).click();
+  await page.getByRole('button', {name: '닫기', exact: true}).click();
+  release();
+  await page.waitForFunction(() => !document.querySelector('[data-plan-action="paper-open"]').disabled);
+  assert.equal(await page.locator('#overlay').evaluate(el => el.classList.contains('hidden')), true);
+  assert.equal(orders, 0);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-pending')), null);
 });
