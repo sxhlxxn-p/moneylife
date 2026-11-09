@@ -99,3 +99,14 @@ class PaperRun(Base):
     created_at: Mapped[int] = mapped_column(BigInteger)
     input_snapshot: Mapped[dict] = mapped_column(JSON)
     result: Mapped[dict] = mapped_column(JSON)
+
+class PaperExplanation(Base):
+    __tablename__ = 'paper_explanations'
+
+    run_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    prompt_version: Mapped[str] = mapped_column(String(64), primary_key=True)
+    model: Mapped[str] = mapped_column(String(128), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    selected_ids: Mapped[list] = mapped_column(JSON)
+    attempts: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[int] = mapped_column(BigInteger)

@@ -25,3 +25,5 @@ requestId는 게스트별로 고유하다. 동일 명령·동일 원본·동일 
 v1 /plans와 /simulations는 그대로 유지한다. 게스트 소유권·Origin 검사와 만료 정책을 공유한다. 다른 게스트의 투자 계획·시세·Run은 ID를 알아도 조회하거나 명령을 실행할 수 없다.
 
 주문 전 참고값은 `POST /paper-plans/{id}/order-preview`로 조회한다. 원본/가격·계획 저장 없이 현재까지의 가격 가정으로만 계산하며, 실제 예약은 별도 `/orders`다. [주문 확인 계약](order-preview-contract.md)을 따른다.
+
+투자 해설은 `/paper-runs/{id}/explanation`의 GET(기본)과 POST(명시적 AI 선택)로 제공한다. 기본 해설은 외부 호출 없이 저장된 Run만 읽는다. [투자 해설 계약](paper-explanation-contract.md)을 따른다.

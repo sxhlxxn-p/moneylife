@@ -33,7 +33,7 @@ before(async () => {
     '--provider', 'Browser Test', '--usage-scope', 'project', '--directory', marketDirectory], {cwd: root, encoding: 'utf8'});
   assert.equal(imported.status, 0, imported.stderr);
   const api = spawn(python, ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', String(apiPort)], {
-    cwd: path.join(root, 'Server'), env: {...process.env, DATABASE_URL: `sqlite+aiosqlite:///${path.join(temporary, 'test.db')}`, CLIENT_ORIGIN: url, MARKET_SERIES_DIR: marketDirectory}, stdio: 'pipe'});
+    cwd: path.join(root, 'Server'), env: {...process.env, DATABASE_URL: `sqlite+aiosqlite:///${path.join(temporary, 'test.db')}`, CLIENT_ORIGIN: url, MARKET_SERIES_DIR: marketDirectory, OPENAI_API_KEY: '', LLM_MODEL: '', LLM_PROVIDER: 'openai'}, stdio: 'pipe'});
   children.push(api);
   const client = spawn(process.execPath, ['scripts/dev-server.cjs'], {cwd: root,
     env: {...process.env, PORT: String(port), API_BASE_URL: `http://127.0.0.1:${apiPort}`}, stdio: 'pipe'});
@@ -51,7 +51,7 @@ after(async () => {
   if (temporary) await rm(temporary, {recursive: true, force: true});
 });
 async function pageFor(t, viewport = {width: 1440, height: 1000}) {
-  const context = await browser.newContext({viewport});
+  const context = await browser.newContext({viewport, baseURL: url});
   t.after(() => context.close());
   const page = await context.newPage();
   const errors = []; page.on('pageerror', error => errors.push(error.message));
@@ -301,5 +301,66 @@ test('확인 요청 실패나 확인 화면을 닫은 뒤 늦은 응답은 주�
   await page.waitForFunction(() => !document.querySelector('[data-plan-action="paper-open"]').disabled);
   assert.equal(await page.locator('#overlay').evaluate(el => el.classList.contains('hidden')), true);
   assert.equal(orders, 0);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-pending')), null);
+});
+test('기본 투자 해설은 외부 AI 요청 없이 현재 실행에 연결된다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  let aiRequests = 0;
+  page.on('request', r => { if (r.url().endsWith('/explanation') && r.method() === 'POST') aiRequests++; });
+  await page.getByRole('button', {name: '기본 해설 보기', exact: true}).click();
+  const section = page.getByRole('region', {name: '투자 결과 해설'});
+  await section.locator('article').first().waitFor();
+  assert.match(await section.innerText(), /기본 계산 지표 해설/);
+  assert.match(await section.innerText(), /진행한 0개월/);
+  assert.doesNotMatch(await section.locator('.paper-explanation-facts').innerText(), /120개월/);
+  assert.equal(aiRequests, 0);
+  await clickCommand(page, '다음 달로 +1개월', 'advance');
+  assert.equal(await section.locator('article').count(), 0, 'An old explanation must not be shown for a new Run');
+  await page.getByRole('button', {name: '기본 해설 보기', exact: true}).click();
+  await page.waitForFunction(() => document.querySelector('.paper-explanation-facts').textContent.includes('진행한 1개월'));
+  assert.equal(aiRequests, 0);
+});
+test('AI 버튼의 명시적 호출·미설정 대체·선택형 해설 출처를 구분한다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  await page.getByRole('button', {name: 'AI로 핵심 지표 정리', exact: true}).click();
+  const section = page.getByRole('region', {name: '투자 결과 해설'});
+  await page.waitForFunction(() => document.querySelector('.paper-explanation').textContent.includes('AI 연결 설정 전'));
+  assert.ok(await section.locator('article').count() >= 4);
+  const planId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  const planResponse = await page.request.get('/api/paper-plans/' + planId);
+  const plan = await planResponse.json();
+  const baseResponse = await page.request.get('/api/paper-runs/' + plan.runId + '/explanation');
+  const base = await baseResponse.json();
+  await page.route('**/explanation', async route => {
+    if (route.request().method() !== 'POST') return route.continue();
+    assert.deepEqual(route.request().postDataJSON(), {useAI: true});
+    await route.fulfill({status: 200, contentType: 'application/json', body: JSON.stringify({...base, source: 'llm-ranked', cached: true})});
+  });
+  await page.getByRole('button', {name: 'AI로 핵심 지표 정리', exact: true}).click();
+  await page.waitForFunction(() => document.querySelector('.paper-explanation').textContent.includes('AI가 선택·정렬한'));
+  assert.match(await section.innerText(), /저장된 선택을 다시 불러왔어요/);
+  assert.match(await section.innerText(), /외부 AI에 전송/);
+});
+test('모바일 해설·실패 안내가 기존 결과와 주문을 바꾸지 않는다', {timeout: 30000}, async t => {
+  const page = await pageFor(t, {width: 390, height: 844});
+  await demo(page);
+  const planId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  await page.getByRole('button', {name: '기본 해설 보기', exact: true}).click();
+  const section = page.getByRole('region', {name: '투자 결과 해설'});
+  await section.locator('article').first().waitFor();
+  const before = await section.locator('.paper-explanation-facts').innerText();
+  const dimensions = await page.evaluate(() => ({width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth}));
+  assert.ok(dimensions.scroll <= dimensions.width);
+  if (process.env.UI_SCREENSHOT_DIR) {
+    await page.evaluate(() => document.fonts.ready);
+    await section.screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'paper-explanation-mobile.png')});
+  }
+  await page.route('**/explanation', route => route.fulfill({status: 503, contentType: 'application/json', body: JSON.stringify({detail: 'DATABASE_UNAVAILABLE'})}));
+  await page.getByRole('button', {name: '기본 해설 보기', exact: true}).click();
+  await page.waitForFunction(() => document.querySelector('.paper-explanation').textContent.includes('저장된 투자 결과와 주문은 유지'));
+  assert.equal(await section.locator('.paper-explanation-facts').innerText(), before);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), planId);
   assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-pending')), null);
 });
