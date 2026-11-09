@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
 from app.models import PaperPlan, PaperRun
 from app.plans import get_owner, owned_plan
-from app.market import load_series, source
+from app.market import load_series, source, catalog_sources
 from app.investment_engine import calculate_investment
 from app.paper_schemas import (PaperCreate, PaperOrderCreate, PaperAdvance,
     PaperSummary, PaperDetail, PaperRunDetail, PaperBundle, MarketSource, MarketView)
@@ -81,7 +81,7 @@ async def save(owner: str, request_id: str, command: dict, financial_plan_id: st
 @router.get('/market/series', response_model=list[MarketSource])
 async def market_series(response: Response):
     response.headers['Cache-Control'] = 'no-store'
-    return [source(load_series('synthetic-monthly-v1'))]
+    return catalog_sources()
 
 @router.post('/paper-plans', response_model=PaperBundle, status_code=201)
 async def create(payload: PaperCreate, response: Response,

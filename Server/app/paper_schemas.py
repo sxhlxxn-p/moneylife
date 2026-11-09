@@ -1,4 +1,5 @@
 """Paper trading API contracts. Author: sxhlxxn / 202439688."""
+from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 from pydantic import Field
@@ -25,14 +26,23 @@ class MarketSource(StrictModel):
     priceSeriesId: str
     symbol: str
     label: str
-    dataKind: Literal['synthetic-test-only']
+    dataKind: Literal['synthetic-test-only', 'historical-market']
     priceDataHash: str
     lastMonth: Month
+    provider: str | None = None
+    sourceUrl: str | None = None
+    collectedAt: datetime | None = None
+    historicalStartMonth: str | None = None
+    historicalEndMonth: str | None = None
+    adjustment: Literal['unadjusted'] | None = None
+    sampling: Literal['last-observed-daily-close'] | None = None
+    corporateActions: Literal['not-modeled'] | None = None
 
 class Price(StrictModel):
     month: Month
     price: Annotated[int, Field(strict=True, ge=1, le=9_007_199_254_740_991)] | None
     tradable: bool
+    observedOn: date | None = None
 
 class MarketView(StrictModel):
     source: MarketSource

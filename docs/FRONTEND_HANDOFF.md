@@ -80,3 +80,7 @@ API 명칭은 Notion 초안과 동일한 제안이며 아직 엔드포인트가 
 사용 엔드포인트: `/market/series`, `/paper-plans`, `/paper-plans/{id}`, `/paper-plans/{id}/orders`, `/paper-plans/{id}/advance`, `/paper-runs/{id}`. 상세 계약은 [모의투자 API](../Shared/paper-api-contract.md)를 따른다. 화면은 현재 월까지의 저장된 실행 결과만 그린다. 금액은 원 단위, 날짜는 재무 시작 월 기준이다. 투자 목록 createdAt은 마이크로초이므로 JS Date 변환 시 1,000으로 나눈다.
 
 최초 투자 생성·주문·진행의 requestId는 전송 전에 브라우저에 보관한다. 응답 유실 시 새 요청을 만들지 않고 동일 명령을 재전송한다. 서버 검증 오류는 사용자에게 안내하며 입력을 고칠 수 있다. 서버/네트워크 실패는 요청을 유지한다. 브라우저 테스트는 `npm run test:ui`로 실행한다.
+
+## 과거 주가 목록 선택
+
+`/market/series`에 등록된 project 가격 묶음을 시작 화면의 선택 상자에서 고른다. dataKind가 historical-market이면 provider, sourceUrl, historicalStartMonth/EndMonth와 관측 방식·기업 이벤트 미반영을 안내한다. 날짜는 선택한 주가의 시작 월+경과 월로 표시한다. 현재 가격이 이전 월 평가값이면 해당 기준 월도 표시한다. 종목·가격·기간을 클라이언트 POST에 임의로 보내지 않고 서버의 priceSeriesId만 사용한다.

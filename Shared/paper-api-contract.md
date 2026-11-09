@@ -1,6 +1,6 @@
 # 모의투자 저장 API v2
 
-검증용 가상 가격만 사용한다. 첫 가격 묶음은 synthetic-monthly-v1, 종목 TEST-KRW, 관측 월 0~4다. 외부 API 키·실제 주문·실제 시세는 사용하지 않는다.
+기본 가격 묶음은 synthetic-monthly-v1, 종목 TEST-KRW, 관측 월 0~4의 가상 자료다. 운영자가 등록한 과거 주가도 선택할 수 있으며, 출처·기간·해시와 데이터 구분을 제공한다. 실제 주문이나 실시간 거래는 하지 않는다. 등록 계약은 historical-market-contract.md를 따른다.
 
 ## 엔드포인트
 

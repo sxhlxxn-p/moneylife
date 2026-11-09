@@ -18,6 +18,7 @@ services:
       - ./app:/app/Server/app
       - ./tests:/app/Server/tests
       - ../Engine/src:/app/Engine/src
+      - ../.data/market:/app/.data/market:ro
     healthcheck:
       test:
         - CMD
