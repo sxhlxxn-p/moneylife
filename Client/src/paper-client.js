@@ -13,9 +13,10 @@ const PaperTrading = (() => {
     reference = localStorage.getItem(referenceKey);
     const saved = JSON.parse(localStorage.getItem(pendingKey));
     // Only replay the three allowed commands, never arbitrary stored URLs.
-    if (saved && ['create', 'orders', 'advance'].includes(saved.action) &&
+    if (saved && ['create', 'orders', 'advance', 'cancel'].includes(saved.action) &&
         typeof saved.body?.requestId === 'string' &&
-        (saved.action === 'create' || /^[a-f0-9-]{36}$/.test(saved.parentId))) pending = saved;
+        (saved.action === 'create' || /^[a-f0-9-]{36}$/.test(saved.parentId)) &&
+        (saved.action !== 'cancel' || /^[a-f0-9-]{36}$/.test(saved.orderId))) pending = saved;
   } catch {}
   const won = value => value.toLocaleString('ko-KR') + '원';
   const signed = value => (value > 0 ? '+' : '') + won(value);
@@ -114,7 +115,13 @@ const PaperTrading = (() => {
     const pendingList = node('div', undefined, 'paper-orders');
     pendingList.append(node('h4', '다음 달 체결 대기'));
     if (!invested.pendingOrders.length) pendingList.append(node('p', '대기 중인 주문이 없어요.'));
-    for (const order of invested.pendingOrders) pendingList.append(node('p', `${order.side === 'buy' ? '매수' : '매도'} ${order.quantity.toLocaleString('ko-KR')}주 · ${marketDate(plan.source, order.submittedMonth + 1)} 체결 예정`));
+    for (const order of invested.pendingOrders) {
+      const row = node('div', undefined, 'paper-pending-row');
+      row.append(node('p', `${order.side === 'buy' ? '매수' : '매도'} ${order.quantity.toLocaleString('ko-KR')}주 · ${marketDate(plan.source, order.submittedMonth + 1)} 체결 예정`),
+        button('주문 취소', () => reviewCancellation(order), Boolean(pending)));
+      pendingList.append(row);
+    }
+    if (plan.action === 'cancel') pendingList.append(node('p', '주문 취소를 반영한 사본이에요. 이전 시점의 기록은 저장한 투자 연습에 남아 있어요.', 'paper-caption'));
     root.append(pendingList, chart(invested.monthlyResults, baseline.monthlyResults));
     const compare = node('div', undefined, 'paper-comparison');
     compare.append(node('h4', '같은 조건에서 투자하지 않았다면?'),
@@ -327,9 +334,29 @@ const PaperTrading = (() => {
       if (container.isConnected && !$('overlay').classList.contains('hidden')) container.querySelector('button')?.focus();
     }
   }
+  function reviewCancellation(order) {
+    if (!available() || !current) return;
+    const planId = current.plan.id;
+    show('<div id="papercancelreview"><div class="eyebrow">대기 주문 취소</div></div>');
+    const content = $('papercancelreview');
+    content.append(node('h2', `${order.side === 'buy' ? '매수' : '매도'} ${order.quantity.toLocaleString('ko-KR')}주 예약을 취소할까요?`),
+      node('p', '이 주문을 제외한 새 투자 사본을 저장해요. 이전 시점의 기록과 다른 사본은 그대로 남아요.'),
+      node('p', '아직 체결 전이므로 현재 현금과 보유 주식은 바뀌지 않아요. 매도 예약 취소 시에는 그 수량만큼 다시 매도할 수 있어요.'));
+    const actions = node('div', undefined, 'modalactions');
+    actions.append(button('주문 유지', closeModal), button('취소 확정', () => {
+      if (!available()) return;
+      if (!current || current.plan.id !== planId) {
+        closeModal(); message('투자 사본이 바뀌었어요. 현재 대기 주문을 다시 확인해주세요.'); return;
+      }
+      closeModal(); command('cancel', {orderId: order.id});
+    }, false, true));
+    content.append(actions);
+  }
   async function command(action, fields) {
     if (!available() || !current) return;
-    pending = {action, parentId: current.plan.id, body: {requestId: crypto.randomUUID(), ...fields}};
+    pending = action === 'cancel'
+      ? {action, parentId: current.plan.id, orderId: fields.orderId, body: {requestId: crypto.randomUUID()}}
+      : {action, parentId: current.plan.id, body: {requestId: crypto.randomUUID(), ...fields}};
     try { localStorage.setItem(pendingKey, JSON.stringify(pending)); }
     catch { pending = null; message('중복 요청을 막으려면 이 기기의 저장 공간을 사용할 수 있어야 해요.'); return; }
     await sendPending();
@@ -339,16 +366,18 @@ const PaperTrading = (() => {
     setPlanBusy(true); render(); message('서버에서 처리 결과를 확인하는 중이에요.');
     const request = pending;
     try {
-      const path = request.action === 'create' ? '' : '/' + encodeURIComponent(request.parentId) + '/' + request.action;
+      const path = request.action === 'create' ? '' : request.action === 'cancel'
+        ? '/' + encodeURIComponent(request.parentId) + '/orders/' + encodeURIComponent(request.orderId) + '/cancel'
+        : '/' + encodeURIComponent(request.parentId) + '/' + request.action;
       const result = await apiRequest('paper-plans', path, {method: 'POST', body: JSON.stringify(request.body)});
       // Store the returned reference before clearing the recoverable command.
       remember(result);
       localStorage.removeItem(pendingKey); pending = null;
-      message(request.action === 'orders' ? '주문을 예약했어요. 다음 달로 진행하면 체결 여부를 확인할 수 있어요.' : request.action === 'advance' ? '월 진행 결과와 체결 기록을 저장했어요.' : '투자 연습을 시작했어요. 모든 금액은 원 단위입니다.');
+      message(request.action === 'cancel' ? '대기 주문을 취소한 새 사본을 저장했어요. 이전 기록은 유지됩니다.' : request.action === 'orders' ? '주문을 예약했어요. 다음 달로 진행하면 체결 여부를 확인할 수 있어요.' : request.action === 'advance' ? '월 진행 결과와 체결 기록을 저장했어요.' : '투자 연습을 시작했어요. 모든 금액은 원 단위입니다.');
       $('paperentry-status').textContent = `${result.plan.name} · ${result.plan.month}개월차 저장됨`;
     } catch (error) {
       // A definite validation failure can be corrected. Uncertain transport/server failures keep the ID.
-      if ([400, 403, 409, 422].includes(error.status)) {
+      if ([400, 403, 409, 422].includes(error.status) || error.code === 'ORDER_NOT_FOUND') {
         localStorage.removeItem(pendingKey); pending = null;
       }
       message(error.message);
@@ -362,7 +391,7 @@ const PaperTrading = (() => {
       const box = node('div', undefined, 'saved-plans');
       box.append(node('h3', '저장한 투자 연습'), node('p', '주문·월 진행마다 보관된 시점이에요. 이전 시점에서 다른 선택을 시작할 수 있어요.'));
       if (!plans.length) box.append(node('p', '저장된 투자 연습이 없어요.'));
-      for (const plan of plans) box.append(button(`${plan.name} · ${plan.month}개월 · ${new Date(plan.createdAt / 1000).toLocaleString('ko-KR')}`, () => load(plan.id)));
+      for (const plan of plans) box.append(button(`${plan.name} · ${plan.month}개월${plan.action === 'cancel' ? ' · 주문 취소' : ''} · ${new Date(plan.createdAt / 1000).toLocaleString('ko-KR')}`, () => load(plan.id)));
       const pages = node('div', undefined, 'paper-toolbar');
       if (offset) pages.append(button('이전 목록', () => list(Math.max(0, offset - 20))));
       if (plans.length === 20) pages.append(button('다음 목록', () => list(offset + 20)));
