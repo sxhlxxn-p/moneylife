@@ -525,3 +525,59 @@ test('모바일 조건 입력·검증과 마지막 달 제한', {timeout: 30000}
   for (let i = 0; i < 4; i++) await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(await page.getByRole('button', {name: '생활 조건 변경', exact: true}).isDisabled(), true);
 });
+test('저장 투자 사본 세 개 비교와 선택 제한·현재 사본 보존', {timeout: 30000}, async t => {
+  const page = await pageFor(t, {width: 390, height: 844});
+  await demo(page);
+  await page.getByLabel('주문 수량 · 주').fill('50');
+  await clickCommand(page, '매수 예약', 'orders');
+  const parent = await clickCommand(page, '다음 달로 +1개월', 'advance');
+  const reference = await clickCommand(page, '다음 달로 +1개월', 'advance');
+  async function fork(values) {
+    const changedResponse = await page.request.post('/api/paper-plans/' + parent.plan.id + '/conditions', {data: {requestId: crypto.randomUUID(), values}});
+    assert.equal(changedResponse.status(), 201);
+    const changed = await changedResponse.json();
+    const advanced = await page.request.post('/api/paper-plans/' + changed.plan.id + '/advance', {data: {requestId: crypto.randomUUID()}});
+    assert.equal(advanced.status(), 201); return advanced.json();
+  }
+  const b = await fork({income: 300000});
+  const c = await fork({monthlySaving: 0});
+  const d = await fork({expense: 80000});
+  await page.getByRole('button', {name: '투자 사본 비교', exact: true}).click();
+  const box = page.locator('#papercompare');
+  await box.locator(`input[value="${b.plan.id}"]`).check();
+  await box.locator(`input[value="${c.plan.id}"]`).check();
+  await box.locator(`input[value="${d.plan.id}"]`).click();
+  assert.equal(await box.locator(`input[value="${d.plan.id}"]`).isChecked(), false);
+  assert.match(await page.locator('#papercompare-status').innerText(), /최대 세 사본/);
+  const response = page.waitForResponse(r => r.url().endsWith('/paper-comparisons') && r.request().method() === 'POST');
+  await page.getByRole('button', {name: '선택한 사본 비교', exact: true}).click();
+  const result = await (await response).json();
+  await page.getByRole('heading', {name: '2개월까지의 선택을 비교했어요', exact: true}).waitFor();
+  assert.equal(result.paths.length, 3);
+  assert.deepEqual(result.paths.map(p => p.summary.finalNetAssets), [1300000, 1400000, 1300000]);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), reference.plan.id);
+  assert.match(await box.innerText(), /A 대비 순자산 \+100,000원/);
+  assert.equal(await box.getByRole('img', {name: '선택한 3개 사본의 2개월까지 순자산 비교'}).count(), 1);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth));
+  if (process.env.UI_SCREENSHOT_DIR) {
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'paper-comparison-mobile.png')});
+  }
+});
+test('진행 월이 다른 비교는 공통 구간의 목표만 표시한다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  const rootId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  const orderResponse = await page.request.post('/api/paper-plans/' + rootId + '/orders', {data: {requestId: crypto.randomUUID(), side: 'buy', quantity: 50}});
+  const pending = await orderResponse.json();
+  const laterResponse = await page.request.post('/api/paper-plans/' + pending.plan.id + '/advance', {data: {requestId: crypto.randomUUID(), months: 3}});
+  const later = await laterResponse.json();
+  assert.equal(later.run.result.invested.summary.goalMonth, 2);
+  await page.getByRole('button', {name: '투자 사본 비교', exact: true}).click();
+  await page.locator(`#papercompare input[value="${later.plan.id}"]`).check();
+  await page.getByRole('button', {name: '선택한 사본 비교', exact: true}).click();
+  await page.getByRole('heading', {name: '0개월까지의 선택을 비교했어요', exact: true}).waitFor();
+  assert.match(await page.locator('.paper-branch-cards').innerText(), /공통 구간 내 아직 미달성/);
+  assert.doesNotMatch(await page.locator('.paper-branch-cards').innerText(), /2개월차/);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), rootId);
+});

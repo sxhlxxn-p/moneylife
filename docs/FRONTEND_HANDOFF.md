@@ -100,3 +100,7 @@ API 명칭은 Notion 초안과 동일한 제안이며 아직 엔드포인트가 
 ## 투자 중 생활 조건 변경
 
 생활 조건 변경 버튼은 /paper-plans/{id}/conditions의 GET으로 다음 달 예정 값을 불러온다. 변경된 항목만 원 단위로 검증한 뒤 전후 금액과 적용 구간을 보여주고, 적용 확인 시에만 requestId를 만들어 POST한다. 조건과 확인 대상 plan.id를 고정하고 확정 직전에 현재 사본인지 검사한다. POST 결과의 현재 자산이 증가했다고 표시하지 않고 다음 달부터 반영됨을 안내한다. 미확인 요청은 action=conditions·values를 보관해 동일 번호로 재확인한다. GET의 날짜는 경과 월이며 화면의 주가 기준 날짜는 source의 과거 시작 월에 맞춘다. 원래 financialPlanId의 조건으로 새 사본을 덮어쓰지 않는다.
+
+## 저장 투자 사본 비교
+
+현재 사본을 기준으로 페이지별 저장 목록에서 최대 두 사본을 추가한다. 다른 출발/가격 버전은 선택하지 못하게 표시하고 서버가 다시 검증한다. /paper-comparisons의 paths·differences를 표시하며 throughMonth 이후 목표나 행을 화면에서 끼워 넣지 않는다. 비교는 읽기 작업이며 서버 사본·현재 localStorage 선택을 바꾸지 않는다. 일반 Plan과 PaperPlan을 섞는 기능은 아니다.

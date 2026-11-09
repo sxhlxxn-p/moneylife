@@ -265,3 +265,37 @@ class PaperConditionsDetail(StrictModel):
     appliesFrom: Month | None
     appliesThrough: Month
     values: EffectivePaperConditions
+
+class PaperComparisonCreate(StrictModel):
+    planIds: list[UUID] = Field(min_length=2, max_length=3)
+    throughMonth: Month | None = None
+
+    @model_validator(mode='after')
+    def distinct_plans(self):
+        if len(set(self.planIds)) != len(self.planIds):
+            raise ValueError('Distinct investment plans are required')
+        return self
+
+class SavedComparisonPath(StrictModel):
+    planId: UUID
+    runId: UUID
+    name: str
+    savedMonth: Month
+    summary: InvestmentMetrics
+    monthlyResults: list[InvestmentMonth] = Field(min_length=1, max_length=121)
+
+class SavedComparisonDifference(StrictModel):
+    planId: UUID
+    finalAssetsDifference: NetAssets
+    goalMonthDifference: Annotated[int, Field(strict=True, ge=-120, le=120)] | None
+    shortageMonthsDifference: Annotated[int, Field(strict=True, ge=-120, le=120)]
+    unmetDifference: NetAssets
+
+class PaperComparisonDetail(StrictModel):
+    basis: Literal['saved-runs-common-period']
+    throughMonth: Month
+    referencePlanId: UUID
+    financialPlanId: UUID
+    source: MarketSource
+    paths: list[SavedComparisonPath] = Field(min_length=2, max_length=3)
+    differences: list[SavedComparisonDifference] = Field(min_length=1, max_length=2)

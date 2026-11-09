@@ -25,7 +25,7 @@ async function apiRequest(resource, path, options = {}) {
       failureStatus = response.status;
       const body = await response.json().catch(() => ({}));
       failureCode = typeof body.detail === 'string' ? body.detail : undefined;
-      if (['paper-plans', 'paper-runs', 'market'].includes(resource)) {
+      if (['paper-plans', 'paper-runs', 'paper-comparisons', 'market'].includes(resource)) {
         const messages = {
           INSUFFICIENT_SHARES: '현재 보유 주식에서 이미 예약한 매도 수량을 제외한 수량만 팔 수 있어요.',
           SERIES_PERIOD_EXCEEDED: '가상 가격이 지원하는 마지막 달이에요. 새 투자 연습을 시작해주세요.',
@@ -34,6 +34,9 @@ async function apiRequest(resource, path, options = {}) {
           MARKET_CATALOG_LIMIT: '등록된 가격 자료 수를 확인해주세요.',
           EXPLANATION_INPUT_INVALID: '저장된 결과의 지표를 확인하지 못해 해설을 표시할 수 없어요.',
           ORDER_VALUE_TOO_LARGE: '참고 거래대금이 계산 범위를 넘었어요. 수량을 줄여주세요.',
+          COMPARISON_INCOMPATIBLE: '출발 조건·가격 버전·계산 버전이 같은 사본끼리 비교해주세요.',
+          COMPARISON_FUTURE_MONTH: '선택한 사본이 모두 진행한 시점까지만 비교할 수 있어요.',
+          COMPARISON_INPUT_INVALID: '저장된 비교 결과를 확인하지 못했어요. 원본은 유지됩니다.',
           CONDITIONS_UNCHANGED: '적용 기간의 조건이 이미 같은 금액이에요. 변경할 항목을 확인해주세요.',
           CONDITIONS_INVALID: '변경할 금액·기간이나 저장된 조건 기록의 크기를 확인해주세요. 현재 사본은 유지됩니다.',
           ORDER_NOT_FOUND: '이 투자 사본에서 해당 주문을 찾을 수 없어요.',

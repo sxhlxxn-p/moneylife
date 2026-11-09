@@ -13,7 +13,7 @@ docs               개발·API·계산 명세
 prototype          기존 정적 초안 원본
 ```
 
-## 현재 결정
+## 초기 폴더 분리 기록
 
 - 기존 정적 초안은 `prototype`에 동일본으로 보관했다.
 - 현재 실행본은 `Client`와 `Engine`으로 분리했다.
@@ -53,7 +53,7 @@ LLM은 `Server` 내부에서 계산 결과를 설명하되 금융 수치를 직�
 - Cypress 기본 예제: 테스트 도구 선정 후 프로젝트 시나리오만 추가한다.
 - React·Vite 파일: 기술 전환 결정 전에는 현재 HTML·CSS·JavaScript 실행을 유지한다.
 
-## 다음 합의 항목
+## 초기 검토 항목 (후속 결정은 아래 통합 이후 상태 참고)
 
 1. 현재 정적 JavaScript client를 유지한 상태에서 Node.js 서버 프레임워크 확정
 2. Plan·Event·Run 계약 및 원 단위·반올림 규칙 확정
@@ -65,3 +65,7 @@ LLM은 `Server` 내부에서 계산 결과를 설명하되 금융 수치를 직�
 ## 첫 통합 이후 상태
 
 Client는 `/api/plans` 프록시로 FastAPI에 현재 여정의 스냅샷을 저장·조회한다. Server는 SQLAlchemy로 Plan과 GuestSession을 저장한다. Compose는 PostgreSQL이며, `dev:server:local`은 명시적인 SQLite 개발 경로다. Engine은 JS로 브라우저 미리보기와 서버 Node 실행에 함께 사용한다. 서버는 원 단위 반올림을 적용해 입력 스냅샷·월별 결과·요약을 Run으로 저장한다. Shared의 계획·서버 계산 계약을 사용한다. 위의 프레임워크 미정·Server 문서만 존재한다는 설명은 초기 상태 기록이며, 현재 구현 상태는 이 항목을 기준으로 한다.
+
+## 투자 통합 이후 상태 (2026-11-09)
+
+FastAPI·SQLAlchemy·고정 Node 계산 엔진과 Client의 투자 연습실을 연결했다. 투자 계획·Run은 불변 사본으로 저장하며 주문/취소/생활 조건 변경마다 새 사본을 만든다. 저장 투자 사본 최대 3개 비교는 공통 진행 시점의 저장 결과만 읽는다. 과거 주가 등록/읽기 전용 어댑터·해설 선택 연결부는 있으나 외부 실제 호출은 미검증이다. SQLite·Node·Chromium으로 검증하며 운영 PostgreSQL/Docker·배포는 남아 있다. 초기의 Server 문서만 존재한다는 기록을 현재 구현으로 해석하지 않는다. 계획서와의 차이는 progress-2026-11-09.md를 따른다.

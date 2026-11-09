@@ -13,6 +13,7 @@ from app.plans import router as plans_router
 from app.simulations import router as simulations_router
 from app.ai import router as ai_router
 from app.paper import router as paper_router
+from app.paper_comparison import router as paper_comparison_router
 from app.paper_explanation_api import router as paper_explanation_router
 
 
@@ -67,6 +68,7 @@ app.include_router(plans_router)
 app.include_router(simulations_router)
 app.include_router(ai_router)
 app.include_router(paper_router)
+app.include_router(paper_comparison_router)
 app.include_router(paper_explanation_router)
 
 
