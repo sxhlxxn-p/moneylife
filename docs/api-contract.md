@@ -29,3 +29,7 @@
 
 
 자연어 변경·기간·승인·오류 계약은 [AI 변경 계약](../Shared/ai-change-contract.md)을 따른다. 외부 모델 실제 호출은 키와 모델 설정 후 확인해야 한다.
+
+## 모의투자 연결
+
+월별 모의투자 저장 API와 Client 투자 연습실은 [모의투자 계약](../Shared/paper-api-contract.md)을 따른다. 기존 `/plans`와 `/simulations` 흐름은 유지하며, 투자 화면은 `/paper-plans` 명령과 `/paper-runs` 저장 결과를 사용한다. 가격 원본은 서버 내부에 고정하고 현재 시점 이후의 가격/계산 경로는 화면에 제공하지 않는다.

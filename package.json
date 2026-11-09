@@ -23,7 +23,8 @@
     "demo:trading": "npm run demo:trading --workspace Engine",
     "setup:llm": "python3 Server/scripts/setup_llm.py",
     "check:llm": "python3 Server/scripts/check_llm.py",
-    "demo:monthly-trading": "npm run demo:monthly-trading --workspace Engine"
+    "demo:monthly-trading": "npm run demo:monthly-trading --workspace Engine",
+    "test:ui": "npm run test:ui --workspace Test"
   },
   "engines": {
     "node": ">=18"

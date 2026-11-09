@@ -5,6 +5,6 @@
   "description": "머니 라이프 정적 JavaScript 클라이언트",
   "scripts": {
     "dev": "node ../scripts/dev-server.cjs",
-    "check": "node --check src/app.js && node --check src/plan-state.js && node --check src/server-plans.js && node --check src/ai-client.js"
+    "check": "node --check src/app.js && node --check src/plan-state.js && node --check src/server-plans.js && node --check src/ai-client.js && node --check src/paper-client.js"
   }
 }

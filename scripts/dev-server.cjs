@@ -21,6 +21,7 @@ const routes = new Map(prototypeMode ? [
   ['/plan-state.js', 'Client/src/plan-state.js'],
   ['/server-plans.js', 'Client/src/server-plans.js'],
   ['/ai-client.js', 'Client/src/ai-client.js'],
+  ['/paper-client.js', 'Client/src/paper-client.js'],
   ['/engine.js', 'Engine/src/index.js']
 ]);
 http.createServer(async (req,res) => {
