@@ -5,7 +5,7 @@
   "description": "머니 라이프 통합·회귀·AI 평가 영역",
   "scripts": {
     "test": "node --test *.test.cjs",
-    "check": "node --check engine.test.cjs && node --check plan-state.test.cjs && node --check paper-trading.test.cjs && node --check monthly-trading.test.cjs && node --check paper-ui.spec.cjs",
+    "check": "node --check engine.test.cjs && node --check plan-state.test.cjs && node --check paper-trading.test.cjs && node --check monthly-trading.test.cjs && node --check paper-ui.spec.cjs && node --check order-preview.test.cjs",
     "test:ui": "node --test paper-ui.spec.cjs"
   },
   "devDependencies": {

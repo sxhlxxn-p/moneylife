@@ -10,9 +10,10 @@ from app.database import get_session
 from app.models import PaperPlan, PaperRun
 from app.plans import get_owner, owned_plan
 from app.market import load_series, source, catalog_sources
-from app.investment_engine import calculate_investment
+from app.investment_engine import calculate_investment, calculate_order_preview
 from app.paper_schemas import (PaperCreate, PaperOrderCreate, PaperAdvance,
-    PaperSummary, PaperDetail, PaperRunDetail, PaperBundle, MarketSource, MarketView)
+    PaperSummary, PaperDetail, PaperRunDetail, PaperBundle, MarketSource, MarketView,
+    OrderPreviewCreate, OrderPreviewDetail)
 
 router = APIRouter(tags=['paper-trading'])
 
@@ -122,6 +123,20 @@ async def get_market(plan_id: UUID, request: Request, response: Response,
     return {'source': source(plan.market_snapshot), 'throughMonth': month,
             'prices': [q for q in plan.market_snapshot['prices'] if q['month'] <= month]}
 
+async def ensure_order_allowed(plan: PaperPlan, side: str, quantity: int, session: AsyncSession):
+    month = plan.state['month']
+    if month >= plan.market_snapshot['lastMonth']:
+        raise HTTPException(409, 'SERIES_PERIOD_EXCEEDED')
+    if len(plan.orders) >= 1000:
+        raise HTTPException(409, 'ORDER_LIMIT_EXCEEDED')
+    run = await stored_run(plan, session)
+    if side == 'sell':
+        held = run.result['invested']['account']['quantity']
+        reserved = sum(o['quantity'] for o in plan.orders if o['submittedMonth'] == month and o['side'] == 'sell')
+        if quantity > held - reserved:
+            raise HTTPException(409, 'INSUFFICIENT_SHARES')
+    return run
+
 @router.post('/paper-plans/{plan_id}/orders', response_model=PaperBundle, status_code=201)
 async def order(plan_id: UUID, payload: PaperOrderCreate, response: Response,
                 owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
@@ -131,17 +146,8 @@ async def order(plan_id: UUID, payload: PaperOrderCreate, response: Response,
     if prior is not None:
         return prior
     parent = await owned_paper(str(plan_id), owner, session)
+    await ensure_order_allowed(parent, payload.side, payload.quantity, session)
     month = parent.state['month']
-    if month >= parent.market_snapshot['lastMonth']:
-        raise HTTPException(409, 'SERIES_PERIOD_EXCEEDED')
-    if len(parent.orders) >= 1000:
-        raise HTTPException(409, 'ORDER_LIMIT_EXCEEDED')
-    if payload.side == 'sell':
-        run = await stored_run(parent, session)
-        held = run.result['invested']['account']['quantity']
-        reserved = sum(o['quantity'] for o in parent.orders if o['submittedMonth'] == month and o['side'] == 'sell')
-        if payload.quantity > held - reserved:
-            raise HTTPException(409, 'INSUFFICIENT_SHARES')
     orders = [*parent.orders, {'id': str(payload.requestId), 'symbol': parent.market_snapshot['symbol'],
         'side': payload.side, 'quantity': payload.quantity, 'submittedMonth': month}]
     return await save(owner, str(payload.requestId), command, parent.financial_plan_id,
@@ -170,3 +176,28 @@ async def get_run(run_id: UUID, response: Response, owner: str = Depends(get_own
     if run is None:
         raise HTTPException(404, 'PAPER_RUN_NOT_FOUND')
     return run_detail(run)
+
+
+@router.post('/paper-plans/{plan_id}/order-preview', response_model=OrderPreviewDetail)
+async def preview_order(plan_id: UUID, payload: OrderPreviewCreate, response: Response,
+                        owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+    response.headers['Cache-Control'] = 'no-store'
+    plan = await owned_paper(str(plan_id), owner, session)
+    run = await ensure_order_allowed(plan, payload.side, payload.quantity, session)
+    position = run.result['invested']['monthlyResults'][-1]['investment']
+    price = position['price']
+    if price is not None:
+        gross = price * payload.quantity
+        fee = (gross * plan.market_snapshot['costs'].get('feeBps', 0) + 5000) // 10000
+        if gross > 9_007_199_254_740_991 or (payload.side == 'buy' and gross + fee > 9_007_199_254_740_991):
+            raise HTTPException(422, 'ORDER_VALUE_TOO_LARGE')
+    investment = {key: plan.market_snapshot[key] for key in ('symbol', 'priceSeriesId', 'prices', 'costs')}
+    investment['orders'] = plan.orders
+    values = await calculate_order_preview(plan.state, investment,
+        {'id': str(uuid4()), 'side': payload.side, 'quantity': payload.quantity})
+    final = run.result['invested']['monthlyResults'][-1]
+    if values.currentCash != final['cash'] or values.currentQuantity != position['quantity']:
+        raise HTTPException(503, 'ENGINE_OUTPUT_INVALID')
+    return {**values.model_dump(mode='json'), 'paperPlanId': plan.id,
+        'symbol': plan.market_snapshot['symbol'], 'side': payload.side, 'quantity': payload.quantity,
+        'month': plan.state['month'], 'executionMonth': plan.state['month'] + 1}

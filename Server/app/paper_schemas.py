@@ -171,3 +171,37 @@ class PaperRunDetail(StrictModel):
 class PaperBundle(StrictModel):
     plan: PaperDetail
     run: PaperRunDetail
+
+class OrderPreviewCreate(StrictModel):
+    side: Literal['buy', 'sell']
+    quantity: Quantity
+
+class OrderPreviewValues(StrictModel):
+    basis: Literal['current-price-assumption']
+    referencePrice: CalculatedMoney | None
+    referencePriceMonth: Month | None
+    staleReference: bool
+    referenceGross: CalculatedMoney | None
+    referenceFee: CalculatedMoney | None
+    referenceTax: CalculatedMoney | None
+    referenceCashChange: NetAssets | None
+    currentCash: CalculatedMoney
+    currentQuantity: CalculatedMoney
+    reservedSellQuantity: CalculatedMoney
+    availableSellQuantity: CalculatedMoney
+    existingPendingCount: Annotated[int, Field(strict=True, ge=0, le=1000)]
+    nextIncome: CalculatedMoney
+    nextExpense: CalculatedMoney
+    estimatedNextCash: CalculatedMoney | None
+    estimatedNextSaved: CalculatedMoney | None
+    estimatedNextShortfall: CalculatedMoney
+    estimatedStatus: Literal['filled', 'rejected', 'unavailable']
+    estimatedReason: str | None
+
+class OrderPreviewDetail(OrderPreviewValues):
+    paperPlanId: UUID
+    symbol: str
+    side: Literal['buy', 'sell']
+    quantity: Quantity
+    month: Month
+    executionMonth: Month

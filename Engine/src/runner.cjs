@@ -1,6 +1,7 @@
 // Fixed stdin/stdout bridge. Author: sxhlxxn / Student ID: 202439688.
 const {calculateSnapshot} = require('./snapshot.cjs');
 const {compareWithTrading} = require('./monthly-trading.cjs');
+const {previewOrder} = require('./order-preview.cjs');
 let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', chunk => {
@@ -9,10 +10,11 @@ process.stdin.on('data', chunk => {
 });
 process.stdin.on('end', () => {
   try {
-    const {state, months, investment, mode} = JSON.parse(input);
-    const minimum = mode === 'monthly-investment' ? 0 : 1;
+    const {state, months, investment, mode, order} = JSON.parse(input);
+    const minimum = ['monthly-investment', 'order-preview'].includes(mode) ? 0 : 1;
     if (!Number.isInteger(months) || months < minimum || months > 120) throw new Error('Invalid period');
     if (mode === 'monthly-investment') process.stdout.write(JSON.stringify(compareWithTrading(state, investment, months)));
+    else if (mode === 'order-preview') process.stdout.write(JSON.stringify(previewOrder(state, investment, months, order)));
     else if (mode === undefined) process.stdout.write(JSON.stringify(calculateSnapshot(state, months)));
     else throw new Error('Unknown mode');
   } catch {

@@ -219,14 +219,67 @@ const PaperTrading = (() => {
     finally { setPlanBusy(false); render(); }
     if (pending) await sendPending();
   }
-  function submitOrder(side) {
+  async function submitOrder(side) {
     if (!available() || !current) return;
     const input = $('paperquantity');
     const quantity = Number(input.value);
     if (input.value.trim() === '' || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 1000000000) {
       message('주문 수량은 1~1,000,000,000 사이의 정수로 입력해주세요.'); input.focus(); return;
     }
-    command('orders', {side, quantity});
+    const planId = current.plan.id;
+    setPlanBusy(true);
+    show('<div id="paperreview"><div class="eyebrow">주문 전 확인</div><h2>참고 금액을 확인하고 있어요</h2><p role="status">현재까지 확인한 가격과 다음 달 생활 조건으로 계산합니다. 아직 주문은 접수되지 않았어요.</p></div>');
+    const container = $('paperreview');
+    try {
+      const review = await apiRequest('paper-plans', '/' + encodeURIComponent(planId) + '/order-preview', {
+        method: 'POST', body: JSON.stringify({side, quantity})});
+      if (!container.isConnected || $('overlay').classList.contains('hidden')) return;
+      container.replaceChildren(node('div', '주문 전 확인', 'eyebrow'),
+        node('h2', `${side === 'buy' ? '매수' : '매도'} ${quantity.toLocaleString('ko-KR')}주를 예약할까요?`),
+        node('p', `${review.symbol} · ${marketDate(current.plan.source, review.executionMonth)} 체결 예정. 아직 주문은 접수되지 않았어요.`));
+      const grid = node('div', undefined, 'paper-review-grid');
+      const amount = value => value === null ? '계산할 가격이 없어요' : won(value);
+      for (const [label, value] of [
+        ['현재 기준 가격', amount(review.referencePrice)],
+        ['참고 거래대금', amount(review.referenceGross)],
+        ['참고 수수료 / 세금', review.referenceFee === null ? '가격 없음' : `${won(review.referenceFee)} / ${won(review.referenceTax)}`],
+        ['현재 현금', won(review.currentCash)],
+        ['다음 달 소득', won(review.nextIncome)],
+        ['다음 달 생활비·일회성 지출', won(review.nextExpense)],
+        ['같은 가격일 때 다음 달말 현금', amount(review.estimatedNextCash)],
+        ['같은 가격일 때 다음 달말 저축', amount(review.estimatedNextSaved)]
+      ]) {
+        const card = node('div'); card.append(node('small', label), node('strong', value)); grid.append(card);
+      }
+      container.append(grid, node('p', `현재 매도 가능 ${review.availableSellQuantity.toLocaleString('ko-KR')}주 · 기존 매도 예약 ${review.reservedSellQuantity.toLocaleString('ko-KR')}주. 기존 예약 ${review.existingPendingCount}건과 이번 주문, 생활비와 월말 저축을 함께 반영한 참고값이에요.`));
+      const warning = node('div', undefined, 'paper-review-warning');
+      warning.append(node('strong', '다음 달 실제 가격으로 다시 판단해요.'),
+        node('p', '참고 금액은 지금까지 확인한 가격이 유지되고 다음 달에 거래할 수 있다는 가정입니다. 체결 금액이나 수익을 보장하지 않아요.'));
+      if (review.referencePriceMonth !== null) warning.append(node('p', `가격 기준 ${marketDate(current.plan.source, review.referencePriceMonth)}${review.staleReference ? ' · 현재 월 가격이 없어 이전 가격으로 계산했어요.' : ''}`));
+      if (review.estimatedStatus === 'rejected') warning.append(node('p', review.estimatedReason === 'INSUFFICIENT_CASH' ? '참고 조건에서는 현금이 부족해 이 주문이 거부돼요. 다음 달에는 실제 가격과 현금으로 다시 판단합니다.' : '참고 조건에서는 이 주문이 체결되지 않아요. 다음 달에 실제 조건으로 다시 판단합니다.'));
+      if (review.estimatedStatus === 'unavailable') warning.append(node('p', '확인된 가격이 없어 거래대금과 거래 후 잔액을 계산하지 않았어요. 예약 후 다음 달에 체결 여부를 판단합니다.'));
+      if (review.estimatedNextShortfall > 0) warning.append(node('p', `다음 달 지출 중 ${won(review.estimatedNextShortfall)}이 부족해요. 주식은 자동 매도하지 않고 같은 달 매도 대금으로 앞선 미충족 지출을 지우지 않아요.`));
+      container.append(warning);
+      const actions = node('div', undefined, 'modalactions');
+      actions.append(button('수량 다시 수정', () => { closeModal(); $('paperquantity')?.focus(); }),
+        button('예약 확정', () => {
+          if (!available()) return;
+          if (!current || current.plan.id !== planId || review.paperPlanId !== planId) {
+            closeModal(); message('투자 계획이 바뀌었어요. 주문 내용을 다시 확인해주세요.'); return;
+          }
+          closeModal(); command('orders', {side, quantity});
+        }, false, true));
+      container.append(actions);
+    } catch (error) {
+      if (container.isConnected && !$('overlay').classList.contains('hidden')) {
+        container.replaceChildren(node('h2', '주문 내용을 확인하지 못했어요'), node('p', error.message),
+          button('돌아가기', closeModal));
+      }
+      message(error.message);
+    } finally {
+      setPlanBusy(false);
+      if (container.isConnected && !$('overlay').classList.contains('hidden')) container.querySelector('button')?.focus();
+    }
   }
   async function command(action, fields) {
     if (!available() || !current) return;
