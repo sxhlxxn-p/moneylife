@@ -131,7 +131,11 @@ const PaperTrading = (() => {
       node('p', `현재 순자산 차이 ${signed(comparison.finalAssetsDifference)} · 투자 ${won(final.total)} / 비투자 ${won(baseline.summary.finalNetAssets)}`),
       node('p', `목표 최초 달성: 투자 ${goal(invested.summary.goalMonth)} / 비투자 ${goal(baseline.summary.goalMonth)}`),
       node('p', `현금 부족: 투자 ${invested.summary.shortageMonths}개월 / 비투자 ${baseline.summary.shortageMonths}개월 · 투자 계획 미충족 지출 ${won(final.unpaid)}`));
-    root.append(compare, explanationPanel(run.id));
+    const news = node('section', undefined, 'news-investment-entry');
+    news.append(node('span', 'NEWS SIMULATION', 'tag'), node('h3', '내 포트폴리오에 경제 뉴스가 찾아온다면?'),
+      node('p', '금리·물가·고용 변화에 대응하며 가정한 손실과 현금 부족을 체험해요. 원본과 분리된 4라운드 연습이에요.'),
+      button('내 투자로 뉴스 체험', startNews, Boolean(pending) || position.price === null, true));
+    root.append(news, compare, explanationPanel(run.id));
     const tableBox = node('details', undefined, 'paper-history');
     tableBox.append(node('summary', `체결·거부 기록 ${invested.executions.length}건`));
     const scroll = node('div', undefined, 'run-table-scroll');
@@ -336,6 +340,22 @@ const PaperTrading = (() => {
       setPlanBusy(false);
       if (container.isConnected && !$('overlay').classList.contains('hidden')) container.querySelector('button')?.focus();
     }
+  }
+  async function startNews() {
+    if (!available() || !current) return;
+    const bundle = current;
+    setPlanBusy(true); message('뉴스 게임의 출발 조건을 불러오는 중이에요.');
+    try {
+      const conditions = await apiRequest('paper-plans', '/' + encodeURIComponent(bundle.plan.id) + '/conditions');
+      if (current?.run.id !== bundle.run.id) return;
+      const row = bundle.run.result.invested.monthlyResults.at(-1);
+      show('<div id="newsportfolio"></div>');
+      NewsGame.start($('newsportfolio'), {cash: row.cash, saved: row.saved, quantity: row.investment.quantity,
+        price: row.investment.price, unpaid: row.unpaid, income: conditions.values.income,
+        expense: conditions.values.expense}, bundle.run.id, `${bundle.plan.name} · ${bundle.plan.month}개월차`);
+      message('뉴스 게임은 별도 연습이에요. 원래 투자 사본의 시간과 주문은 유지됩니다.');
+    } catch (error) { message(error.message); }
+    finally { setPlanBusy(false); }
   }
   async function compareSavedPlans() {
     if (!available() || !current) return;

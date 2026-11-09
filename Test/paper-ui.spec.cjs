@@ -7,6 +7,7 @@ const {existsSync} = require('node:fs');
 const {tmpdir} = require('node:os');
 const path = require('node:path');
 const {chromium} = require('playwright');
+const newsRules = require('../Client/src/news-scenario.js');
 const root = path.resolve(__dirname, '..');
 const port = Number(process.env.UI_TEST_PORT || 5187);
 const apiPort = Number(process.env.UI_TEST_API_PORT || 3017);
@@ -580,4 +581,62 @@ test('진행 월이 다른 비교는 공통 구간의 목표만 표시한다', {
   assert.match(await page.locator('.paper-branch-cards').innerText(), /공통 구간 내 아직 미달성/);
   assert.doesNotMatch(await page.locator('.paper-branch-cards').innerText(), /2개월차/);
   assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), rootId);
+});
+
+test('가상 뉴스 게임은 선택 미리보기·네 라운드·재시작·새로고침 복원을 지원한다', {timeout: 30000}, async t => {
+  const page = await pageFor(t, {width: 390, height: 844});
+  const original = await page.evaluate(() => localStorage.getItem('money-life-v1'));
+  const writes = [];
+  await page.route('**/api/**', route => { writes.push(route.request().method()); return route.abort(); });
+  await page.getByRole('button', {name: '뉴스 게임 체험', exact: true}).click();
+  const game = page.locator('#newsdemo');
+  assert.match(await game.innerText(), /실제 뉴스·예측이 아니며/);
+  await game.getByRole('button', {name: '보유 유지', exact: true}).click();
+  assert.match(await game.locator('.news-preview').innerText(), /주가 변화 손익 -60,000원/);
+  assert.equal(await game.locator('.news-round').innerText(), '0 / 4 라운드');
+  await game.getByRole('button', {name: '절반 매도', exact: true}).click();
+  assert.match(await game.locator('.news-preview').innerText(), /주가 변화 손익 -30,000원/);
+  await game.getByRole('button', {name: '이 선택으로 라운드 진행'}).click();
+  assert.match(await game.locator('.news-history').innerText(), /절반 매도/);
+  assert.equal(await game.locator('.news-round').innerText(), '1 / 4 라운드');
+  if (process.env.UI_SCREENSHOT_DIR) await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'news-game-mobile.png')});
+  for (let i = 0; i < 3; i++) {
+    await game.getByRole('button', {name: '보유 유지', exact: true}).click();
+    await game.getByRole('button', {name: '이 선택으로 라운드 진행'}).click();
+  }
+  assert.equal(await game.locator('.news-history p').count(), 4);
+  await game.locator('.news-finish').waitFor();
+  assert.deepEqual(writes, []);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-v1')), original);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await page.unroute('**/api/**');
+  await page.reload();
+  await page.getByRole('button', {name: '닫기', exact: true}).click();
+  await page.getByRole('button', {name: '뉴스 게임 체험', exact: true}).click();
+  assert.equal(await game.locator('.news-round').innerText(), '4 / 4 라운드');
+  await game.getByRole('button', {name: '뉴스 게임 처음부터'}).click();
+  assert.equal(await game.locator('.news-round').innerText(), '0 / 4 라운드');
+});
+
+test('저장 포트폴리오에서 시작한 뉴스 게임은 원본 주문과 가격을 바꾸지 않는다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  await page.getByLabel('주문 수량 · 주').fill('50');
+  await clickCommand(page, '매수 예약', 'orders');
+  const bundle = await clickCommand(page, '다음 달로 +1개월', 'advance');
+  const before = await (await page.request.get('/api/paper-plans/' + bundle.plan.id)).json();
+  const conditions = await (await page.request.get('/api/paper-plans/' + bundle.plan.id + '/conditions')).json();
+  const final = bundle.run.result.invested.monthlyResults.at(-1);
+  const expected = newsRules.play({cash: final.cash, saved: final.saved, quantity: final.investment.quantity,
+    price: final.investment.price, unpaid: final.unpaid, income: conditions.values.income,
+    expense: conditions.values.expense}, 'rates', 'hold');
+  await page.getByRole('button', {name: '내 투자로 뉴스 체험'}).click();
+  const game = page.locator('#newsportfolio');
+  await game.getByRole('button', {name: '보유 유지', exact: true}).click();
+  assert.match(await game.locator('.news-preview').innerText(), new RegExp(expected.stockChange.toLocaleString('ko-KR') + '원'));
+  await game.getByRole('button', {name: '이 선택으로 라운드 진행'}).click();
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), bundle.plan.id);
+  const after = await (await page.request.get('/api/paper-plans/' + bundle.plan.id)).json();
+  assert.deepEqual(after, before);
+  if (process.env.UI_SCREENSHOT_DIR) await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'news-game-desktop.png')});
 });
