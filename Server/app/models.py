@@ -71,3 +71,31 @@ class AIExplanation(Base):
     model: Mapped[str] = mapped_column(String(128))
     prompt_version: Mapped[str] = mapped_column(String(64))
     attempts: Mapped[int] = mapped_column(Integer)
+
+
+class PaperPlan(Base):
+    __tablename__ = "paper_plans"
+    __table_args__ = (UniqueConstraint("owner_id", "request_id"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    command: Mapped[dict] = mapped_column(JSON)
+    financial_plan_id: Mapped[str] = mapped_column(String(36))
+    parent_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    state: Mapped[dict] = mapped_column(JSON)
+    orders: Mapped[list] = mapped_column(JSON)
+    market_snapshot: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger)
+
+
+class PaperRun(Base):
+    __tablename__ = "paper_runs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    paper_plan_id: Mapped[str] = mapped_column(String(36), unique=True)
+    engine_version: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[int] = mapped_column(BigInteger)
+    input_snapshot: Mapped[dict] = mapped_column(JSON)
+    result: Mapped[dict] = mapped_column(JSON)
