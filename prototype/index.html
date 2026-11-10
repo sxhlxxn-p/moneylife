@@ -112,36 +112,44 @@
         <section class="ml-card">
           <h2>10년 후 계획 비교</h2>
           <p class="ml-desc">같은 재무 상태에서 시작해 선택에 따라 순자산이 어떻게 달라지는지 비교해요.</p>
-          <div class="ml-note ml-report-summary" id="ml-report-summary" role="status"></div>
+          <div class="ml-note ml-report-summary" id="ml-report-summary" role="status">
+            <h3>처음 계획 대비 내 선택</h3>
+            <dl>
+              <div><dt>10년 후 순자산</dt><dd id="ml-report-net-difference"></dd></div>
+              <div><dt>목표 첫 도달</dt><dd id="ml-report-goal-difference"></dd></div>
+            </dl>
+          </div>
           <p class="ml-report-goal-note">목표 금액 <strong id="ml-report-goal-amount"></strong>에 처음 도달한 시점을 표시해요.</p>
           <div class="ml-report-grid">
             <section class="ml-report-item">
               <h3>처음 계획</h3>
               <p>시작 조건을 유지</p>
               <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-base">-</dd>
-                <dt>목표 첫 도달</dt><dd id="ml-report-base-goal">-</dd></dl>
+                <dt>목표 첫 도달</dt><dd><span id="ml-report-base-goal">-</span><small class="ml-report-month" id="ml-report-base-month" hidden></small></dd></dl>
             </section>
             <section class="ml-report-item featured">
               <h3>내 선택</h3>
               <p>이벤트와 조건 변경 반영</p>
               <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-current">-</dd>
-                <dt>목표 첫 도달</dt><dd id="ml-report-current-goal">-</dd></dl>
+                <dt>목표 첫 도달</dt><dd><span id="ml-report-current-goal">-</span><small class="ml-report-month" id="ml-report-current-month" hidden></small></dd></dl>
             </section>
             <section class="ml-report-item ml-report-stress">
               <h3>소득 공백 가정</h3>
               <p id="ml-report-stress-description"></p>
               <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-stress">-</dd>
-                <dt>목표 첫 도달</dt><dd id="ml-report-stress-goal">-</dd></dl>
+                <dt>목표 첫 도달</dt><dd><span id="ml-report-stress-goal">-</span><small class="ml-report-month" id="ml-report-stress-month" hidden></small></dd></dl>
             </section>
           </div>
           <div class="ml-report-plot">
-            <h3>월별 순자산 흐름 <small>(만 원)</small></h3>
+            <h3>월별 순자산 흐름</h3>
             <ul class="ml-report-legend" id="ml-report-legend">
               <li class="ml-series-base">처음 계획</li>
               <li class="ml-series-current">내 선택</li>
               <li class="ml-series-stress">소득 공백 가정</li>
+              <li class="ml-series-goal" id="ml-report-goal-legend" hidden></li>
             </ul>
-            <svg class="ml-chart" id="ml-report-chart" viewBox="0 0 520 210" role="img" aria-label="10년간 월별 순자산 비교" aria-describedby="ml-report-legend ml-report-summary"></svg>
+            <svg class="ml-chart" id="ml-report-chart" viewBox="0 0 520 250" role="img" aria-label="10년간 월별 순자산 비교" aria-describedby="ml-report-legend ml-report-summary ml-report-chart-note"></svg>
+            <p class="ml-report-goal-note" id="ml-report-chart-note" hidden></p>
           </div>
         </section>
       </section>

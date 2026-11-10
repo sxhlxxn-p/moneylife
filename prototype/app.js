@@ -15,6 +15,24 @@ const won = (value) => Math.max(0, Number(value) || 0);
 const mlFormatAmount = (value) => Math.round(value).toLocaleString("ko-KR");
 const mlFormatWon = (value) => mlFormatAmount(value) + "원";
 const mlFormatMan = (value) => Math.round(value).toLocaleString("ko-KR") + "만 원";
+function mlFormatKoreanWon(value) {
+  let remainder = Math.round(Math.abs(value));
+  const parts = [];
+  for (const [size, unit] of [[1e12,"조"],[1e8,"억"],[1e4,"만"]]) {
+    const count = Math.floor(remainder/size);
+    if (count) parts.push(mlFormatAmount(count) + unit);
+    remainder %= size;
+  }
+  const sign = value < 0 && (parts.length || remainder) ? "−" : "";
+  parts.push(remainder || !parts.length ? mlFormatAmount(remainder) + "원" : "원");
+  return sign + parts.join(" ");
+}
+
+function mlFormatDuration(months) {
+  const years = Math.floor(months/12);
+  const remaining = months%12;
+  return [years ? years + "년" : "", remaining ? remaining + "개월" : ""].filter(Boolean).join(" ");
+}
 const mlCompact = (value) => {
   const n = Math.round(value);
   if (Math.abs(n) >= 10000) return (n / 10000).toFixed(1) + "억";
@@ -162,18 +180,32 @@ document.querySelectorAll("#money-life-app [data-page]").forEach((button) => {
 function mlDrawChart(svgId, paths, large=false) {
   const svg = mlEl(svgId);
   const width = large ? 520 : 420;
-  const height = large ? 210 : 127;
-  const pad = {left:large?84:46,right:15,top:14,bottom:25};
+  const height = large ? 250 : 127;
+  const pad = {left:large?106:46,right:15,top:large?18:14,bottom:large?30:25};
   const all = paths.flatMap((path) => path.map((point) => point.total));
-  const minimum = Math.min(0,...all) * 1.12;
-  const maximum = Math.max(large?0:mlFinance.goalAmount/10000,...all,1) * 1.12;
+  let minimum = Math.min(0,...all) * 1.12;
+  let maximum = Math.max(large?0:mlFinance.goalAmount/10000,...all,1) * 1.12;
+  let tickCount = 3;
+  if (large) {
+    const desiredStep = Math.max(1,(maximum-minimum)/5);
+    const unit = 10**Math.floor(Math.log10(desiredStep));
+    const step = [1,2,5,10].find((factor) => desiredStep <= factor*unit*1.5)*unit;
+    minimum = Math.floor(minimum/step)*step;
+    maximum = Math.ceil(maximum/step)*step;
+    tickCount = Math.round((maximum-minimum)/step);
+  }
   const x = (month) => pad.left + month/120*(width-pad.left-pad.right);
   const y = (value) => height-pad.bottom-((value-minimum)/(maximum-minimum))*(height-pad.top-pad.bottom);
   let html = "";
-  for (let i=0;i<=3;i++) {
-    const value = minimum + (maximum-minimum)*i/3;
+  for (let i=0;i<=tickCount;i++) {
+    const value = minimum + (maximum-minimum)*i/tickCount;
     html += '<line x1="' + pad.left + '" y1="' + y(value) + '" x2="' + (width-pad.right) + '" y2="' + y(value) + '" stroke="#eeeaf3" stroke-dasharray="3 4"/>';
-    if (large) html += '<text x="' + (pad.left-8) + '" y="' + (y(value)+4) + '" text-anchor="end" font-size="12" fill="#6b637c">' + mlFormatAmount(value) + '</text>';
+    if (large) html += '<text class="ml-chart-axis-label" x="' + (pad.left-8) + '" y="' + y(value) + '" text-anchor="end" dominant-baseline="middle">' + mlFormatKoreanWon(value*10000).replace(/ ?원$/,"") + '</text>';
+  }
+  const goal = mlFinance.goalAmount/10000;
+  const showGoal = large && goal <= maximum;
+  if (showGoal) {
+    html += '<line class="ml-chart-goal ml-series-goal" x1="' + pad.left + '" y1="' + y(goal) + '" x2="' + (width-pad.right) + '" y2="' + y(goal) + '" stroke-dasharray="8 4"/>';
   }
   const series = ["current","base","stress"];
   const dashes = ["none","5 4","1 4"];
@@ -184,9 +216,14 @@ function mlDrawChart(svgId, paths, large=false) {
   const current = paths[0][Math.min(mlMonth,120)];
   html += '<line x1="' + x(mlMonth) + '" x2="' + x(mlMonth) + '" y1="' + pad.top + '" y2="' + (height-pad.bottom) + '" stroke="#c7b5e3" stroke-dasharray="3 4"/>';
   html += '<circle cx="' + x(mlMonth) + '" cy="' + y(current.total) + '" r="4" fill="#8c75ce" stroke="white" stroke-width="2"/>';
-  const axisFont = large ? 12 : 8;
-  html += '<text x="' + pad.left + '" y="' + (height-5) + '" font-size="' + axisFont + '" fill="#6b637c">시작</text><text x="' + (width-pad.right) + '" y="' + (height-5) + '" text-anchor="end" font-size="' + axisFont + '" fill="#6b637c">10년 후</text>';
+  const milestones = large ? [0,24,48,72,96,120] : [0,120];
+  milestones.forEach((month) => {
+    const anchor = month === 0 ? "start" : month === 120 ? "end" : "middle";
+    const label = month === 0 ? "시작" : month/12 + "년";
+    html += '<text class="ml-chart-axis-label" x="' + x(month) + '" y="' + (height-8) + '" text-anchor="' + anchor + '">' + label + '</text>';
+  });
   svg.innerHTML = html;
+  return showGoal;
 }
 
 // 이벤트가 적용된 금융 경로를 생성합니다.
@@ -207,6 +244,15 @@ function mlCompareNetWorth(difference, baseline) {
 
 function mlGoalMonth(path) {
   return path.findIndex((point) => point.total >= mlFinance.goalAmount/10000);
+}
+
+function mlCompareGoalTiming(base, current) {
+  if (base < 0 && current < 0) return "두 계획 모두 10년 내 미도달";
+  if (base < 0) return "내 선택만 10년 내 도달";
+  if (current < 0) return "처음 계획만 10년 내 도달";
+  const difference = current-base;
+  if (difference === 0) return "같은 시점에 도달";
+  return mlFormatDuration(Math.abs(difference)) + (difference > 0 ? " 늦어짐" : " 빨라짐");
 }
 
 function mlShowEvent(eventMonth) {
@@ -405,18 +451,31 @@ function mlRenderReport() {
   const stress = stressMonths > 0 ? mlSimulation([...mlChanges,{
     type:"income",v:-100,m:mlMonth+1,end:mlMonth+stressMonths
   }]) : current;
-  mlEl("ml-report-goal-amount").textContent = mlFormatWon(mlFinance.goalAmount);
+  const goalAmount = mlFormatKoreanWon(mlFinance.goalAmount);
+  const goalMonths = {base:mlGoalMonth(base),current:mlGoalMonth(current),stress:mlGoalMonth(stress)};
+  mlEl("ml-report-goal-amount").textContent = goalAmount;
   mlEl("ml-report-stress-description").textContent = stressMonths > 0
-    ? (mlMonth+1) + "개월차부터 " + stressMonths + "개월간 월 소득 100만 원 감소"
+    ? "내 선택에 " + (mlMonth+1) + "개월차부터 " + stressMonths + "개월간 월 소득 100만 원 감소를 추가한 경우"
     : "10년 진행이 끝나 내 선택과 같아요.";
   Object.entries({base,current,stress}).forEach(([id,path]) => {
-    const hit = mlGoalMonth(path);
-    mlEl("ml-report-" + id).textContent = mlFormatMan(path[120].total);
-    mlEl("ml-report-" + id + "-goal").textContent = hit < 0 ? "10년 내 미도달" : hit === 0 ? "시작 시점" : hit + "개월차";
+    const hit = goalMonths[id];
+    mlEl("ml-report-" + id).textContent = mlFormatKoreanWon(Math.round(path[120].total)*10000);
+    mlEl("ml-report-" + id + "-goal").textContent = hit < 0 ? "10년 내 미도달" : hit === 0 ? "시작 시점" : "시작 후 " + mlFormatDuration(hit);
+    const month = mlEl("ml-report-" + id + "-month");
+    month.textContent = hit > 0 ? hit + "개월차" : "";
+    month.hidden = hit <= 0;
   });
-  mlDrawChart("ml-report-chart",[current,base,stress],true);
   const difference = Math.round(current[120].total)-Math.round(base[120].total);
-  mlEl("ml-report-summary").textContent = "내 선택의 10년 후 순자산은 " + mlCompareNetWorth(difference,"처음 계획");
+  mlEl("ml-report-net-difference").textContent = difference === 0 ? "차이 없음"
+    : mlFormatKoreanWon(Math.abs(difference)*10000) + (difference < 0 ? " 감소" : " 증가");
+  mlEl("ml-report-goal-difference").textContent = mlCompareGoalTiming(goalMonths.base,goalMonths.current);
+  const showGoal = mlDrawChart("ml-report-chart",[current,base,stress],true);
+  const goalLegend = mlEl("ml-report-goal-legend");
+  const chartNote = mlEl("ml-report-chart-note");
+  goalLegend.hidden = !showGoal;
+  goalLegend.textContent = showGoal ? "목표 " + goalAmount : "";
+  chartNote.hidden = showGoal;
+  chartNote.textContent = showGoal ? "" : "목표 " + goalAmount + "은 차트의 표시 범위보다 높아요.";
 }
 
 // 재무 정보 입력 폼을 제출하면 시뮬레이션 시작 조건으로 변환합니다.
