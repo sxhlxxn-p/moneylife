@@ -193,15 +193,36 @@ function mlConfirmAction(title, description, action, onConfirm) {
   dialog.showModal();
 }
 
+const mlMobileToggle = mlEl("ml-mobile-toggle");
+const mlMainNav = mlEl("ml-main-nav");
+function mlSetMobileMenu(open) {
+  mlMobileToggle.setAttribute("aria-expanded",String(open));
+  mlMobileToggle.textContent = open ? "메뉴 닫기" : "전체 메뉴";
+}
+mlMobileToggle.addEventListener("click",() => mlSetMobileMenu(mlMobileToggle.getAttribute("aria-expanded") === "false"));
+mlMobileToggle.closest(".ml-sidebar").addEventListener("keydown",(event) => {
+  if (event.key !== "Escape" || mlMobileToggle.getAttribute("aria-expanded") !== "true") return;
+  mlSetMobileMenu(false);
+  mlMobileToggle.focus({preventScroll:true});
+});
+
 // 왼쪽 사이드바 버튼에 맞춰 오른쪽 콘텐츠만 교체합니다.
 function mlShowPage(page) {
   if (page !== "dashboard" && mlTimer) mlStop();
   document.querySelectorAll("#money-life-app .ml-page").forEach((section) => {
     section.classList.toggle("active", section.id === "ml-page-" + page);
   });
-  document.querySelectorAll("#money-life-app .ml-nav button").forEach((button) => {
-    button.classList.toggle("active", button.dataset.page === page);
+  const focusWasInMenu = mlMainNav.contains(document.activeElement);
+  mlMainNav.querySelectorAll("button").forEach((button) => {
+    const selected = button.dataset.page === page;
+    button.classList.toggle("active", selected);
+    if (selected) {
+      button.setAttribute("aria-current","page");
+      mlEl("ml-mobile-current").textContent = button.querySelector(".ml-nav-label").textContent;
+    } else button.removeAttribute("aria-current");
   });
+  mlSetMobileMenu(false);
+  if (focusWasInMenu && mlMobileToggle.getClientRects().length) mlMobileToggle.focus({preventScroll:true});
   if (page === "dashboard") mlRenderDashboard();
   if (page === "assets") mlRenderAssets();
   if (page === "goal") mlRenderGoal();

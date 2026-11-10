@@ -23,13 +23,17 @@
     <!-- 기존 MY FINANCE 사이드바 메뉴와 구성을 유지합니다. -->
     <aside class="ml-sidebar">
       <div class="ml-side-caption">MY FINANCE</div>
-      <nav class="ml-nav" aria-label="주요 메뉴">
-        <button type="button" data-page="dashboard"><span class="ml-nav-icon">🏠</span>대시보드</button>
-        <button type="button" data-page="assets"><span class="ml-nav-icon">🔍</span>자산관리</button>
-        <button type="button" class="active" data-page="finance"><span class="ml-nav-icon">💰</span>재무 정보 입력</button>
-        <button type="button" data-page="goal"><span class="ml-nav-icon">🎯</span>목표 설정</button>
-        <button type="button" data-page="report"><span class="ml-nav-icon">📈</span>분석 리포트</button>
-        <button type="button" data-page="settings"><span class="ml-nav-icon">⚙️</span>설정</button>
+      <div class="ml-mobile-menu">
+        <span id="ml-mobile-current">재무 정보 입력</span>
+        <button type="button" class="ml-btn" id="ml-mobile-toggle" aria-expanded="false" aria-controls="ml-main-nav">전체 메뉴</button>
+      </div>
+      <nav class="ml-nav" id="ml-main-nav" aria-label="주요 메뉴">
+        <button type="button" data-page="dashboard"><span class="ml-nav-icon" aria-hidden="true">🏠</span><span class="ml-nav-label">대시보드</span></button>
+        <button type="button" data-page="assets"><span class="ml-nav-icon" aria-hidden="true">🔍</span><span class="ml-nav-label">자산관리</span></button>
+        <button type="button" class="active" data-page="finance" aria-current="page"><span class="ml-nav-icon" aria-hidden="true">💰</span><span class="ml-nav-label">재무 정보 입력</span></button>
+        <button type="button" data-page="goal"><span class="ml-nav-icon" aria-hidden="true">🎯</span><span class="ml-nav-label">목표 설정</span></button>
+        <button type="button" data-page="report"><span class="ml-nav-icon" aria-hidden="true">📈</span><span class="ml-nav-label">분석 리포트</span></button>
+        <button type="button" data-page="settings"><span class="ml-nav-icon" aria-hidden="true">⚙️</span><span class="ml-nav-label">설정</span></button>
       </nav>
       <div class="ml-side-bottom"><div class="plant">🌱</div><strong>더 나은 내일을 위한<br>오늘의 재무관리</strong><p>지금의 선택이 만드는<br>나만의 미래를 경험해 보세요.</p></div>
     </aside>
