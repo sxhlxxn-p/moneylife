@@ -64,7 +64,13 @@
               <div class="ml-milestones" id="ml-milestones"><span>25세 출발</span><span>26세 독립</span><span>29세 이직</span><span>31세 여행</span><span>35세 다음 장</span></div>
             </section>
             <div class="ml-bottom-grid">
-              <section class="ml-card"><h3>나의 첫 번째 목표</h3><p class="ml-desc" id="ml-game-goal-name">나만의 공간 마련하기</p><div class="ml-goal-money"><span id="ml-game-goal-current">3,300</span><small> / <span id="ml-game-goal-target">5,000</span>만 원</small></div><div class="ml-bar"><span id="ml-game-goal-bar" style="width:66%"></span></div><p class="ml-hint" id="ml-game-goal-eta">목표까지 계산 중</p></section>
+              <section class="ml-card">
+                <h3>나의 첫 번째 목표</h3><p class="ml-desc" id="ml-game-goal-name">나만의 공간 마련하기</p>
+                <div class="ml-goal-money"><span id="ml-game-goal-current">3,300만 원</span><small> / <span id="ml-game-goal-target">5,000만 원</span></small></div>
+                <div class="ml-bar"><span id="ml-game-goal-bar" style="width:66%"></span></div>
+                <p class="ml-hint" id="ml-game-goal-eta">목표까지 계산 중</p>
+                <p class="ml-goal-deadline" id="ml-game-goal-deadline"></p>
+              </section>
               <section class="ml-card">
                 <h3>자산이 자라는 과정</h3>
                 <p class="ml-chart-current" id="ml-game-chart-current"></p>
@@ -101,8 +107,26 @@
       <section class="ml-page" id="ml-page-goal">
         <div class="ml-page-head"><div><div class="ml-eyebrow">MY MILESTONE</div><h1>목표 설정</h1><p>이루고 싶은 목표와 목표 시점을 정하고 진행 상황을 확인해요.</p></div></div>
         <div class="ml-content-grid">
-          <section class="ml-card"><h2>나의 목표</h2><p class="ml-desc">목표 금액을 바꾸면 시뮬레이션과 분석 리포트에 함께 반영됩니다.</p><div class="ml-stack"><div class="ml-field"><label for="ml-goal-name">목표 이름</label><div class="ml-input-wrap"><input id="ml-goal-name" value="나만의 공간 마련하기"></div></div><div class="ml-field"><label for="ml-goal-amount">목표 금액</label><div class="ml-input-wrap"><input id="ml-goal-amount" type="number" min="1" value="50000000"><span class="ml-unit">원</span></div></div><div class="ml-field"><label for="ml-goal-months">목표 시점</label><div class="ml-input-wrap"><input id="ml-goal-months" type="number" min="1" max="120" value="60"><span class="ml-unit">개월 후</span></div></div><button class="ml-btn primary" id="ml-save-goal">목표 저장하기 ✓</button></div></section>
-          <section class="ml-card"><h2>목표 달성 현황</h2><p class="ml-desc">현재 순자산을 기준으로 계산한 목표 진행률입니다.</p><div class="ml-goal-money"><span id="ml-goal-current-page">3,300</span><small> / <span id="ml-goal-target-page">5,000</span>만 원</small></div><div class="ml-bar"><span id="ml-goal-bar-page" style="width:66%"></span></div><p class="ml-hint" id="ml-goal-status">목표까지 남은 금액을 계산하고 있어요.</p><div class="ml-note" style="margin-top:18px">목표 달성 시점은 현재 입력값과 선택한 이벤트를 바탕으로 한 시뮬레이션 결과입니다. 실제 자산 증가를 보장하지 않습니다.</div></section>
+          <section class="ml-card">
+            <h2>나의 목표</h2><p class="ml-desc">목표를 저장하면 대시보드와 분석 리포트에 함께 반영돼요.</p>
+            <form id="ml-goal-form" class="ml-stack" novalidate>
+              <div class="ml-field"><label for="ml-goal-name">목표 이름 (선택)</label><div class="ml-input-wrap"><input id="ml-goal-name" maxlength="40"></div></div>
+              <div class="ml-field"><label for="ml-goal-amount">목표 금액</label><div class="ml-input-wrap"><input id="ml-goal-amount" type="text" inputmode="numeric" required aria-describedby="ml-goal-amount-error"><span class="ml-unit">원</span></div><small class="ml-field-error" id="ml-goal-amount-error" aria-live="polite" hidden></small></div>
+              <div class="ml-field"><label for="ml-goal-months">목표 기한</label><div class="ml-input-wrap"><input id="ml-goal-months" type="number" min="1" max="120" required aria-describedby="ml-goal-months-hint ml-goal-months-error"><span class="ml-unit">개월차</span></div><small class="ml-hint" id="ml-goal-months-hint">여정을 시작한 시점부터 1~120개월 사이로 정해요.</small><small class="ml-field-error" id="ml-goal-months-error" aria-live="polite" hidden></small></div>
+              <button type="submit" class="ml-btn primary" id="ml-save-goal">목표 저장하기</button>
+            </form>
+          </section>
+          <section class="ml-card">
+            <h2>목표 달성 현황</h2><p class="ml-desc">현재 순자산과 목표 금액을 비교해요.</p>
+            <div class="ml-goal-money"><span id="ml-goal-current-page">3,300만 원</span><small> / <span id="ml-goal-target-page">5,000만 원</span></small></div>
+            <div class="ml-bar"><span id="ml-goal-bar-page" style="width:66%"></span></div>
+            <dl class="ml-goal-facts">
+              <div><dt>내 목표 기한</dt><dd id="ml-goal-deadline"></dd></div>
+              <div><dt>예상 첫 도달</dt><dd id="ml-goal-status"></dd></div>
+              <div><dt>기한 비교</dt><dd id="ml-goal-deadline-status"></dd></div>
+            </dl>
+            <p class="ml-note">입력한 조건과 지금까지 선택한 이벤트를 기준으로 계산해요.</p>
+          </section>
         </div>
       </section>
 
@@ -119,25 +143,28 @@
               <div><dt>목표 첫 도달</dt><dd id="ml-report-goal-difference"></dd></div>
             </dl>
           </div>
-          <p class="ml-report-goal-note">목표 금액 <strong id="ml-report-goal-amount"></strong>에 처음 도달한 시점을 표시해요.</p>
+          <p class="ml-report-goal-note">목표 금액 <strong id="ml-report-goal-amount"></strong> · 목표 기한 <strong id="ml-report-goal-deadline"></strong></p>
           <div class="ml-report-grid">
             <section class="ml-report-item">
               <h3>처음 계획</h3>
               <p>시작 조건을 유지</p>
               <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-base">-</dd>
-                <dt>목표 첫 도달</dt><dd><span id="ml-report-base-goal">-</span><small class="ml-report-month" id="ml-report-base-month" hidden></small></dd></dl>
+                <dt>목표 첫 도달</dt><dd><span id="ml-report-base-goal">-</span><small class="ml-report-month" id="ml-report-base-month" hidden></small><small class="ml-report-deadline" id="ml-report-base-deadline"></small></dd>
+                <dt>현금 부족</dt><dd class="ml-report-shortage" id="ml-report-base-shortage"><span></span><small></small></dd></dl>
             </section>
             <section class="ml-report-item featured">
               <h3>내 선택</h3>
               <p>이벤트와 조건 변경 반영</p>
               <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-current">-</dd>
-                <dt>목표 첫 도달</dt><dd><span id="ml-report-current-goal">-</span><small class="ml-report-month" id="ml-report-current-month" hidden></small></dd></dl>
+                <dt>목표 첫 도달</dt><dd><span id="ml-report-current-goal">-</span><small class="ml-report-month" id="ml-report-current-month" hidden></small><small class="ml-report-deadline" id="ml-report-current-deadline"></small></dd>
+                <dt>현금 부족</dt><dd class="ml-report-shortage" id="ml-report-current-shortage"><span></span><small></small></dd></dl>
             </section>
             <section class="ml-report-item ml-report-stress">
               <h3>소득 공백 가정</h3>
               <p id="ml-report-stress-description"></p>
               <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-stress">-</dd>
-                <dt>목표 첫 도달</dt><dd><span id="ml-report-stress-goal">-</span><small class="ml-report-month" id="ml-report-stress-month" hidden></small></dd></dl>
+                <dt>목표 첫 도달</dt><dd><span id="ml-report-stress-goal">-</span><small class="ml-report-month" id="ml-report-stress-month" hidden></small><small class="ml-report-deadline" id="ml-report-stress-deadline"></small></dd>
+                <dt>현금 부족</dt><dd class="ml-report-shortage" id="ml-report-stress-shortage"><span></span><small></small></dd></dl>
             </section>
           </div>
           <div class="ml-report-plot">

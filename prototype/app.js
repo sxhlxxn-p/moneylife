@@ -14,7 +14,7 @@ const mlEl = (id) => document.getElementById(id);
 const won = (value) => Math.max(0, Number(value) || 0);
 const mlFormatAmount = (value) => Math.round(value).toLocaleString("ko-KR");
 const mlFormatWon = (value) => mlFormatAmount(value) + "원";
-const mlFormatMan = (value) => Math.round(value).toLocaleString("ko-KR") + "만 원";
+const mlFormatMan = (value) => mlFormatKoreanWon(Math.round(value)*10000);
 function mlFormatKoreanWon(value) {
   let remainder = Math.round(Math.abs(value));
   const parts = [];
@@ -33,11 +33,6 @@ function mlFormatDuration(months) {
   const remaining = months%12;
   return [years ? years + "년" : "", remaining ? remaining + "개월" : ""].filter(Boolean).join(" ");
 }
-const mlCompact = (value) => {
-  const n = Math.round(value);
-  if (Math.abs(n) >= 10000) return (n / 10000).toFixed(1) + "억";
-  return n.toLocaleString("ko-KR");
-};
 const mlFinanceStorageKey = "money-life-finance-v1";
 
 // 재무 입력 화면의 기본 예시값입니다. 금액 단위는 원입니다.
@@ -291,6 +286,13 @@ function mlGoalMonth(path) {
   return path.findIndex((point) => point.total >= mlFinance.goalAmount/10000);
 }
 
+function mlShowGoalDeadline(id, hit, prefix = "") {
+  const label = mlEl(id);
+  const delay = hit-mlFinance.goalMonths;
+  label.dataset.goalStatus = hit < 0 ? "unreached" : delay > 0 ? "late" : "on-time";
+  label.textContent = prefix + (hit < 0 ? "10년 내 미도달" : delay > 0 ? delay + "개월 초과" : "기한 내 도달");
+}
+
 function mlCompareGoalTiming(base, current) {
   if (base < 0 && current < 0) return "두 계획 모두 10년 내 미도달";
   if (base < 0) return "내 선택만 10년 내 도달";
@@ -396,10 +398,10 @@ function mlRenderDashboard() {
   mlEl("ml-game-date").textContent = year + "년 " + month + "월";
   mlEl("ml-game-month-label").textContent = mlMonth + " / 120개월";
   mlEl("ml-game-age").textContent = "☀ 맑음 · " + (mlFinance.age+Math.floor(mlMonth/12)) + "세";
-  mlEl("ml-game-net").innerHTML = Math.round(state.total).toLocaleString("ko-KR") + "<small>만 원</small>";
-  mlEl("ml-game-income").innerHTML = Math.round(state.income).toLocaleString("ko-KR") + "<small>만 원</small>";
-  mlEl("ml-game-expense").innerHTML = Math.round(state.expense).toLocaleString("ko-KR") + "<small>만 원</small>";
-  mlEl("ml-game-cash").innerHTML = Math.round(state.cash).toLocaleString("ko-KR") + "<small>만 원</small>";
+  mlEl("ml-game-net").textContent = mlFormatMan(state.total);
+  mlEl("ml-game-income").textContent = mlFormatMan(state.income);
+  mlEl("ml-game-expense").textContent = mlFormatMan(state.expense);
+  mlEl("ml-game-cash").textContent = mlFormatMan(state.cash);
   mlEl("ml-time-progress").style.width = (mlMonth/120*100) + "%";
   const next = mlNextEventMonth();
   if (next) {
@@ -419,8 +421,8 @@ function mlRenderDashboard() {
     mlEl("ml-event-later").onclick = () => mlShowPage("settings");
   }
   mlEl("ml-game-goal-name").textContent = mlFinance.goalName;
-  mlEl("ml-game-goal-current").textContent = mlCompact(Math.max(0,state.total));
-  mlEl("ml-game-goal-target").textContent = mlCompact(mlFinance.goalAmount/10000);
+  mlEl("ml-game-goal-current").textContent = mlFormatMan(state.total);
+  mlEl("ml-game-goal-target").textContent = mlFormatKoreanWon(mlFinance.goalAmount);
   const percent = Math.max(0,Math.min(100,state.total/(mlFinance.goalAmount/10000)*100));
   mlEl("ml-game-goal-bar").style.width = percent + "%";
   const goalHit = mlGoalMonth(path);
@@ -430,6 +432,7 @@ function mlRenderDashboard() {
     else goalStatus = percent >= 100 ? "첫 번째 목표에 도달했어요!" : "목표에 한 번 도달했지만, 현재 순자산은 목표 금액보다 낮아요.";
   }
   mlEl("ml-game-goal-eta").textContent = goalStatus;
+  mlShowGoalDeadline("ml-game-goal-deadline",goalHit,"목표 " + mlFinance.goalMonths + "개월차 · ");
   mlEl("ml-profile-name").textContent = mlFinance.name;
   mlEl("ml-profile-age").textContent = mlFinance.age+Math.floor(mlMonth/12);
   mlEl("ml-user-name").textContent = mlFinance.name + "님";
@@ -476,16 +479,20 @@ function mlRenderAssets() {
 // 목표 화면의 값과 진행률을 갱신합니다.
 function mlRenderGoal() {
   mlEl("ml-goal-name").value = mlFinance.goalName;
-  mlEl("ml-goal-amount").value = mlFinance.goalAmount;
+  mlEl("ml-goal-amount").value = mlFormatAmount(mlFinance.goalAmount);
   mlEl("ml-goal-months").value = mlFinance.goalMonths;
-  const state = mlCurrentState();
-  mlEl("ml-goal-current-page").textContent = mlCompact(Math.max(0,state.total));
-  mlEl("ml-goal-target-page").textContent = mlCompact(mlFinance.goalAmount/10000);
+  mlSetFinanceFieldError(mlEl("ml-goal-amount"),"");
+  mlSetFinanceFieldError(mlEl("ml-goal-months"),"");
+  const path = mlSimulation();
+  const state = path[mlMonth];
+  mlEl("ml-goal-current-page").textContent = mlFormatMan(state.total);
+  mlEl("ml-goal-target-page").textContent = mlFormatKoreanWon(mlFinance.goalAmount);
   const pct = Math.max(0,Math.min(100,state.total/(mlFinance.goalAmount/10000)*100));
   mlEl("ml-goal-bar-page").style.width = pct + "%";
-  const path = mlSimulation();
   const hit = mlGoalMonth(path);
-  mlEl("ml-goal-status").textContent = hit < 0 ? "현재 조건으로는 10년 안에 목표에 도달하지 못해요." : "현재 조건에서는 약 " + hit + "개월 후 목표에 도달할 것으로 계산돼요.";
+  mlEl("ml-goal-deadline").textContent = mlFinance.goalMonths + "개월차";
+  mlEl("ml-goal-status").textContent = hit < 0 ? "10년 내 미도달" : hit === 0 ? "시작 시점" : hit + "개월차";
+  mlShowGoalDeadline("ml-goal-deadline-status",hit);
 }
 
 // 기본 계획, 현재 선택, 소득 공백 가정을 비교합니다.
@@ -499,6 +506,7 @@ function mlRenderReport() {
   const goalAmount = mlFormatKoreanWon(mlFinance.goalAmount);
   const goalMonths = {base:mlGoalMonth(base),current:mlGoalMonth(current),stress:mlGoalMonth(stress)};
   mlEl("ml-report-goal-amount").textContent = goalAmount;
+  mlEl("ml-report-goal-deadline").textContent = mlFinance.goalMonths + "개월차";
   mlEl("ml-report-stress-description").textContent = stressMonths > 0
     ? "내 선택에 " + (mlMonth+1) + "개월차부터 " + stressMonths + "개월간 월 소득 100만 원 감소를 추가한 경우"
     : "10년 진행이 끝나 내 선택과 같아요.";
@@ -509,6 +517,14 @@ function mlRenderReport() {
     const month = mlEl("ml-report-" + id + "-month");
     month.textContent = hit > 0 ? hit + "개월차" : "";
     month.hidden = hit <= 0;
+    mlShowGoalDeadline("ml-report-" + id + "-deadline",hit);
+    const shortage = mlEl("ml-report-" + id + "-shortage");
+    const shortageMonths = path.flatMap((state,index) => Math.round(state.short*10000) > 0 ? [index] : []);
+    shortage.toggleAttribute("data-shortage",shortageMonths.length > 0);
+    shortage.querySelector("span").textContent = shortageMonths.length ? shortageMonths.length + "개월 발생" : "없음";
+    shortage.querySelector("small").textContent = shortageMonths.length
+      ? "첫 부족 " + shortageMonths[0] + "개월차 · 미충족 지출 누적 " + mlFormatKoreanWon(path[120].unpaid*10000)
+      : "";
   });
   const difference = Math.round(current[120].total)-Math.round(base[120].total);
   mlEl("ml-report-net-difference").textContent = difference === 0 ? "차이 없음"
@@ -626,14 +642,40 @@ mlEl("ml-finance-reset").addEventListener("click",() => {
 document.querySelectorAll("#money-life-app .ml-building").forEach((building) => {
   building.addEventListener("click",() => mlShowPage(building.dataset.page));
 });
-mlEl("ml-save-goal").addEventListener("click",() => {
+const mlGoalAmountInput = mlEl("ml-goal-amount");
+const mlGoalMonthsInput = mlEl("ml-goal-months");
+const mlValidateGoalAmount = () => mlSetFinanceFieldError(mlGoalAmountInput,
+  mlParseFinanceAmount(mlGoalAmountInput.value) > 0 ? "" : "목표 금액을 1원 이상의 정수로 입력해 주세요.");
+const mlValidateGoalMonths = () => mlSetFinanceFieldError(mlGoalMonthsInput,
+  mlGoalMonthsInput.validity.valid ? "" : "목표 기한을 1~120개월 사이의 정수로 입력해 주세요.");
+mlGoalAmountInput.addEventListener("focus",() => {
+  if (mlParseFinanceAmount(mlGoalAmountInput.value) !== null) mlGoalAmountInput.value = mlGoalAmountInput.value.replaceAll(",", "");
+});
+mlGoalAmountInput.addEventListener("blur",() => {
+  if (mlValidateGoalAmount()) mlGoalAmountInput.value = mlFormatAmount(mlParseFinanceAmount(mlGoalAmountInput.value));
+});
+mlGoalMonthsInput.addEventListener("blur",mlValidateGoalMonths);
+[[mlGoalAmountInput,mlValidateGoalAmount],[mlGoalMonthsInput,mlValidateGoalMonths]].forEach(([input,validate]) => {
+  input.addEventListener("input",() => {
+    if (input.hasAttribute("aria-invalid")) validate();
+  });
+});
+mlEl("ml-goal-form").addEventListener("submit",(event) => {
+  event.preventDefault();
+  const amountValid = mlValidateGoalAmount();
+  const monthsValid = mlValidateGoalMonths();
+  if (!amountValid || !monthsValid) {
+    (amountValid ? mlGoalMonthsInput : mlGoalAmountInput).focus();
+    return;
+  }
   mlFinance.goalName = mlEl("ml-goal-name").value.trim() || mlDefaults.goalName;
-  mlFinance.goalAmount = won(mlEl("ml-goal-amount").value);
-  mlFinance.goalMonths = Math.max(1,Math.min(120,won(mlEl("ml-goal-months").value)));
+  mlFinance.goalAmount = mlParseFinanceAmount(mlGoalAmountInput.value);
+  mlFinance.goalMonths = mlGoalMonthsInput.valueAsNumber;
+  const saved = mlSaveFinance();
   mlRenderGoal();
   mlRenderDashboard();
   mlRenderReport();
-  mlToast("새로운 목표를 저장했어요.");
+  mlToast(saved ? "새로운 목표를 저장했어요." : "새로운 목표를 적용했어요. 이 브라우저에는 저장하지 못했어요.");
 });
 mlEl("ml-refresh-report").addEventListener("click",() => { mlRenderReport(); mlToast("현재 조건으로 다시 계산했어요."); });
 mlEl("ml-apply-saving").addEventListener("click",() => {
