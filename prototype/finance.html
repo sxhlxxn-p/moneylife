@@ -1,0 +1,1382 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Life | 재무 정보 입력</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #4969ed;
+            --primary-light: #edf1ff;
+            --ink: #202945;
+            --sub: #8490a8;
+            --line: #e8edf6;
+            --bg: #f5f7fc;
+            --white: #ffffff;
+            --green: #40a58b;
+            --shadow: 0 8px 28px rgba(39, 61, 112, 0.045);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 14px;
+        }
+
+        button, input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            min-height: 100vh;
+        }
+
+        /* 상단 네비게이션 */
+
+        .topbar {
+            height: 68px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+        }
+
+        .brand-mark {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            color: white;
+            background: var(--primary);
+            border-radius: 12px;
+            font-size: 19px;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 23px;
+            color: #596681;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #e9edfa;
+            font-size: 18px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 600;
+        }
+
+        /* 전체 레이아웃 */
+
+        .layout {
+            display: grid;
+            grid-template-columns: 215px minmax(0, 1fr);
+            min-height: calc(100vh - 68px);
+        }
+
+        .sidebar {
+            padding: 26px 15px;
+            background: #fff;
+            border-right: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-caption {
+            padding: 0 14px;
+            margin: 6px 0 15px;
+            color: #a4aec1;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            width: 100%;
+            padding: 13px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 0;
+            border-radius: 11px;
+            background: transparent;
+            color: #6e7b95;
+            text-align: left;
+            margin-bottom: 5px;
+            transition: .2s;
+        }
+
+        .nav-item:hover {
+            background: #f6f8ff;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: var(--primary-light);
+            font-weight: 700;
+        }
+
+        .nav-icon {
+            width: 23px;
+            text-align: center;
+            font-size: 19px;
+        }
+
+        .side-bottom {
+            margin-top: auto;
+            padding: 19px 13px;
+            background: #f5f7ff;
+            border-radius: 14px;
+        }
+
+        .side-bottom .plant {
+            font-size: 28px;
+        }
+
+        .side-bottom strong {
+            display: block;
+            margin: 10px 0 7px;
+            line-height: 1.7;
+        }
+
+        .side-bottom p {
+            margin: 0;
+            color: var(--sub);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* 메인 콘텐츠 */
+
+        .main {
+            min-width: 0;
+            padding: 28px;
+        }
+
+        .content-grid {
+            max-width: 1450px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 265px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .main-panel {
+            min-width: 0;
+        }
+
+        .back {
+            padding: 0;
+            margin-bottom: 22px;
+            border: 0;
+            background: none;
+            color: #71809c;
+            font-weight: 500;
+        }
+
+        /* 진행 단계 */
+
+        .steps {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 31px;
+        }
+
+        .step {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #9ca7ba;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .step-circle {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #dce3f0;
+            border-radius: 50%;
+            background: white;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .step.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .step.active .step-circle,
+        .step.done .step-circle {
+            color: white;
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 1px;
+            min-width: 10px;
+            margin: 0 10px;
+            background: #dce3f0;
+        }
+
+        /* 페이지 제목 */
+
+        .page-heading {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+            margin-bottom: 26px;
+        }
+
+        .heading-icon {
+            width: 55px;
+            height: 55px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 18px;
+            background: #eaf0ff;
+            font-size: 27px;
+        }
+
+        h1 {
+            margin: 0 0 7px;
+            font-size: 27px;
+            letter-spacing: -1px;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: var(--sub);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* 입력 카드 */
+
+        .form-card {
+            padding: 23px 25px;
+            margin-bottom: 17px;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 47px;
+            height: 47px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #edf1ff;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .card-heading h2 {
+            margin: 0 0 5px;
+            font-size: 16px;
+        }
+
+        .card-heading p {
+            margin: 0;
+            color: var(--sub);
+            font-size: 12px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .field {
+            min-width: 0;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #53617d;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .input-wrap {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            height: 45px;
+            padding: 0 13px;
+            border: 1px solid #e0e6f1;
+            border-radius: 10px;
+            background: #fff;
+            transition: .2s;
+        }
+
+        .input-wrap:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px #4969ed12;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            border: 0;
+            outline: 0;
+            color: var(--ink);
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .input-wrap input::placeholder {
+            color: #b1bacb;
+            font-weight: 400;
+        }
+
+        .unit {
+            flex-shrink: 0;
+            color: #8e9ab0;
+            font-size: 12px;
+        }
+
+        .field-hint {
+            display: block;
+            margin-top: 6px;
+            color: #a2adbf;
+            font-size: 11px;
+        }
+
+        /* 소득 유형 선택 */
+
+        .choice-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .choice {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 8px;
+            border: 1px solid #e1e7f2;
+            border-radius: 9px;
+            background: white;
+            color: #7c89a1;
+            font-size: 12px;
+            transition: .2s;
+        }
+
+        .choice:hover {
+            border-color: #a9b9ff;
+        }
+
+        .choice.selected {
+            color: white;
+            background: var(--primary);
+            border-color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* 지출 항목 */
+
+        .expense-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .expense-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 11px;
+            border: 1px solid #e6eaf3;
+            border-radius: 9px;
+            color: #66738c;
+            background: #fff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .expense-tag input {
+            accent-color: var(--primary);
+            margin: 0;
+        }
+
+        /* 하단 버튼 */
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 0 5px;
+        }
+
+        .privacy {
+            color: #8f9ab0;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            min-width: 115px;
+            padding: 12px 19px;
+            border: 1px solid #dce3f0;
+            border-radius: 10px;
+            background: white;
+            color: #61708d;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn.primary {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 5px 13px #4969ed30;
+        }
+
+        /* 오른쪽 안내 패널 */
+
+        .info-panel {
+            padding: 23px 19px;
+            border: 1px solid #e3e9fa;
+            border-radius: 18px;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .info-illustration {
+            min-height: 135px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 18px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #edf2ff, #f8faff);
+            font-size: 55px;
+        }
+
+        .info-panel h3 {
+            margin: 0 0 9px;
+            font-size: 18px;
+            line-height: 1.6;
+            letter-spacing: -.5px;
+        }
+
+        .info-panel > p {
+            color: var(--sub);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .benefit-list {
+            padding: 0;
+            margin: 22px 0;
+            list-style: none;
+        }
+
+        .benefit-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-bottom: 17px;
+            color: #65728d;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .check {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: #e4f5ef;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .summary {
+            padding: 17px;
+            border: 1px solid #e7ecfb;
+            border-radius: 13px;
+            background: #f7f8ff;
+        }
+
+        .summary-title {
+            margin-bottom: 15px;
+            color: #73809b;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: #75819a;
+            font-size: 12px;
+        }
+
+        .summary-row strong {
+            color: var(--ink);
+            text-align: right;
+        }
+
+        .summary-row.total {
+            padding-top: 12px;
+            margin-bottom: 0;
+            border-top: 1px solid #e2e7f4;
+        }
+
+        .summary-row.total strong {
+            color: var(--primary);
+            font-size: 17px;
+        }
+
+        .quote {
+            padding: 17px;
+            margin-top: 17px;
+            border-radius: 13px;
+            background: #f0f7f5;
+            color: #538477;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        .quote strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* 입력 완료 메시지 */
+
+        .notice {
+            display: none;
+            padding: 13px 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: #e8f7ef;
+            color: #287b59;
+            font-size: 13px;
+        }
+
+        .notice.show {
+            display: block;
+        }
+
+        /* 반응형 */
+
+        @media (max-width: 1100px) {
+            .content-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .info-panel {
+                display: grid;
+                grid-template-columns: 130px 1fr;
+                gap: 17px;
+            }
+
+            .info-illustration {
+                min-height: 130px;
+                grid-row: span 2;
+                margin: 0;
+            }
+
+            .benefit-list {
+                grid-column: 1 / -1;
+            }
+
+            .summary,
+            .quote {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .topbar {
+                height: 60px;
+                padding: 0 17px;
+            }
+
+            .brand {
+                font-size: 18px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                padding: 10px;
+                flex-direction: row;
+                gap: 6px;
+                overflow-x: auto;
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .side-caption,
+            .side-bottom {
+                display: none;
+            }
+
+            .nav-item {
+                width: auto;
+                min-width: max-content;
+                padding: 10px 12px;
+                margin: 0;
+                font-size: 12px;
+            }
+
+            .nav-icon {
+                font-size: 16px;
+            }
+
+            .main {
+                padding: 19px 13px;
+            }
+
+            .steps {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+
+            .step {
+                font-size: 10px;
+                gap: 5px;
+            }
+
+            .step-line {
+                margin: 0 6px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            .form-card {
+                padding: 19px 15px;
+            }
+
+            .fields {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .info-panel {
+                display: block;
+                padding: 17px;
+            }
+
+            .info-illustration {
+                min-height: 110px;
+                margin-bottom: 15px;
+            }
+
+            .form-footer {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .button-row {
+                width: 100%;
+            }
+
+            .button-row .btn {
+                flex: 1;
+            }
+
+            .privacy {
+                order: 2;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- 상단 헤더 -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">↗</div>
+            <span>Money Life</span>
+        </div>
+
+        <div class="top-right">
+            <span aria-label="알림">♧</span>
+
+            <div class="user">
+                <div class="avatar">👤</div>
+                <span>김지은님</span>
+                <span>⌄</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- 왼쪽 메뉴 -->
+        <aside class="sidebar">
+            <div class="side-caption">MY FINANCE</div>
+
+            <button class="nav-item" onclick="showNotice('대시보드 메뉴를 선택했어요.')">
+                <span class="nav-icon">⌂</span>
+                대시보드
+            </button>
+
+            <button class="nav-item" onclick="showNotice('자산관리 메뉴를 선택했어요.')">
+                <span class="nav-icon">▣</span>
+                자산관리
+            </button>
+
+            <button class="nav-item active">
+                <span class="nav-icon">▤</span>
+                재무 정보 입력
+            </button>
+
+            <button class="nav-item" onclick="showNotice('목표 설정 메뉴를 선택했어요.')">
+                <span class="nav-icon">◎</span>
+                목표 설정
+            </button>
+
+            <button class="nav-item" onclick="showNotice('분석 리포트 메뉴를 선택했어요.')">
+                <span class="nav-icon">▥</span>
+                분석 리포트
+            </button>
+
+            <button class="nav-item" onclick="showNotice('설정 메뉴를 선택했어요.')">
+                <span class="nav-icon">⚙</span>
+                설정
+            </button>
+
+            <div class="side-bottom">
+                <div class="plant">🌱</div>
+                <strong>
+                    더 나은 내일을 위한<br>
+                    오늘의 재무관리
+                </strong>
+                <p>
+                    지금, 당신의 재무 정보를<br>
+                    입력해 보세요.
+                </p>
+            </div>
+        </aside>
+
+        <!-- 메인 화면 -->
+        <main class="main">
+            <div class="content-grid">
+
+                <section class="main-panel">
+
+                    <button class="back" onclick="history.back()">
+                        ← 이전으로
+                    </button>
+
+                    <!-- 진행 단계 -->
+                    <div class="steps">
+                        <div class="step done">
+                            <div class="step-circle">✓</div>
+                            <span>기본 정보</span>
+                        </div>
+
+                        <div class="step-line"></div>
+
+                        <div class="step active">
+                            <div class="step-circle">2</div>
+                            <span>재무 정보 입력</span>
+                        </div>
+
+                        <div class="step-line"></div>
+
+                        <div class="step">
+                            <div class="step-circle">3</div>
+                            <span>확인 및 저장</span>
+                        </div>
+
+                        <div class="step-line"></div>
+
+                        <div class="step">
+                            <div class="step-circle">4</div>
+                            <span>완료</span>
+                        </div>
+                    </div>
+
+                    <!-- 제목 -->
+                    <div class="page-heading">
+                        <div class="heading-icon">📑</div>
+
+                        <div>
+                            <h1>재무 정보 입력</h1>
+                            <p>
+                                현재 재무 상태를 입력하고
+                                나에게 맞는 미래 계획을 만들어 보세요.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="notice" class="notice" role="status"></div>
+
+                    <form id="financeForm">
+
+                        <!-- 자산 -->
+                        <section class="form-card">
+                            <div class="card-heading">
+                                <div class="card-icon">💳</div>
+                                <div>
+                                    <h2>자산 현황</h2>
+                                    <p>현재 보유하고 있는 자산을 입력해 주세요.</p>
+                                </div>
+                            </div>
+
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="cash">예금 · 현금</label>
+                                    <div class="input-wrap">
+                                        <input id="cash" type="number" min="0"
+                                            value="12000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="stocks">주식</label>
+                                    <div class="input-wrap">
+                                        <input id="stocks" type="number" min="0"
+                                            value="5000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="funds">펀드 · 기타 금융자산</label>
+                                    <div class="input-wrap">
+                                        <input id="funds" type="number" min="0"
+                                            value="3000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="property">부동산</label>
+                                    <div class="input-wrap">
+                                        <input id="property" type="number" min="0"
+                                            value="50000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 부채 -->
+                        <section class="form-card">
+                            <div class="card-heading">
+                                <div class="card-icon">🏦</div>
+                                <div>
+                                    <h2>부채 현황</h2>
+                                    <p>현재 갚아야 할 금액을 입력해 주세요.</p>
+                                </div>
+                            </div>
+
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="loan">대출</label>
+                                    <div class="input-wrap">
+                                        <input id="loan" type="number" min="0"
+                                            value="30000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="credit">신용대출</label>
+                                    <div class="input-wrap">
+                                        <input id="credit" type="number" min="0"
+                                            value="5000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="cardDebt">카드 미결제 금액</label>
+                                    <div class="input-wrap">
+                                        <input id="cardDebt" type="number" min="0"
+                                            value="2000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label for="otherDebt">기타 부채</label>
+                                    <div class="input-wrap">
+                                        <input id="otherDebt" type="number" min="0"
+                                            value="0" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 소득 -->
+                        <section class="form-card">
+                            <div class="card-heading">
+                                <div class="card-icon">💰</div>
+                                <div>
+                                    <h2>소득 정보</h2>
+                                    <p>한 달 동안 들어오는 소득을 입력해 주세요.</p>
+                                </div>
+                            </div>
+
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="income">월 평균 소득</label>
+                                    <div class="input-wrap">
+                                        <input id="income" type="number" min="0"
+                                            value="4000000" placeholder="금액 입력">
+                                        <span class="unit">원</span>
+                                    </div>
+                                    <small class="field-hint">
+                                        세후 실제 수령 금액을 기준으로 입력해 주세요.
+                                    </small>
+                                </div>
+
+                                <div class="field">
+                                    <label>주요 소득 유형</label>
+                                    <div class="choice-row" id="incomeTypes">
+                                        <button type="button" class="choice selected"
+                                            data-value="근로소득">근로소득</button>
+                                        <button type="button" class="choice"
+                                            data-value="사업소득">사업소득</button>
+                                        <button type="button" class="choice"
+                                            data-value="연금소득">연금소득</button>
+                                        <button type="button" class="choice"
+                                            data-value="기타">기타</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 지출 -->
+                        <section class="form-card">
+                            <div class="card-heading">
+                                <div class="card-icon">🐷</div>
+                                <div>
+                                    <h2>지출 정보</h2>
+                                    <p>매달 사용하는 생활비를 입력해 주세요.</p>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label for="expense">월 평균 지출</label>
+                                <div class="input-wrap">
+                                    <input id="expense" type="number" min="0"
+                                        value="2500000" placeholder="금액 입력">
+                                    <span class="unit">원</span>
+                                </div>
+                            </div>
+
+                            <div class="field" style="margin-top:20px">
+                                <label>주요 지출 항목 (복수 선택)</label>
+
+                                <div class="expense-tags">
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="주거비" checked>
+                                        🏠 주거비
+                                    </label>
+
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="식비" checked>
+                                        🍚 식비
+                                    </label>
+
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="교통비">
+                                        🚇 교통비
+                                    </label>
+
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="교육비">
+                                        📚 교육비
+                                    </label>
+
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="의료비">
+                                        🩺 의료비
+                                    </label>
+
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="여가">
+                                        🎨 여가
+                                    </label>
+
+                                    <label class="expense-tag">
+                                        <input type="checkbox" value="기타">
+                                        ··· 기타
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 버튼 -->
+                        <div class="form-footer">
+                            <div class="privacy">
+                                🔒 입력한 정보는 재무 분석과 계획 수립에 사용됩니다.<br>
+                                이 프로토타입은 서버에 정보를 전송하지 않습니다.
+                            </div>
+
+                            <div class="button-row">
+                                <button type="button" class="btn"
+                                    onclick="history.back()">
+                                    이전으로
+                                </button>
+
+                                <button type="submit" class="btn primary">
+                                    분석하기 →
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- 오른쪽 안내 패널 -->
+                <aside class="info-panel">
+                    <div class="info-illustration">
+                        💰 📊 🌿
+                    </div>
+
+                    <div>
+                        <h3>
+                            입력한 정보로<br>
+                            나만의 미래를 설계해요!
+                        </h3>
+
+                        <p>
+                            현재 재무 상태를 바탕으로
+                            더 현실적인 계획을 세울 수 있어요.
+                        </p>
+                    </div>
+
+                    <ul class="benefit-list">
+                        <li>
+                            <span class="check">✓</span>
+                            <span>현재 순자산과 부채 현황 확인</span>
+                        </li>
+
+                        <li>
+                            <span class="check">✓</span>
+                            <span>매월 저축 가능한 금액 계산</span>
+                        </li>
+
+                        <li>
+                            <span class="check">✓</span>
+                            <span>소득과 지출 패턴 파악</span>
+                        </li>
+
+                        <li>
+                            <span class="check">✓</span>
+                            <span>목표 달성을 위한 미래 계획 준비</span>
+                        </li>
+                    </ul>
+
+                    <!-- 실시간 요약 -->
+                    <div class="summary">
+                        <div class="summary-title">
+                            나의 재무 요약
+                        </div>
+
+                        <div class="summary-row">
+                            <span>총자산</span>
+                            <strong id="totalAssets">70,000,000원</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>총부채</span>
+                            <strong id="totalDebt">37,000,000원</strong>
+                        </div>
+
+                        <div class="summary-row total">
+                            <span>순자산</span>
+                            <strong id="netAssets">33,000,000원</strong>
+                        </div>
+
+                        <div class="summary-row" style="margin-top:15px">
+                            <span>월 예상 잔액</span>
+                            <strong id="monthlyBalance">1,500,000원</strong>
+                        </div>
+                    </div>
+
+                    <div class="quote">
+                        <strong>🌱 작은 기록이 만드는 변화</strong>
+                        지금의 재무 상태를 아는 것부터<br>
+                        더 나은 미래가 시작됩니다.
+                    </div>
+                </aside>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // 금액 입력 필드
+    const assetIds = [
+        "cash",
+        "stocks",
+        "funds",
+        "property"
+    ];
+
+    const debtIds = [
+        "loan",
+        "credit",
+        "cardDebt",
+        "otherDebt"
+    ];
+
+    const moneyIds = [
+        ...assetIds,
+        ...debtIds,
+        "income",
+        "expense"
+    ];
+
+    // 숫자 입력값 읽기
+    function getValue(id) {
+        const value = Number(
+            document.getElementById(id).value
+        );
+
+        return Number.isFinite(value) && value > 0
+            ? value
+            : 0;
+    }
+
+    // 원 단위 숫자 표시
+    function formatMoney(value) {
+        return Math.round(value).toLocaleString("ko-KR") + "원";
+    }
+
+    // 입력한 금액으로 요약 갱신
+    function updateSummary() {
+        const totalAssets = assetIds.reduce(
+            (sum, id) => sum + getValue(id),
+            0
+        );
+
+        const totalDebt = debtIds.reduce(
+            (sum, id) => sum + getValue(id),
+            0
+        );
+
+        const income = getValue("income");
+        const expense = getValue("expense");
+
+        const netAssets = totalAssets - totalDebt;
+        const monthlyBalance = income - expense;
+
+        document.getElementById("totalAssets").textContent =
+            formatMoney(totalAssets);
+
+        document.getElementById("totalDebt").textContent =
+            formatMoney(totalDebt);
+
+        document.getElementById("netAssets").textContent =
+            formatMoney(netAssets);
+
+        document.getElementById("monthlyBalance").textContent =
+            formatMoney(monthlyBalance);
+
+        document.getElementById("netAssets").style.color =
+            netAssets < 0 ? "#df626b" : "#4969ed";
+
+        document.getElementById("monthlyBalance").style.color =
+            monthlyBalance < 0 ? "#df626b" : "#202945";
+    }
+
+    // 입력값 변경 시 실시간 계산
+    moneyIds.forEach((id) => {
+        document.getElementById(id).addEventListener(
+            "input",
+            updateSummary
+        );
+    });
+
+    // 소득 유형 선택
+    let selectedIncomeType = "근로소득";
+
+    document.querySelectorAll("#incomeTypes .choice").forEach(
+        (button) => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(
+                    "#incomeTypes .choice"
+                ).forEach((item) => {
+                    item.classList.remove("selected");
+                });
+
+                button.classList.add("selected");
+                selectedIncomeType = button.dataset.value;
+            });
+        }
+    );
+
+    // 알림 표시
+    function showNotice(message) {
+        const notice = document.getElementById("notice");
+
+        notice.textContent = message;
+        notice.classList.add("show");
+
+        notice.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    }
+
+    // 입력값 확인 및 다음 단계 안내
+    document.getElementById("financeForm").addEventListener(
+        "submit",
+        (event) => {
+            event.preventDefault();
+
+            const income = getValue("income");
+            const expense = getValue("expense");
+
+            if (income <= 0) {
+                showNotice("월 평균 소득을 입력해 주세요.");
+                document.getElementById("income").focus();
+                return;
+            }
+
+            if (expense < 0) {
+                showNotice("지출 금액을 확인해 주세요.");
+                return;
+            }
+
+            const expenses = [
+                ...document.querySelectorAll(
+                    ".expense-tag input:checked"
+                )
+            ].map((input) => input.value);
+
+            // 다음 화면 구현 전 확인용 데이터
+            const financeData = {
+                assets: {
+                    cash: getValue("cash"),
+                    stocks: getValue("stocks"),
+                    funds: getValue("funds"),
+                    property: getValue("property")
+                },
+
+                debts: {
+                    loan: getValue("loan"),
+                    credit: getValue("credit"),
+                    cardDebt: getValue("cardDebt"),
+                    otherDebt: getValue("otherDebt")
+                },
+
+                income,
+                incomeType: selectedIncomeType,
+                expense,
+                expenseCategories: expenses
+            };
+
+            // 현재 브라우저 탭에서 다음 화면이 사용할 수 있도록 보관
+            sessionStorage.setItem(
+                "moneyLifeFinance",
+                JSON.stringify(financeData)
+            );
+
+            showNotice(
+                "재무 정보 입력이 완료됐어요! " +
+                "순자산은 " +
+                formatMoney(
+                    assetIds.reduce(
+                        (sum, id) => sum + getValue(id),
+                        0
+                    ) -
+                    debtIds.reduce(
+                        (sum, id) => sum + getValue(id),
+                        0
+                    )
+                ) +
+                "입니다. 다음 단계 화면은 아직 연결되지 않았어요."
+            );
+        }
+    );
+
+    // 최초 요약 계산
+    updateSummary();
+</script>
+
+</body>
+</html>
