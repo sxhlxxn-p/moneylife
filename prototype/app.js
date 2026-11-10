@@ -38,21 +38,30 @@ const mlCompact = (value) => {
   if (Math.abs(n) >= 10000) return (n / 10000).toFixed(1) + "억";
   return n.toLocaleString("ko-KR");
 };
+const mlFinanceStorageKey = "money-life-finance-v1";
 
 // 재무 입력 화면의 기본 예시값입니다. 금액 단위는 원입니다.
 const mlDefaults = {
   cash:12000000, stocks:5000000, funds:3000000, property:50000000,
   loan:30000000, credit:5000000, cardDebt:2000000, otherDebt:0,
   income:4000000, expense:2500000, goalName:"나만의 공간 마련하기",
-  goalAmount:50000000, goalMonths:60, incomeType:"근로소득",
-  name:"나의 첫 번째 인생", age:25, annualRate:3
+  goalAmount:50000000, goalMonths:60, incomeType:"근로소득", expenseCategories:["주거비","식비"],
+  name:"나의 첫 번째 인생", age:25, annualRate:3, monthlySaving:null
 };
 const mlFinanceFields = {
   cash:"cash", stocks:"stocks", funds:"funds", property:"property",
   loan:"loan", credit:"credit", "card-debt":"cardDebt", "other-debt":"otherDebt",
   income:"income", expense:"expense"
 };
+const mlStartFieldErrors = {
+  "ml-start-age":"시작 나이는 18~80세 사이의 정수로 입력해 주세요.",
+  "ml-start-saving":"월 저축액을 0원 이상의 정수로 입력해 주세요.",
+  "ml-start-rate":"연 수익률은 0~8% 사이로 입력해 주세요."
+};
+const mlIncomeOptions = document.querySelectorAll("#ml-income-types .ml-choice");
+const mlExpenseOptions = document.querySelectorAll("#ml-finance-form .ml-tag input");
 let mlFinance = {...mlDefaults};
+let mlFinanceDraft = {};
 let mlMonth = 0;
 let mlTimer = null;
 let mlSpeed = 1;
@@ -77,55 +86,66 @@ function mlParseFinanceAmount(value) {
   return Number.isSafeInteger(amount) ? amount : null;
 }
 
-function mlValidateFinanceAmount(input) {
-  const valid = mlParseFinanceAmount(input.value) !== null;
+function mlSetFinanceFieldError(input, message) {
   const error = mlEl(input.id + "-error");
-  if (valid) {
-    input.removeAttribute("aria-invalid");
-    error.hidden = true;
-    error.textContent = "";
-  } else {
-    input.setAttribute("aria-invalid", "true");
-    error.hidden = false;
-    error.textContent = input.value.trim() ? "0원 이상의 정수 금액을 입력해 주세요." : "금액을 입력해 주세요. 해당 금액이 없으면 0원을 입력하세요.";
-  }
-  return valid;
+  if (message) input.setAttribute("aria-invalid", "true");
+  else input.removeAttribute("aria-invalid");
+  error.hidden = !message;
+  error.textContent = message;
+  return !message;
 }
 
-function mlWriteFinanceAmounts(data) {
+function mlValidateFinanceAmount(input) {
+  if (mlParseFinanceAmount(input.value) !== null) return mlSetFinanceFieldError(input,"");
+  const message = input.value.trim() ? "0원 이상의 정수 금액을 입력해 주세요." : "금액을 입력해 주세요. 해당 금액이 없으면 0원을 입력하세요.";
+  return mlSetFinanceFieldError(input,message);
+}
+
+function mlValidateStartField(input) {
+  const valid = input.id === "ml-start-saving" ? !input.value.trim() || mlParseFinanceAmount(input.value) !== null : input.validity.valid;
+  return mlSetFinanceFieldError(input,valid ? "" : mlStartFieldErrors[input.id]);
+}
+
+function mlWriteFinanceInputs(data) {
+  mlEl("ml-start-name").value = data.name;
+  mlEl("ml-start-age").value = data.age;
+  mlEl("ml-start-rate").value = data.annualRate;
+  mlEl("ml-start-saving").value = data.monthlySaving == null ? "" : mlFormatAmount(data.monthlySaving);
+  Object.keys(mlStartFieldErrors).forEach((id) => mlValidateStartField(mlEl(id)));
   Object.entries(mlFinanceFields).forEach(([id, key]) => {
     const input = mlEl("ml-" + id);
+    mlFinanceDraft[key] = data[key];
     input.value = mlFormatAmount(data[key]);
     mlValidateFinanceAmount(input);
   });
+  mlIncomeOptions.forEach((button) => button.classList.toggle("active",button.dataset.value === data.incomeType));
+  const categories = Array.isArray(data.expenseCategories) ? data.expenseCategories : mlDefaults.expenseCategories;
+  mlExpenseOptions.forEach((input) => { input.checked = categories.includes(input.value); });
 }
 
 // 입력을 수정하는 동안에는 마지막으로 유효했던 금액을 요약에 사용합니다.
-function mlReadFinance() {
-  const value = (id) => won(mlEl("ml-" + id).value);
-  const amounts = Object.fromEntries(Object.entries(mlFinanceFields).map(([id, key]) => [
-    key, mlParseFinanceAmount(mlEl("ml-" + id).value) ?? mlFinance[key]
+function mlReadFinanceAmounts() {
+  return Object.fromEntries(Object.entries(mlFinanceFields).map(([id, key]) => [
+    key, mlParseFinanceAmount(mlEl("ml-" + id).value) ?? mlFinanceDraft[key]
   ]));
-  return {
-    ...amounts, goalName:mlEl("ml-goal-name").value.trim() || mlDefaults.goalName,
-    goalAmount:value("goal-amount") || mlDefaults.goalAmount, goalMonths:Math.max(1,Math.min(120,value("goal-months") || 60)),
-    incomeType:mlFinance.incomeType, name:mlFinance.name, age:mlFinance.age, annualRate:mlFinance.annualRate
-  };
 }
 function mlTotalAssets(data=mlFinance) { return data.cash + data.stocks + data.funds + data.property; }
 function mlTotalDebt(data=mlFinance) { return data.loan + data.credit + data.cardDebt + data.otherDebt; }
 function mlNetWorth(data=mlFinance) { return mlTotalAssets(data) - mlTotalDebt(data); }
 function mlMonthlyLeft(data=mlFinance) { return data.income - data.expense; }
+function mlInitialSaving() { return (mlFinance.monthlySaving ?? Math.max(0,mlMonthlyLeft()))/10000; }
 
 // 재무 정보 입력값을 원 단위로 요약해 보여줍니다.
 function mlUpdateFinanceSummary() {
-  mlFinance = {...mlFinance, ...mlReadFinance()};
-  mlEl("ml-total-assets").textContent = mlFormatWon(mlTotalAssets());
-  mlEl("ml-total-debt").textContent = mlFormatWon(mlTotalDebt());
-  mlEl("ml-net-assets").textContent = mlFormatWon(mlNetWorth());
-  mlEl("ml-month-balance").textContent = mlFormatWon(mlMonthlyLeft());
-  mlEl("ml-net-assets").style.color = mlNetWorth() < 0 ? "#c56868" : "#7563df";
-  mlEl("ml-month-balance").style.color = mlMonthlyLeft() < 0 ? "#c56868" : "#292841";
+  mlFinanceDraft = mlReadFinanceAmounts();
+  const net = mlNetWorth(mlFinanceDraft);
+  const balance = mlMonthlyLeft(mlFinanceDraft);
+  mlEl("ml-total-assets").textContent = mlFormatWon(mlTotalAssets(mlFinanceDraft));
+  mlEl("ml-total-debt").textContent = mlFormatWon(mlTotalDebt(mlFinanceDraft));
+  mlEl("ml-net-assets").textContent = mlFormatWon(net);
+  mlEl("ml-month-balance").textContent = mlFormatWon(balance);
+  mlEl("ml-net-assets").style.color = net < 0 ? "#c56868" : "#7563df";
+  mlEl("ml-month-balance").style.color = balance < 0 ? "#c56868" : "#292841";
 }
 
 // 엔진의 시작 데이터는 만 원 단위입니다.
@@ -158,8 +178,29 @@ function mlToast(message) {
   mlToast.timer = setTimeout(() => toast.classList.remove("show"), 2400);
 }
 
+function mlSaveFinance() {
+  try {
+    localStorage.setItem(mlFinanceStorageKey,JSON.stringify(mlFinance));
+    return true;
+  } catch(error) { return false; }
+}
+
+function mlConfirmAction(title, description, action, onConfirm) {
+  const dialog = mlEl("ml-confirm");
+  const accept = mlEl("ml-confirm-accept");
+  mlEl("ml-confirm-title").textContent = title;
+  mlEl("ml-confirm-description").textContent = description;
+  accept.textContent = action;
+  accept.onclick = () => {
+    dialog.close();
+    onConfirm();
+  };
+  dialog.showModal();
+}
+
 // 왼쪽 사이드바 버튼에 맞춰 오른쪽 콘텐츠만 교체합니다.
 function mlShowPage(page) {
+  if (page !== "dashboard" && mlTimer) mlStop();
   document.querySelectorAll("#money-life-app .ml-page").forEach((section) => {
     section.classList.toggle("active", section.id === "ml-page-" + page);
   });
@@ -170,6 +211,10 @@ function mlShowPage(page) {
   if (page === "assets") mlRenderAssets();
   if (page === "goal") mlRenderGoal();
   if (page === "report") mlRenderReport();
+  if (page === "settings") {
+    mlEl("ml-setting-rate").value = mlRateChanges.at(-1)?.v ?? mlFinance.annualRate;
+    mlEl("ml-setting-saving").value = Math.round(mlCurrentSaving*10000);
+  }
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll("#money-life-app [data-page]").forEach((button) => {
@@ -479,24 +524,44 @@ function mlRenderReport() {
 }
 
 // 재무 정보 입력 폼을 제출하면 시뮬레이션 시작 조건으로 변환합니다.
-function mlStartFromFinance(event) {
-  event.preventDefault();
+function mlStartFromFinance() {
   let firstInvalid;
+  for (const id of Object.keys(mlStartFieldErrors)) {
+    const input = mlEl(id);
+    if (!mlValidateStartField(input)) firstInvalid ??= input;
+  }
   for (const id of Object.keys(mlFinanceFields)) {
     const input = mlEl("ml-" + id);
     if (!mlValidateFinanceAmount(input)) firstInvalid ??= input;
   }
   if (firstInvalid) {
+    if (!mlEl("ml-page-finance").classList.contains("active")) mlShowPage("finance");
+    const details = firstInvalid.closest("details");
+    if (details) details.open = true;
     firstInvalid.focus();
-    return;
+    return false;
   }
-  mlFinance = mlReadFinance();
-  mlWriteFinanceAmounts(mlFinance);
-  const income = mlFinance.income;
-  const expense = mlFinance.expense;
-  const categories = Array.from(document.querySelectorAll("#ml-page-finance .ml-tag input:checked")).map((input) => input.value);
-  mlFinance.expenseCategories = categories;
-  mlBaseSaving = Math.max(0,income-expense)/10000;
+  if (mlMonth > 0 || mlChanges.length || mlRateChanges.length) {
+    mlConfirmAction("새 여정을 시작할까요?","현재 진행 월과 이벤트 선택 기록이 초기화돼요. 입력한 조건으로 0개월부터 다시 시작합니다.","새 여정 시작",mlApplyFinance);
+    return false;
+  }
+  mlApplyFinance();
+  return true;
+}
+
+function mlApplyFinance() {
+  mlFinance = {
+    ...mlFinance,
+    ...mlReadFinanceAmounts(),
+    name:mlEl("ml-start-name").value.trim() || mlDefaults.name,
+    age:mlEl("ml-start-age").valueAsNumber,
+    annualRate:mlEl("ml-start-rate").valueAsNumber,
+    monthlySaving:mlParseFinanceAmount(mlEl("ml-start-saving").value),
+    incomeType:mlEl("ml-income-types").querySelector(".active")?.dataset.value ?? mlDefaults.incomeType,
+    expenseCategories:[...mlExpenseOptions].filter((input) => input.checked).map((input) => input.value)
+  };
+  mlWriteFinanceInputs(mlFinance);
+  mlBaseSaving = mlInitialSaving();
   mlCurrentSaving = mlBaseSaving;
   mlChanges = [];
   mlRateChanges = [];
@@ -505,20 +570,35 @@ function mlStartFromFinance(event) {
   mlEventSelections = new Set();
   mlLogs = [];
   mlLog("재무 정보를 바탕으로 새로운 10년의 여정을 시작합니다.");
-  try { localStorage.setItem("money-life-finance-v1",JSON.stringify(mlFinance)); } catch(error) {}
+  const saved = mlSaveFinance();
   mlEl("ml-finance-notice").textContent = "입력한 정보가 적용됐어요. 이제 나의 마을에서 10년의 미래를 탐험해보세요.";
   mlEl("ml-finance-notice").classList.add("show");
-  mlRenderDashboard();
   mlShowPage("dashboard");
-  mlToast("재무 정보를 시뮬레이션에 적용했어요.");
+  mlToast(saved ? "재무 정보를 시뮬레이션에 적용했어요." : "재무 정보를 적용했어요. 이 브라우저에는 저장하지 못했어요.");
 }
-mlEl("ml-finance-form").addEventListener("submit",mlStartFromFinance);
+mlEl("ml-finance-form").addEventListener("submit",(event) => {
+  event.preventDefault();
+  mlStartFromFinance();
+});
+Object.keys(mlStartFieldErrors).forEach((id) => {
+  const input = mlEl(id);
+  if (id === "ml-start-saving") input.addEventListener("focus", () => {
+    if (mlParseFinanceAmount(input.value) !== null) input.value = input.value.replaceAll(",", "");
+  });
+  input.addEventListener("input", () => {
+    if (input.hasAttribute("aria-invalid")) mlValidateStartField(input);
+  });
+  input.addEventListener("blur", () => {
+    if (mlValidateStartField(input) && id === "ml-start-saving" && input.value.trim()) {
+      input.value = mlFormatAmount(mlParseFinanceAmount(input.value));
+    }
+  });
+});
 
 // 소득 유형 선택 버튼을 활성화합니다.
-document.querySelectorAll("#ml-income-types .ml-choice").forEach((button) => {
+mlIncomeOptions.forEach((button) => {
   button.addEventListener("click",() => {
-    document.querySelectorAll("#ml-income-types .ml-choice").forEach((item) => item.classList.toggle("active",item===button));
-    mlFinance.incomeType = button.dataset.value;
+    mlIncomeOptions.forEach((item) => item.classList.toggle("active",item===button));
   });
 });
 
@@ -537,7 +617,7 @@ Object.keys(mlFinanceFields).forEach((id) => {
   });
 });
 mlEl("ml-finance-reset").addEventListener("click",() => {
-  mlWriteFinanceAmounts(mlDefaults);
+  mlWriteFinanceInputs(mlDefaults);
   mlUpdateFinanceSummary();
   mlToast("예시 재무 정보를 복원했어요.");
 });
@@ -564,55 +644,68 @@ mlEl("ml-apply-saving").addEventListener("click",() => {
   mlLog("다음 달부터 월 저축 이체액을 " + mlFormatMan(amount) + "으로 변경했습니다.");
   mlRenderDashboard(); mlRenderReport(); mlToast("새로운 저축 조건을 적용했어요.");
 });
-document.querySelectorAll("#money-life-app [data-open-settings]").forEach((button) => button.addEventListener("click",() => mlShowPage("settings")));
 mlEl("ml-apply-settings").addEventListener("click",() => {
-  const age = Number(mlEl("ml-setting-age").value);
-  const rate = Number(mlEl("ml-setting-rate").value);
-  const saving = won(mlEl("ml-setting-saving").value)/10000;
-  if (!Number.isInteger(age) || age<18 || age>80 || !Number.isFinite(rate) || rate<0 || rate>8 || !Number.isFinite(saving)) { mlToast("나이 18~80세, 수익률 0~8% 범위로 입력해 주세요."); return; }
-  mlFinance.name = mlEl("ml-setting-name").value.trim() || "나의 첫 번째 인생";
-  mlFinance.age = age;
-  mlFinance.annualRate = rate;
-  mlBaseSaving = saving;
+  if (mlMonth >= 120) { mlToast("여정이 끝났어요. 재무 정보 입력에서 새로 시작할 수 있어요."); return; }
+  const rateInput = mlEl("ml-setting-rate");
+  const savingInput = mlEl("ml-setting-saving");
+  if (!savingInput.reportValidity() || !rateInput.reportValidity()) return;
+  const rate = rateInput.valueAsNumber;
+  const saving = savingInput.valueAsNumber/10000;
   mlCurrentSaving = saving;
   mlChanges.push({type:"saving",v:saving,m:mlMonth+1});
   mlRateChanges.push({v:rate,m:mlMonth+1});
-  mlLog("시작 설정을 변경했습니다. 월 저축 " + mlFormatMan(saving) + ", 연 수익률 가정 " + rate + "%.");
-  mlRenderDashboard(); mlRenderReport(); mlToast("설정을 적용했어요.");
+  mlLog("월 저축 " + mlFormatMan(saving) + ", 연 수익률 가정 " + rate + "%",mlMonth+1);
+  mlRenderDashboard(); mlRenderReport(); mlToast("다음 달부터 설정을 적용해요.");
 });
-mlEl("ml-reset-all").addEventListener("click",() => {
-  if (!confirm("입력한 재무 정보와 진행 기록을 예시값으로 초기화할까요?")) return;
+function mlResetAll() {
+  let cleared = true;
+  try { localStorage.removeItem(mlFinanceStorageKey); } catch(error) { cleared = false; }
   mlFinance = {...mlDefaults};
-  mlWriteFinanceAmounts(mlDefaults);
-  mlEl("ml-goal-name").value = mlDefaults.goalName;
-  mlEl("ml-goal-amount").value = mlDefaults.goalAmount;
-  mlEl("ml-goal-months").value = mlDefaults.goalMonths;
-  mlEl("ml-setting-name").value = mlDefaults.name;
-  mlEl("ml-setting-age").value = mlDefaults.age;
-  mlEl("ml-setting-rate").value = mlDefaults.annualRate;
-  mlEl("ml-setting-saving").value = 1500000;
+  mlWriteFinanceInputs(mlDefaults);
   mlMonth = 0; mlChanges = []; mlRateChanges = []; mlEventSelections = new Set(); mlLogs = [];
-  mlBaseSaving = 150; mlCurrentSaving = 150; mlStop();
-  mlUpdateFinanceSummary(); mlRenderDashboard(); mlRenderAssets(); mlRenderGoal(); mlRenderReport();
-  mlShowPage("finance"); mlToast("모든 정보를 예시값으로 초기화했어요.");
+  mlBaseSaving = mlInitialSaving(); mlCurrentSaving = mlBaseSaving; mlStop();
+  mlEl("ml-finance-notice").classList.remove("show");
+  mlUpdateFinanceSummary(); mlRenderGoal(); mlRenderDashboard(); mlRenderReport();
+  mlShowPage("finance");
+  mlToast(cleared ? "모든 정보를 예시값으로 초기화했어요." : "화면을 초기화했어요. 브라우저에 저장된 정보는 지우지 못했어요.");
+}
+mlEl("ml-reset-all").addEventListener("click",() => {
+  mlConfirmAction("모든 정보를 초기화할까요?","현재 여정과 이 브라우저에 저장한 시작 조건·목표가 지워져요.","모든 정보 초기화",mlResetAll);
 });
 
 // 저장된 재무 입력값이 있으면 복원하고, 없으면 예시값으로 시작합니다.
+let hasSavedFinance = false;
 try {
-  const saved = JSON.parse(localStorage.getItem("money-life-finance-v1"));
-  if (saved && typeof saved === "object") mlFinance = {...mlFinance,...saved};
+  const saved = JSON.parse(localStorage.getItem(mlFinanceStorageKey));
+  if (saved && typeof saved === "object") {
+    mlFinance = {...mlFinance,...saved};
+    if (!Number.isSafeInteger(mlFinance.goalAmount) || mlFinance.goalAmount < 1) mlFinance.goalAmount = mlDefaults.goalAmount;
+    if (!Number.isInteger(mlFinance.goalMonths) || mlFinance.goalMonths < 1 || mlFinance.goalMonths > 120) mlFinance.goalMonths = mlDefaults.goalMonths;
+    hasSavedFinance = true;
+  }
 } catch(error) {}
-mlWriteFinanceAmounts(mlFinance);
-mlEl("ml-goal-name").value = mlFinance.goalName;
-mlEl("ml-goal-amount").value = mlFinance.goalAmount;
-mlEl("ml-goal-months").value = mlFinance.goalMonths;
-mlEl("ml-setting-name").value = mlFinance.name;
-mlEl("ml-setting-age").value = mlFinance.age;
-mlEl("ml-setting-rate").value = mlFinance.annualRate;
-mlBaseSaving = Math.max(0,mlFinance.income-mlFinance.expense)/10000;
+mlWriteFinanceInputs(mlFinance);
+mlBaseSaving = mlInitialSaving();
 mlCurrentSaving = mlBaseSaving;
 mlUpdateFinanceSummary();
-mlRenderDashboard();
-mlRenderAssets();
 mlRenderGoal();
 mlRenderReport();
+mlShowPage("dashboard");
+
+const welcome = mlEl("ml-welcome");
+mlEl("ml-welcome-age").textContent = mlFinance.age + "세";
+mlEl("ml-welcome-net").textContent = mlFormatKoreanWon(mlNetWorth());
+const welcomeStart = mlEl("ml-welcome-start");
+if (hasSavedFinance) {
+  welcomeStart.textContent = "저장한 조건으로 시작 →";
+  mlEl("ml-welcome-note").textContent = "저장한 재무 정보로 0개월부터 새 여정을 시작해요.";
+}
+mlEl("ml-welcome-settings").addEventListener("click", () => {
+  welcome.close();
+  mlShowPage("finance");
+});
+welcomeStart.addEventListener("click", () => {
+  welcome.close();
+  if (mlStartFromFinance()) mlTogglePlay();
+});
+welcome.showModal();

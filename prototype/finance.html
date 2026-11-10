@@ -2,7 +2,7 @@
   <div>
     <div class="ml-eyebrow">MY FINANCIAL STATUS</div>
     <h1>재무 정보 입력</h1>
-    <p>입력한 금액으로 10년 시뮬레이션을 시작해요.</p>
+    <p>시작 나이와 현재 재무 상태를 입력해 10년 시뮬레이션을 시작해요.</p>
   </div>
 </div>
 <div class="ml-note ml-finance-example">
@@ -13,6 +13,39 @@
 <form id="ml-finance-form" novalidate>
   <div class="ml-content-grid">
     <div class="ml-stack">
+      <section class="ml-card">
+        <div class="ml-card-title">
+          <div class="ml-card-icon" aria-hidden="true">🌱</div>
+          <div><h2>나의 시작 조건</h2><p>마을에서 사용할 이름과 여정을 시작할 나이를 정해요.</p></div>
+        </div>
+        <div class="ml-fields">
+          <div class="ml-field">
+            <label for="ml-start-name">이름 (선택)</label>
+            <div class="ml-input-wrap"><input id="ml-start-name" maxlength="20" value="나의 첫 번째 인생"></div>
+          </div>
+          <div class="ml-field">
+            <label for="ml-start-age">시작 나이</label>
+            <div class="ml-input-wrap"><input id="ml-start-age" type="number" min="18" max="80" required value="25" aria-describedby="ml-start-age-error"><span class="ml-unit">세</span></div>
+            <small class="ml-field-error" id="ml-start-age-error" aria-live="polite" hidden></small>
+          </div>
+        </div>
+        <details class="ml-start-assumptions">
+          <summary>저축·수익률 설정 (선택)</summary>
+          <div class="ml-fields">
+            <div class="ml-field">
+              <label for="ml-start-saving">월 저축액</label>
+              <div class="ml-input-wrap"><input id="ml-start-saving" type="text" inputmode="numeric" placeholder="월 잔액으로 자동 설정" aria-describedby="ml-start-saving-hint ml-start-saving-error"><span class="ml-unit">원</span></div>
+              <small class="ml-hint" id="ml-start-saving-hint">비워두면 월 잔액을 저축해요. 잔액이 부족하면 0원으로 시작해요.</small>
+              <small class="ml-field-error" id="ml-start-saving-error" aria-live="polite" hidden></small>
+            </div>
+            <div class="ml-field">
+              <label for="ml-start-rate">연 수익률 가정</label>
+              <div class="ml-input-wrap"><input id="ml-start-rate" type="number" min="0" max="8" step="any" required value="3" aria-describedby="ml-start-rate-error"><span class="ml-unit">%</span></div>
+              <small class="ml-field-error" id="ml-start-rate-error" aria-live="polite" hidden></small>
+            </div>
+          </div>
+        </details>
+      </section>
       <section class="ml-card">
         <div class="ml-card-title">
           <div class="ml-card-icon">💳</div>
