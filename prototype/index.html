@@ -65,7 +65,12 @@
             </section>
             <div class="ml-bottom-grid">
               <section class="ml-card"><h3>나의 첫 번째 목표</h3><p class="ml-desc" id="ml-game-goal-name">나만의 공간 마련하기</p><div class="ml-goal-money"><span id="ml-game-goal-current">3,300</span><small> / <span id="ml-game-goal-target">5,000</span>만 원</small></div><div class="ml-bar"><span id="ml-game-goal-bar" style="width:66%"></span></div><p class="ml-hint" id="ml-game-goal-eta">목표까지 계산 중</p></section>
-              <section class="ml-card"><h3>자산이 자라는 과정</h3><svg class="ml-chart" id="ml-game-chart" viewBox="0 0 420 127" role="img" aria-label="10년 자산 경로 차트"></svg><div class="ml-hint">보라색 선: 현재 선택 · 회색 선: 처음 계획</div></section>
+              <section class="ml-card">
+                <h3>자산이 자라는 과정</h3>
+                <p class="ml-chart-current" id="ml-game-chart-current"></p>
+                <svg class="ml-chart" id="ml-game-chart" viewBox="0 0 420 127" role="img" aria-label="10년 자산 경로 차트" aria-describedby="ml-game-chart-current ml-game-chart-legend"></svg>
+                <div class="ml-hint" id="ml-game-chart-legend">보라색 실선은 내 선택, 회색 점선은 처음 계획</div>
+              </section>
             </div>
           </div>
           <aside class="ml-aside">
@@ -114,7 +119,26 @@
       </section>
     </main>
   </div>
-  <div class="ml-modal-backdrop" id="ml-modal-backdrop"><div class="ml-modal" id="ml-modal" role="dialog" aria-modal="true"></div></div>
+  <dialog class="ml-modal" id="ml-modal" aria-labelledby="ml-event-dialog-title" aria-describedby="ml-event-dialog-description">
+    <div class="ml-eyebrow" id="ml-event-dialog-date"></div>
+    <h2 id="ml-event-dialog-title" tabindex="-1" autofocus></h2>
+    <p id="ml-event-dialog-description"></p>
+    <div class="ml-modal-options">
+      <section class="ml-modal-option featured">
+        <h3>변경할 경우</h3>
+        <p id="ml-event-accept-detail"></p>
+        <p class="ml-event-impact" id="ml-event-accept-impact"></p>
+        <button type="button" class="ml-btn primary" id="ml-event-accept"></button>
+      </section>
+      <section class="ml-modal-option">
+        <h3>유지할 경우</h3>
+        <p id="ml-event-decline-detail"></p>
+        <p class="ml-event-impact" id="ml-event-decline-impact"></p>
+        <button type="button" class="ml-btn" id="ml-event-decline"></button>
+      </section>
+    </div>
+    <form method="dialog" class="ml-modal-dismiss"><button class="ml-btn" type="submit">나중에 결정하기</button></form>
+  </dialog>
   <div class="ml-toast" id="ml-toast" role="status" aria-live="polite"></div>
 </div>
 
