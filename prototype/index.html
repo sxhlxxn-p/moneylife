@@ -63,7 +63,18 @@
                 <div class="ml-town"><div class="ml-building bank" data-page="assets"><span></span><strong>나의 은행</strong></div><div class="ml-building office" data-page="report"><span></span><strong>나의 직장</strong></div><div class="ml-building home" data-page="goal"><span></span><strong>나의 집</strong></div></div>
                 <div class="ml-person">🧑🏻‍🌾</div><span class="ml-world-location">⌖ 가능성이 자라는 나의 마을</span>
               </div>
-              <div class="ml-game-controls"><div class="ml-button-row"><button class="ml-btn primary" id="ml-play">▶ 시간 시작</button><button class="ml-btn" id="ml-next-event">다음 이벤트 ⇥</button><button class="ml-btn" id="ml-one-month">＋1개월</button></div><div class="ml-button-row"><button class="ml-speed active" data-speed="1">1×</button><button class="ml-speed" data-speed="4">4×</button><button class="ml-speed" data-speed="12">12×</button></div></div>
+              <div class="ml-game-controls">
+                <div class="ml-button-row" role="group" aria-label="시간 진행">
+                  <button type="button" class="ml-btn primary" id="ml-play">▶ 시간 시작</button>
+                  <button type="button" class="ml-btn" id="ml-next-event">다음 이벤트로 이동</button>
+                  <button type="button" class="ml-btn" id="ml-one-month">＋1개월</button>
+                </div>
+                <div class="ml-button-row" role="group" aria-label="재생 속도">
+                  <button type="button" class="ml-speed active" data-speed="1" aria-pressed="true">1×</button>
+                  <button type="button" class="ml-speed" data-speed="4" aria-pressed="false">4×</button>
+                  <button type="button" class="ml-speed" data-speed="12" aria-pressed="false">12×</button>
+                </div>
+              </div>
               <div class="ml-progress"><span id="ml-time-progress" style="width:0%"></span></div>
               <div class="ml-milestones" id="ml-milestones"><span>25세 출발</span><span>26세 독립</span><span>29세 이직</span><span>31세 여행</span><span>35세 다음 장</span></div>
             </section>
@@ -85,7 +96,7 @@
           </div>
           <aside class="ml-aside">
             <section class="ml-card"><div class="ml-profile"><div class="ml-profile-avatar" id="ml-profile-avatar">🌱</div><div><strong id="ml-profile-name">나의 첫 번째 인생</strong><p><span id="ml-profile-age">25</span>세 · 미래를 준비하는 중</p></div></div><div class="ml-summary-row" style="margin-top:15px;padding-top:12px;border-top:1px solid #f1eef6"><span>생활비 충당 상태</span><strong id="ml-game-health">차근차근 안정적으로</strong></div></section>
-            <section class="ml-event-card"><div class="ml-eyebrow">NEXT LIFE MOMENT</div><h3 id="ml-event-title">나만의 공간을 꿈꿔본 적 있나요?</h3><p id="ml-event-desc">26세, 독립의 기회가 찾아옵니다. 지금의 선택은 어떤 미래를 만들까요?</p><div class="ml-event-options"><button id="ml-event-yes">지금 선택하기</button><button id="ml-event-later">조금 더 준비하기</button></div></section>
+            <section class="ml-event-card"><div class="ml-eyebrow" id="ml-event-status">다음 인생 이벤트</div><h3 id="ml-event-title">나만의 공간을 꿈꿔본 적 있나요?</h3><p id="ml-event-desc">26세, 독립의 기회가 찾아옵니다. 지금의 선택은 어떤 미래를 만들까요?</p><div class="ml-event-options"><button type="button" id="ml-event-yes">지금 선택하기</button><button type="button" id="ml-event-later">조금 더 준비하기</button></div></section>
             <section class="ml-card"><h3>나의 선택 기록</h3><div class="ml-log" id="ml-game-log"><div class="ml-log-entry"><small>시작</small><p>새로운 일상을 준비하고 있어요.</p></div></div></section>
             <section class="ml-card"><h3>✧ 미래에게 물어보기</h3><p class="ml-desc">“저축을 100만 원으로 바꾸면?” 다른 선택의 미래도 확인해보세요.</p><div class="ml-field"><input id="ml-ask-saving" type="number" min="0" max="1000000" placeholder="월 저축액 · 원" class="ml-input-wrap" style="width:100%"></div><button class="ml-btn primary" id="ml-apply-saving" style="width:100%;margin-top:9px">저축 계획 바꾸기</button></section>
           </aside>

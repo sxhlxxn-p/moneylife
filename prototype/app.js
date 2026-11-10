@@ -390,21 +390,22 @@ mlEl("ml-one-month").addEventListener("click",() => { mlStop(); mlStep(); });
 function mlOpenNextEvent() {
   mlStop();
   const next = mlNextEventMonth();
-  if (next) {
-    mlMonth = next;
-    mlRenderDashboard();
-    mlShowEvent(next);
-  } else {
-    mlMonth = 120;
-    mlRenderDashboard();
+  if (next === undefined) {
     mlShowPage("report");
+    return;
   }
+  mlMonth = next;
+  mlRenderDashboard();
+  mlShowEvent(next);
 }
 mlEl("ml-next-event").addEventListener("click",mlOpenNextEvent);
 document.querySelectorAll("#money-life-app [data-speed]").forEach((button) => {
   button.addEventListener("click",() => {
     mlSpeed = Number(button.dataset.speed);
-    document.querySelectorAll("#money-life-app [data-speed]").forEach((item) => item.classList.toggle("active",item===button));
+    document.querySelectorAll("#money-life-app [data-speed]").forEach((item) => {
+      item.classList.toggle("active",item===button);
+      item.setAttribute("aria-pressed",String(item===button));
+    });
     if (mlTimer) { mlStop(); mlTogglePlay(); }
   });
 });
@@ -425,21 +426,27 @@ function mlRenderDashboard() {
   mlEl("ml-game-cash").textContent = mlFormatMan(state.cash);
   mlEl("ml-time-progress").style.width = (mlMonth/120*100) + "%";
   const next = mlNextEventMonth();
+  const finished = mlMonth >= 120;
+  mlEl("ml-one-month").disabled = finished;
   if (next) {
     const event = mlEvents[next];
+    mlEl("ml-event-status").textContent = next === mlMonth ? "현재 인생 이벤트" : "다음 인생 이벤트";
+    mlEl("ml-next-event").textContent = next === mlMonth ? "현재 이벤트 보기" : "다음 이벤트로 이동";
     mlEl("ml-event-title").textContent = event.emoji + " " + event.title;
     mlEl("ml-event-desc").textContent = next === mlMonth ? "지금 만난 이벤트예요. 두 선택의 결과를 비교해 보세요." : next + "개월차에 만나는 선택이에요.";
     mlEl("ml-event-yes").textContent = next === mlMonth ? "이벤트 다시 열기" : "이벤트 만나보기";
     mlEl("ml-event-later").textContent = "나중에 보기";
     mlEl("ml-event-yes").onclick = mlOpenNextEvent;
-    mlEl("ml-event-later").onclick = () => mlToast("현재의 일상을 이어가 볼게요.");
+    mlEl("ml-event-later").onclick = () => mlToast(next === mlMonth ? "다음 달로 가려면 이 이벤트에서 먼저 선택해 주세요." : "이벤트가 열리는 달까지 시간을 진행할 수 있어요.");
   } else {
-    mlEl("ml-event-title").textContent = "당신의 10년이 쌓였어요";
-    mlEl("ml-event-desc").textContent = "지나온 기록을 확인하거나 새로운 조건으로 다시 시작해보세요.";
-    mlEl("ml-event-yes").textContent = "결과 확인";
-    mlEl("ml-event-later").textContent = "설정 변경";
+    mlEl("ml-event-status").textContent = finished ? "여정 완료" : "여정 진행 중";
+    mlEl("ml-event-title").textContent = finished ? "당신의 10년이 쌓였어요" : "예정된 이벤트를 모두 지나왔어요";
+    mlEl("ml-event-desc").textContent = finished ? "지나온 기록을 확인하거나 새로운 조건으로 다시 시작해보세요." : "10년까지 " + (120-mlMonth) + "개월 남았어요. 시간을 이어가거나 예상 결과를 확인해 보세요.";
+    mlEl("ml-next-event").textContent = finished ? "최종 결과 보기" : "예상 결과 보기";
+    mlEl("ml-event-yes").textContent = mlEl("ml-next-event").textContent;
+    mlEl("ml-event-later").textContent = finished ? "새 여정 준비" : "시간 이어가기";
     mlEl("ml-event-yes").onclick = () => mlShowPage("report");
-    mlEl("ml-event-later").onclick = () => mlShowPage("settings");
+    mlEl("ml-event-later").onclick = finished ? () => mlShowPage("finance") : () => { if (!mlTimer) mlTogglePlay(); };
   }
   mlEl("ml-game-goal-name").textContent = mlFinance.goalName;
   mlEl("ml-game-goal-current").textContent = mlFormatMan(state.total);
