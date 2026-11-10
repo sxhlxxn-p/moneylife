@@ -109,7 +109,41 @@
       <!-- 화면 5: 분석 리포트 -->
       <section class="ml-page" id="ml-page-report">
         <div class="ml-page-head"><div><div class="ml-eyebrow">FINANCIAL REPORT</div><h1>분석 리포트</h1><p>처음 계획과 현재 선택을 비교해 앞으로의 차이를 확인해요.</p></div><button class="ml-btn" id="ml-refresh-report">↻ 다시 계산</button></div>
-        <div class="ml-card"><h2>10년 후 계획 비교</h2><p class="ml-desc">동일한 출발점에서 조건을 다르게 적용했을 때의 예상 결과입니다.</p><div class="ml-report-grid"><div class="ml-report-item"><small>처음의 계획</small><strong id="ml-report-base">-</strong><p>현재 조건을 그대로 유지한 경우</p></div><div class="ml-report-item featured"><small>나의 선택</small><strong id="ml-report-current">-</strong><p>선택한 이벤트를 반영한 경우</p></div><div class="ml-report-item"><small>소득 공백 가정</small><strong id="ml-report-stress">-</strong><p>일정 기간 소득이 줄어드는 경우</p></div></div><svg class="ml-chart" id="ml-report-chart" viewBox="0 0 760 220" role="img" aria-label="미래 자산 비교 그래프"></svg><div class="ml-note" id="ml-report-summary">재무 정보를 입력하고 시뮬레이션을 시작하면 비교 결과가 표시됩니다.</div></div>
+        <section class="ml-card">
+          <h2>10년 후 계획 비교</h2>
+          <p class="ml-desc">같은 재무 상태에서 시작해 선택에 따라 순자산이 어떻게 달라지는지 비교해요.</p>
+          <div class="ml-note ml-report-summary" id="ml-report-summary" role="status"></div>
+          <p class="ml-report-goal-note">목표 금액 <strong id="ml-report-goal-amount"></strong>에 처음 도달한 시점을 표시해요.</p>
+          <div class="ml-report-grid">
+            <section class="ml-report-item">
+              <h3>처음 계획</h3>
+              <p>시작 조건을 유지</p>
+              <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-base">-</dd>
+                <dt>목표 첫 도달</dt><dd id="ml-report-base-goal">-</dd></dl>
+            </section>
+            <section class="ml-report-item featured">
+              <h3>내 선택</h3>
+              <p>이벤트와 조건 변경 반영</p>
+              <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-current">-</dd>
+                <dt>목표 첫 도달</dt><dd id="ml-report-current-goal">-</dd></dl>
+            </section>
+            <section class="ml-report-item ml-report-stress">
+              <h3>소득 공백 가정</h3>
+              <p id="ml-report-stress-description"></p>
+              <dl><dt>10년 후 순자산</dt><dd class="ml-report-net" id="ml-report-stress">-</dd>
+                <dt>목표 첫 도달</dt><dd id="ml-report-stress-goal">-</dd></dl>
+            </section>
+          </div>
+          <div class="ml-report-plot">
+            <h3>월별 순자산 흐름 <small>(만 원)</small></h3>
+            <ul class="ml-report-legend" id="ml-report-legend">
+              <li class="ml-series-base">처음 계획</li>
+              <li class="ml-series-current">내 선택</li>
+              <li class="ml-series-stress">소득 공백 가정</li>
+            </ul>
+            <svg class="ml-chart" id="ml-report-chart" viewBox="0 0 520 210" role="img" aria-label="10년간 월별 순자산 비교" aria-describedby="ml-report-legend ml-report-summary"></svg>
+          </div>
+        </section>
       </section>
 
       <!-- 화면 6: 설정 -->

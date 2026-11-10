@@ -161,27 +161,31 @@ document.querySelectorAll("#money-life-app [data-page]").forEach((button) => {
 // 자산 시뮬레이션 그래프의 SVG를 생성합니다.
 function mlDrawChart(svgId, paths, large=false) {
   const svg = mlEl(svgId);
-  const width = large ? 760 : 420;
-  const height = large ? 220 : 127;
-  const pad = {left:46,right:15,top:14,bottom:25};
+  const width = large ? 520 : 420;
+  const height = large ? 210 : 127;
+  const pad = {left:large?84:46,right:15,top:14,bottom:25};
   const all = paths.flatMap((path) => path.map((point) => point.total));
-  const maximum = Math.max(mlFinance.goalAmount/10000,...all,1) * 1.12;
+  const minimum = Math.min(0,...all) * 1.12;
+  const maximum = Math.max(large?0:mlFinance.goalAmount/10000,...all,1) * 1.12;
   const x = (month) => pad.left + month/120*(width-pad.left-pad.right);
-  const y = (value) => height-pad.bottom-(value/maximum)*(height-pad.top-pad.bottom);
+  const y = (value) => height-pad.bottom-((value-minimum)/(maximum-minimum))*(height-pad.top-pad.bottom);
   let html = "";
   for (let i=0;i<=3;i++) {
-    const value = maximum*i/3;
+    const value = minimum + (maximum-minimum)*i/3;
     html += '<line x1="' + pad.left + '" y1="' + y(value) + '" x2="' + (width-pad.right) + '" y2="' + y(value) + '" stroke="#eeeaf3" stroke-dasharray="3 4"/>';
+    if (large) html += '<text x="' + (pad.left-8) + '" y="' + (y(value)+4) + '" text-anchor="end" font-size="12" fill="#6b637c">' + mlFormatAmount(value) + '</text>';
   }
-  const colors = ["#8c75ce","#cdc9d7","#dbb27b"];
+  const series = ["current","base","stress"];
+  const dashes = ["none","5 4","1 4"];
   paths.forEach((path,index) => {
     const points = path.map((point,month) => x(month) + "," + y(point.total)).join(" ");
-    html += '<polyline points="' + points + '" fill="none" stroke="' + colors[index] + '" stroke-width="' + (index===0?2.7:1.6) + '" stroke-linecap="round" stroke-linejoin="round"' + (index ? ' stroke-dasharray="4 4"' : "") + '/>';
+    html += '<polyline class="ml-series-' + series[index] + '" points="' + points + '" fill="none" stroke-width="' + (index===0?2.7:1.8) + '" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="' + dashes[index] + '"/>';
   });
   const current = paths[0][Math.min(mlMonth,120)];
   html += '<line x1="' + x(mlMonth) + '" x2="' + x(mlMonth) + '" y1="' + pad.top + '" y2="' + (height-pad.bottom) + '" stroke="#c7b5e3" stroke-dasharray="3 4"/>';
   html += '<circle cx="' + x(mlMonth) + '" cy="' + y(current.total) + '" r="4" fill="#8c75ce" stroke="white" stroke-width="2"/>';
-  html += '<text x="' + pad.left + '" y="' + (height-5) + '" font-size="8" fill="#b2a8bf">시작</text><text x="' + (width-pad.right) + '" y="' + (height-5) + '" text-anchor="end" font-size="8" fill="#b2a8bf">10년 후</text>';
+  const axisFont = large ? 12 : 8;
+  html += '<text x="' + pad.left + '" y="' + (height-5) + '" font-size="' + axisFont + '" fill="#6b637c">시작</text><text x="' + (width-pad.right) + '" y="' + (height-5) + '" text-anchor="end" font-size="' + axisFont + '" fill="#6b637c">10년 후</text>';
   svg.innerHTML = html;
 }
 
@@ -199,6 +203,10 @@ function mlNextEventMonth() {
 function mlCompareNetWorth(difference, baseline) {
   if (Math.round(Math.abs(difference)) === 0) return baseline + "과 같아요.";
   return baseline + "보다 " + mlFormatMan(Math.abs(difference)) + (difference < 0 ? " 낮아요." : " 높아요.");
+}
+
+function mlGoalMonth(path) {
+  return path.findIndex((point) => point.total >= mlFinance.goalAmount/10000);
 }
 
 function mlShowEvent(eventMonth) {
@@ -324,7 +332,7 @@ function mlRenderDashboard() {
   mlEl("ml-game-goal-target").textContent = mlCompact(mlFinance.goalAmount/10000);
   const percent = Math.max(0,Math.min(100,state.total/(mlFinance.goalAmount/10000)*100));
   mlEl("ml-game-goal-bar").style.width = percent + "%";
-  const goalHit = path.findIndex((point) => point.total >= mlFinance.goalAmount/10000);
+  const goalHit = mlGoalMonth(path);
   let goalStatus = "10년 안에 목표에 도달하지 못하는 것으로 계산돼요.";
   if (goalHit >= 0) {
     if (goalHit > mlMonth) goalStatus = "목표까지 약 " + (goalHit-mlMonth) + "개월 남았어요.";
@@ -385,7 +393,7 @@ function mlRenderGoal() {
   const pct = Math.max(0,Math.min(100,state.total/(mlFinance.goalAmount/10000)*100));
   mlEl("ml-goal-bar-page").style.width = pct + "%";
   const path = mlSimulation();
-  const hit = path.findIndex((point) => point.total >= mlFinance.goalAmount/10000);
+  const hit = mlGoalMonth(path);
   mlEl("ml-goal-status").textContent = hit < 0 ? "현재 조건으로는 10년 안에 목표에 도달하지 못해요." : "현재 조건에서는 약 " + hit + "개월 후 목표에 도달할 것으로 계산돼요.";
 }
 
@@ -393,14 +401,22 @@ function mlRenderGoal() {
 function mlRenderReport() {
   const base = mlSimulation([],[],mlBaseSaving);
   const current = mlSimulation();
-  const stressChanges = mlChanges.concat([{type:"income",v:-100,m:Math.max(1,mlMonth+1),end:Math.min(120,mlMonth+6)}]);
-  const stress = mlSimulation(stressChanges,mlRateChanges,mlBaseSaving);
-  mlEl("ml-report-base").textContent = mlCompact(base[120].total) + "만 원";
-  mlEl("ml-report-current").textContent = mlCompact(current[120].total) + "만 원";
-  mlEl("ml-report-stress").textContent = mlCompact(stress[120].total) + "만 원";
+  const stressMonths = Math.min(6,120-mlMonth);
+  const stress = stressMonths > 0 ? mlSimulation([...mlChanges,{
+    type:"income",v:-100,m:mlMonth+1,end:mlMonth+stressMonths
+  }]) : current;
+  mlEl("ml-report-goal-amount").textContent = mlFormatWon(mlFinance.goalAmount);
+  mlEl("ml-report-stress-description").textContent = stressMonths > 0
+    ? (mlMonth+1) + "개월차부터 " + stressMonths + "개월간 월 소득 100만 원 감소"
+    : "10년 진행이 끝나 내 선택과 같아요.";
+  Object.entries({base,current,stress}).forEach(([id,path]) => {
+    const hit = mlGoalMonth(path);
+    mlEl("ml-report-" + id).textContent = mlFormatMan(path[120].total);
+    mlEl("ml-report-" + id + "-goal").textContent = hit < 0 ? "10년 내 미도달" : hit === 0 ? "시작 시점" : hit + "개월차";
+  });
   mlDrawChart("ml-report-chart",[current,base,stress],true);
-  const difference = current[120].total-base[120].total;
-  mlEl("ml-report-summary").textContent = "현재 선택의 10년 후 순자산은 처음 계획보다 " + mlCompact(Math.abs(difference)) + "만 원 " + (difference>=0?"높게":"낮게") + " 계산됩니다. 소득 공백 가정은 다음 달부터 최대 6개월간 월 소득 100만 원 감소를 반영한 비교용 시나리오입니다.";
+  const difference = Math.round(current[120].total)-Math.round(base[120].total);
+  mlEl("ml-report-summary").textContent = "내 선택의 10년 후 순자산은 " + mlCompareNetWorth(difference,"처음 계획");
 }
 
 // 재무 정보 입력 폼을 제출하면 시뮬레이션 시작 조건으로 변환합니다.
