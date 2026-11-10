@@ -8,6 +8,7 @@ const prototypeMode = process.argv.includes('--prototype');
 const routes = new Map(prototypeMode ? [
   ['/', 'prototype/index.html'],
   ['/index.html', 'prototype/index.html'],
+  ['/finance.html', 'prototype/finance.html'],
   ['/styles.css', 'prototype/styles.css'],
   ['/app.js', 'prototype/app.js'],
   ['/engine.js', 'prototype/engine.js']

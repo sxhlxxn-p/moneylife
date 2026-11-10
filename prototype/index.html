@@ -37,58 +37,7 @@
     <main class="ml-main">
       <!-- 화면 1: 현재 재무 정보 입력 -->
       <section class="ml-page active" id="ml-page-finance">
-        <div class="ml-page-head"><div><div class="ml-eyebrow">MY FINANCIAL STATUS</div><h1>재무 정보 입력</h1><p>현재 재무 상태를 입력하고 나에게 맞는 미래 계획을 만들어 보세요.</p></div><span class="ml-note">STEP 02 · 재무 정보 입력</span></div>
-        <div id="ml-finance-notice" class="ml-notice" role="status"></div>
-        <form id="ml-finance-form">
-          <div class="ml-content-grid">
-            <div class="ml-stack">
-              <section class="ml-card">
-                <div class="ml-card-title"><div class="ml-card-icon">💳</div><div><h2>자산 현황</h2><p>현재 보유하고 있는 자산을 입력해 주세요.</p></div></div>
-                <div class="ml-fields">
-                  <div class="ml-field"><label for="ml-cash">예금 · 현금</label><div class="ml-input-wrap"><input id="ml-cash" type="number" min="0" value="12000000"><span class="ml-unit">원</span></div></div>
-                  <div class="ml-field"><label for="ml-stocks">주식</label><div class="ml-input-wrap"><input id="ml-stocks" type="number" min="0" value="5000000"><span class="ml-unit">원</span></div></div>
-                  <div class="ml-field"><label for="ml-funds">펀드 · 기타 금융자산</label><div class="ml-input-wrap"><input id="ml-funds" type="number" min="0" value="3000000"><span class="ml-unit">원</span></div></div>
-                  <div class="ml-field"><label for="ml-property">부동산</label><div class="ml-input-wrap"><input id="ml-property" type="number" min="0" value="50000000"><span class="ml-unit">원</span></div></div>
-                </div>
-              </section>
-              <section class="ml-card">
-                <div class="ml-card-title"><div class="ml-card-icon">🏦</div><div><h2>부채 현황</h2><p>현재 갚아야 할 금액을 입력해 주세요.</p></div></div>
-                <div class="ml-fields">
-                  <div class="ml-field"><label for="ml-loan">대출</label><div class="ml-input-wrap"><input id="ml-loan" type="number" min="0" value="30000000"><span class="ml-unit">원</span></div></div>
-                  <div class="ml-field"><label for="ml-credit">신용대출</label><div class="ml-input-wrap"><input id="ml-credit" type="number" min="0" value="5000000"><span class="ml-unit">원</span></div></div>
-                  <div class="ml-field"><label for="ml-card-debt">카드 미결제 금액</label><div class="ml-input-wrap"><input id="ml-card-debt" type="number" min="0" value="2000000"><span class="ml-unit">원</span></div></div>
-                  <div class="ml-field"><label for="ml-other-debt">기타 부채</label><div class="ml-input-wrap"><input id="ml-other-debt" type="number" min="0" value="0"><span class="ml-unit">원</span></div></div>
-                </div>
-              </section>
-              <section class="ml-card">
-                <div class="ml-card-title"><div class="ml-card-icon">💰</div><div><h2>소득 정보</h2><p>한 달 동안 들어오는 소득을 입력해 주세요.</p></div></div>
-                <div class="ml-fields">
-                  <div class="ml-field"><label for="ml-income">월 평균 소득</label><div class="ml-input-wrap"><input id="ml-income" type="number" min="0" value="4000000"><span class="ml-unit">원</span></div><small class="ml-hint">세후 실제 수령 금액을 기준으로 입력해 주세요.</small></div>
-                  <div class="ml-field"><label>주요 소득 유형</label><div class="ml-choice-row" id="ml-income-types"><button type="button" class="ml-choice active" data-value="근로소득">근로소득</button><button type="button" class="ml-choice" data-value="사업소득">사업소득</button><button type="button" class="ml-choice" data-value="연금소득">연금소득</button><button type="button" class="ml-choice" data-value="기타">기타</button></div></div>
-                </div>
-              </section>
-              <section class="ml-card">
-                <div class="ml-card-title"><div class="ml-card-icon">🐷</div><div><h2>지출 정보</h2><p>매달 사용하는 생활비를 입력해 주세요.</p></div></div>
-                <div class="ml-field"><label for="ml-expense">월 평균 지출</label><div class="ml-input-wrap"><input id="ml-expense" type="number" min="0" value="2500000"><span class="ml-unit">원</span></div></div>
-                <div class="ml-section-label">주요 지출 항목 (복수 선택)</div>
-                <div class="ml-tags">
-                  <label class="ml-tag"><input type="checkbox" value="주거비" checked>🏠 주거비</label>
-                  <label class="ml-tag"><input type="checkbox" value="식비" checked>🍚 식비</label>
-                  <label class="ml-tag"><input type="checkbox" value="교통비">🚇 교통비</label>
-                  <label class="ml-tag"><input type="checkbox" value="교육비">📚 교육비</label>
-                  <label class="ml-tag"><input type="checkbox" value="의료비">🩺 의료비</label>
-                  <label class="ml-tag"><input type="checkbox" value="여가">🎨 여가</label>
-                  <label class="ml-tag"><input type="checkbox" value="기타">··· 기타</label>
-                </div>
-              </section>
-              <div class="ml-form-footer"><div class="ml-privacy">🔒 입력한 정보는 이 브라우저 안에서만 사용됩니다.<br>실제 금융 계좌 연동이나 서버 전송은 하지 않습니다.</div><div class="ml-button-row"><button type="button" class="ml-btn" id="ml-finance-reset">예시값 복원</button><button type="submit" class="ml-btn primary">분석하고 시작하기 →</button></div></div>
-            </div>
-            <aside class="ml-stack">
-              <div class="ml-card"><div class="ml-world-copy"><div class="ml-eyebrow">YOUR FINANCIAL SNAPSHOT</div><h2 style="margin-top:8px">나의 재무 상태</h2><p class="ml-desc">입력한 금액을 기준으로 실시간 계산합니다.</p></div><div class="ml-summary"><div class="ml-summary-title">재무 요약</div><div class="ml-summary-row"><span>총자산</span><strong id="ml-total-assets">70,000,000원</strong></div><div class="ml-summary-row"><span>총부채</span><strong id="ml-total-debt">37,000,000원</strong></div><div class="ml-summary-row total"><span>순자산</span><strong id="ml-net-assets">33,000,000원</strong></div><div class="ml-summary-row" style="margin-top:14px"><span>월 예상 잔액</span><strong id="ml-month-balance">1,500,000원</strong></div></div></div>
-              <div class="ml-note">🌱 현재 재무 상태를 아는 것부터 더 나은 미래가 시작됩니다. 입력을 완료하면 이 정보가 마을 시뮬레이션의 출발점이 됩니다.</div>
-            </aside>
-          </div>
-        </form>
+        <p class="ml-note" role="status">재무 정보 입력 화면을 불러오는 중이에요.</p>
       </section>
 
       <!-- 화면 2: 마을형 10년 금융 시뮬레이션 -->
@@ -171,6 +120,21 @@
 
   <!-- 금융 계산 엔진을 먼저 불러온 다음 화면 제어 코드를 실행합니다. -->
   <script src="./engine.js"></script>
-  <script src="./app.js"></script>
+  <script type="module">
+    const financePage = document.getElementById("ml-page-finance");
+    try {
+      const response = await fetch("./finance.html");
+      if (!response.ok) throw new Error("Finance screen request failed: " + response.status);
+      financePage.innerHTML = await response.text();
+      await import("./app.js");
+    } catch (error) {
+      console.error(error);
+      const message = document.createElement("p");
+      message.className = "ml-note";
+      message.setAttribute("role", "alert");
+      message.textContent = "재무 정보 화면을 열지 못했어요. 개발 서버에서 페이지를 열고 새로고침해 주세요.";
+      financePage.replaceChildren(message);
+    }
+  </script>
 </body>
 </html>

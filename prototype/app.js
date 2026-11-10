@@ -1,7 +1,7 @@
 /*
  * 파일 목적: 머니 라이프 화면의 입력, 페이지 전환, 금융 시뮬레이션을 제어합니다.
  * 화면 구성: index.html의 MY FINANCE 사이드바는 유지하고 오른쪽 콘텐츠만 전환합니다.
- * 연동 파일: 금융 계산은 engine.js, 화면 구조는 index.html, 스타일은 styles.css에 있습니다.
+ * 연동 파일: 재무 입력은 finance.html, 금융 계산은 engine.js, 스타일은 styles.css에 있습니다.
  * 금액 단위: 입력 데이터는 원, 금융 계산 엔진으로 전달할 때는 만 원으로 변환합니다.
  */
 /* =========================================================
@@ -12,7 +12,8 @@
    ========================================================= */
 const mlEl = (id) => document.getElementById(id);
 const won = (value) => Math.max(0, Number(value) || 0);
-const mlFormatWon = (value) => Math.round(value).toLocaleString("ko-KR") + "원";
+const mlFormatAmount = (value) => Math.round(value).toLocaleString("ko-KR");
+const mlFormatWon = (value) => mlFormatAmount(value) + "원";
 const mlFormatMan = (value) => Math.round(value).toLocaleString("ko-KR") + "만 원";
 const mlCompact = (value) => {
   const n = Math.round(value);
@@ -27,6 +28,11 @@ const mlDefaults = {
   income:4000000, expense:2500000, goalName:"나만의 공간 마련하기",
   goalAmount:50000000, goalMonths:60, incomeType:"근로소득",
   name:"나의 첫 번째 인생", age:25, annualRate:3
+};
+const mlFinanceFields = {
+  cash:"cash", stocks:"stocks", funds:"funds", property:"property",
+  loan:"loan", credit:"credit", "card-debt":"cardDebt", "other-debt":"otherDebt",
+  income:"income", expense:"expense"
 };
 let mlFinance = {...mlDefaults};
 let mlMonth = 0;
@@ -47,13 +53,44 @@ const mlEvents = {
   96:{emoji:"🎓",title:"배움에 투자할 시간",body:"새로운 역량을 배울 수 있는 과정이 열렸습니다. 교육 비용을 반영해 미래를 비교해보세요.",yes:"배움을 시작할래요",yesText:"다음 달에 교육 비용 200만 원을 지출합니다.",changes:[{type:"once",v:200}],no:"지금 계획을 유지",noText:"현재의 지출과 저축 계획을 유지합니다."}
 };
 
-// 원 단위의 입력값을 읽고 유효한 재무 데이터로 정리합니다.
+function mlParseFinanceAmount(value) {
+  const text = value.trim();
+  if (!/^(?:[0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)$/.test(text)) return null;
+  const amount = Number(text.replaceAll(",", ""));
+  return Number.isSafeInteger(amount) ? amount : null;
+}
+
+function mlValidateFinanceAmount(input) {
+  const valid = mlParseFinanceAmount(input.value) !== null;
+  const error = mlEl(input.id + "-error");
+  if (valid) {
+    input.removeAttribute("aria-invalid");
+    error.hidden = true;
+    error.textContent = "";
+  } else {
+    input.setAttribute("aria-invalid", "true");
+    error.hidden = false;
+    error.textContent = input.value.trim() ? "0원 이상의 정수 금액을 입력해 주세요." : "금액을 입력해 주세요. 해당 금액이 없으면 0원을 입력하세요.";
+  }
+  return valid;
+}
+
+function mlWriteFinanceAmounts(data) {
+  Object.entries(mlFinanceFields).forEach(([id, key]) => {
+    const input = mlEl("ml-" + id);
+    input.value = mlFormatAmount(data[key]);
+    mlValidateFinanceAmount(input);
+  });
+}
+
+// 입력을 수정하는 동안에는 마지막으로 유효했던 금액을 요약에 사용합니다.
 function mlReadFinance() {
   const value = (id) => won(mlEl("ml-" + id).value);
+  const amounts = Object.fromEntries(Object.entries(mlFinanceFields).map(([id, key]) => [
+    key, mlParseFinanceAmount(mlEl("ml-" + id).value) ?? mlFinance[key]
+  ]));
   return {
-    cash:value("cash"), stocks:value("stocks"), funds:value("funds"), property:value("property"),
-    loan:value("loan"), credit:value("credit"), cardDebt:value("card-debt"), otherDebt:value("other-debt"),
-    income:value("income"), expense:value("expense"), goalName:mlEl("ml-goal-name").value.trim() || mlDefaults.goalName,
+    ...amounts, goalName:mlEl("ml-goal-name").value.trim() || mlDefaults.goalName,
     goalAmount:value("goal-amount") || mlDefaults.goalAmount, goalMonths:Math.max(1,Math.min(120,value("goal-months") || 60)),
     incomeType:mlFinance.incomeType, name:mlFinance.name, age:mlFinance.age, annualRate:mlFinance.annualRate
   };
@@ -343,10 +380,19 @@ function mlRenderReport() {
 // 재무 정보 입력 폼을 제출하면 시뮬레이션 시작 조건으로 변환합니다.
 function mlStartFromFinance(event) {
   event.preventDefault();
+  let firstInvalid;
+  for (const id of Object.keys(mlFinanceFields)) {
+    const input = mlEl("ml-" + id);
+    if (!mlValidateFinanceAmount(input)) firstInvalid ??= input;
+  }
+  if (firstInvalid) {
+    firstInvalid.focus();
+    return;
+  }
   mlFinance = mlReadFinance();
+  mlWriteFinanceAmounts(mlFinance);
   const income = mlFinance.income;
   const expense = mlFinance.expense;
-  if (income <= 0) { mlEl("ml-finance-notice").textContent = "월 평균 소득을 입력해 주세요."; mlEl("ml-finance-notice").classList.add("show"); mlEl("ml-income").focus(); return; }
   const categories = Array.from(document.querySelectorAll("#ml-page-finance .ml-tag input:checked")).map((input) => input.value);
   mlFinance.expenseCategories = categories;
   mlBaseSaving = Math.max(0,income-expense)/10000;
@@ -374,13 +420,22 @@ document.querySelectorAll("#ml-income-types .ml-choice").forEach((button) => {
   });
 });
 
-// 재무 입력 금액이 바뀔 때 오른쪽 요약을 실시간 갱신합니다.
-["cash","stocks","funds","property","loan","credit","card-debt","other-debt","income","expense"].forEach((id) => {
-  mlEl("ml-"+id).addEventListener("input",mlUpdateFinanceSummary);
+// 편집 중에는 숫자를 입력하고, 입력을 마치면 천 단위 구분을 표시합니다.
+Object.keys(mlFinanceFields).forEach((id) => {
+  const input = mlEl("ml-" + id);
+  input.addEventListener("focus", () => {
+    if (mlParseFinanceAmount(input.value) !== null) input.value = input.value.replaceAll(",", "");
+  });
+  input.addEventListener("input", () => {
+    if (input.hasAttribute("aria-invalid")) mlValidateFinanceAmount(input);
+    mlUpdateFinanceSummary();
+  });
+  input.addEventListener("blur", () => {
+    if (mlValidateFinanceAmount(input)) input.value = mlFormatAmount(mlParseFinanceAmount(input.value));
+  });
 });
 mlEl("ml-finance-reset").addEventListener("click",() => {
-  const mapping = {"cash":"cash","stocks":"stocks","funds":"funds","property":"property","loan":"loan","credit":"credit","card-debt":"cardDebt","other-debt":"otherDebt","income":"income","expense":"expense"};
-  Object.entries(mapping).forEach(([id,key]) => mlEl("ml-"+id).value=mlDefaults[key]);
+  mlWriteFinanceAmounts(mlDefaults);
   mlUpdateFinanceSummary();
   mlToast("예시 재무 정보를 복원했어요.");
 });
@@ -426,9 +481,7 @@ mlEl("ml-apply-settings").addEventListener("click",() => {
 mlEl("ml-reset-all").addEventListener("click",() => {
   if (!confirm("입력한 재무 정보와 진행 기록을 예시값으로 초기화할까요?")) return;
   mlFinance = {...mlDefaults};
-  const ids = ["cash","stocks","funds","property","loan","credit","card-debt","other-debt","income","expense"];
-  const keys = ["cash","stocks","funds","property","loan","credit","cardDebt","otherDebt","income","expense"];
-  ids.forEach((id,index) => mlEl("ml-"+id).value=mlDefaults[keys[index]]);
+  mlWriteFinanceAmounts(mlDefaults);
   mlEl("ml-goal-name").value = mlDefaults.goalName;
   mlEl("ml-goal-amount").value = mlDefaults.goalAmount;
   mlEl("ml-goal-months").value = mlDefaults.goalMonths;
@@ -455,8 +508,7 @@ try {
   const saved = JSON.parse(localStorage.getItem("money-life-finance-v1"));
   if (saved && typeof saved === "object") mlFinance = {...mlFinance,...saved};
 } catch(error) {}
-const initialMapping = {"cash":"cash","stocks":"stocks","funds":"funds","property":"property","loan":"loan","credit":"credit","card-debt":"cardDebt","other-debt":"otherDebt","income":"income","expense":"expense"};
-Object.entries(initialMapping).forEach(([id,key]) => { mlEl("ml-"+id).value = mlFinance[key]; });
+mlWriteFinanceAmounts(mlFinance);
 mlEl("ml-goal-name").value = mlFinance.goalName;
 mlEl("ml-goal-amount").value = mlFinance.goalAmount;
 mlEl("ml-goal-months").value = mlFinance.goalMonths;

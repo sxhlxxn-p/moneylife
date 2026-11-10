@@ -47,6 +47,9 @@ button { cursor: pointer; }
 .ml-btn:disabled { opacity:.45; cursor:not-allowed; }
 .ml-content-grid { display:grid; grid-template-columns:minmax(0,1fr) 265px; gap:20px; align-items:start; }
 .ml-stack { display:grid; gap:16px; min-width:0; }
+@media (min-width:1101px) and (min-height:560px) {
+  .ml-finance-summary { position:sticky; top:88px; }
+}
 .ml-card { min-width:0; padding:22px; border:1px solid #e9e6f0; border-radius:16px; background:#fff; box-shadow:0 8px 28px rgba(39,61,112,.035); }
 .ml-card h2, .ml-card h3 { margin:0 0 6px; font-size:15px; letter-spacing:-.3px; }
 .ml-desc { margin:0 0 19px; color:#8b899b; font-size:11px; line-height:1.8; }
@@ -60,6 +63,10 @@ button { cursor: pointer; }
 .ml-input-wrap { height:43px; padding:0 12px; display:flex; align-items:center; gap:8px; border:1px solid #e5e1ee; border-radius:9px; background:#fff; }
 .ml-input-wrap:focus-within { border-color:#9b8be2; box-shadow:0 0 0 3px #7563df16; }
 .ml-input-wrap input { min-width:0; width:100%; height:100%; border:0; outline:0; color:#292841; background:transparent; font-size:13px; font-weight:700; }
+#ml-finance-form .ml-input-wrap input { scroll-margin-top:145px; }
+.ml-input-wrap:has(input[aria-invalid="true"]) { border-color:#b54050; }
+.ml-field-error { color:#a33243; font-size:11px; line-height:1.6; }
+.ml-field-error:not([hidden]) { display:block; margin-top:6px; }
 .ml-unit { flex-shrink:0; color:#a29caf; font-size:10px; }
 .ml-hint { display:block; margin-top:6px; color:#a29caf; font-size:10px; }
 .ml-choice-row { display:flex; flex-wrap:wrap; gap:7px; }
@@ -68,8 +75,9 @@ button { cursor: pointer; }
 .ml-tags { display:flex; flex-wrap:wrap; gap:7px; }
 .ml-tag { padding:8px 10px; border:1px solid #e9e6f0; border-radius:9px; color:#77728c; font-size:10px; }
 .ml-tag input { accent-color:#7563df; margin:0 5px 0 0; }
-.ml-form-footer { display:flex; justify-content:space-between; align-items:center; gap:14px; padding:7px 0 3px; }
-.ml-privacy { color:#9b97aa; font-size:10px; line-height:1.8; }
+.ml-form-footer { display:grid; gap:8px; margin-top:14px; }
+.ml-form-footer .ml-btn, .ml-finance-example .ml-btn { min-height:44px; }
+.ml-privacy { margin:0; color:#716c88; font-size:11px; line-height:1.6; }
 .ml-button-row { display:flex; gap:8px; flex-wrap:wrap; }
 .ml-summary { padding:17px; border:1px solid #e7e2f3; border-radius:13px; background:#f8f6fd; }
 .ml-summary-title { margin-bottom:14px; color:#77718c; font-size:11px; font-weight:800; }
@@ -78,6 +86,8 @@ button { cursor: pointer; }
 .ml-summary-row.total { padding-top:12px; margin-bottom:0; border-top:1px solid #e6e0f1; }
 .ml-summary-row.total strong { color:#7563df; font-size:16px; }
 .ml-note { padding:12px 14px; border-radius:10px; background:#f0edfd; color:#7666b2; font-size:10px; line-height:1.8; }
+.ml-finance-example { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 14px; margin:0 0 16px; font-size:12px; }
+.ml-finance-example p { margin:0; }
 .ml-notice { display:none; padding:12px 14px; margin-bottom:14px; border-radius:10px; background:#eaf4eb; color:#438c72; font-size:11px; line-height:1.7; }
 .ml-notice.show { display:block; }
 .ml-hud { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
@@ -156,5 +166,5 @@ button { cursor: pointer; }
 .ml-toast { position:fixed; z-index:40; bottom:22px; left:50%; transform:translate(-50%,15px); padding:11px 17px; border-radius:10px; background:#333149; color:#fff; font-size:11px; opacity:0; pointer-events:none; transition:.2s; max-width:90vw; }
 .ml-toast.show { opacity:1; transform:translate(-50%,0); }
 @media(max-width:1100px) { .ml-content-grid,.ml-town-layout { grid-template-columns:1fr; } .ml-aside { grid-template-columns:1fr 1fr; } .ml-hud { grid-template-columns:repeat(2,1fr); } }
-@media(max-width:760px) { .ml-layout { grid-template-columns:1fr; } .ml-sidebar { position:sticky; top:68px; z-index:5; height:auto; padding:9px; flex-direction:row; gap:5px; overflow-x:auto; border-right:0; border-bottom:1px solid #e9e6f0; } .ml-side-caption,.ml-side-bottom { display:none; } .ml-nav { flex-direction:row; gap:5px; } .ml-nav button { width:auto; min-width:max-content; padding:10px 11px; margin:0; font-size:10px; } .ml-nav-icon { font-size:15px; } .ml-main { padding:19px 13px 35px; } .ml-content-grid { grid-template-columns:1fr; } .ml-page-head { align-items:flex-start; flex-direction:column; } .ml-fields { grid-template-columns:1fr; } .ml-form-footer { align-items:flex-start; flex-direction:column; } .ml-button-row,.ml-button-row .ml-btn { width:100%; flex:1; } .ml-bottom-grid { grid-template-columns:1fr; } .ml-aside { grid-template-columns:1fr; } .ml-report-grid { grid-template-columns:1fr; } .ml-world { min-height:300px; } .ml-town { width:83%; right:3%; } }
+@media(max-width:760px) { .ml-layout { grid-template-columns:1fr; } .ml-sidebar { position:sticky; top:68px; z-index:5; height:auto; padding:9px; flex-direction:row; gap:5px; overflow-x:auto; border-right:0; border-bottom:1px solid #e9e6f0; } .ml-side-caption,.ml-side-bottom { display:none; } .ml-nav { flex-direction:row; gap:5px; } .ml-nav button { width:auto; min-width:max-content; padding:10px 11px; margin:0; font-size:10px; } .ml-nav-icon { font-size:15px; } .ml-main { padding:19px 13px 35px; } .ml-content-grid { grid-template-columns:1fr; } .ml-page-head { align-items:flex-start; flex-direction:column; } .ml-fields { grid-template-columns:1fr; } .ml-button-row,.ml-button-row .ml-btn { width:100%; flex:1; } .ml-bottom-grid { grid-template-columns:1fr; } .ml-aside { grid-template-columns:1fr; } .ml-report-grid { grid-template-columns:1fr; } .ml-world { min-height:300px; } .ml-town { width:83%; right:3%; } }
 @media(max-width:440px) { .ml-topbar { padding:0 15px; } .ml-top-user span:first-child { display:none; } .ml-page-head h1 { font-size:22px; } .ml-card { padding:17px 14px; } .ml-metric { padding:11px 9px; gap:7px; } .ml-metric-icon { width:29px; height:29px; font-size:14px; } .ml-metric strong { font-size:14px; } .ml-world-copy h2 { font-size:19px; } .ml-world-copy { max-width:250px; } .ml-town { width:100%; right:-2%; opacity:.88; } }
