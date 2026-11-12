@@ -697,3 +697,66 @@ test('뉴스 저장 응답 유실 후 같은 요청 번호로 다시 확인해 �
   const records = await (await page.request.get('/api/paper-plans/' + planId + '/news-games')).json();
   assert.equal(records.length, 1);
 });
+
+test('뉴스 기록 세 개를 공통 라운드로 비교하고 네 번째 선택을 막는다', {timeout: 30000}, async t => {
+  const page = await pageFor(t, {width: 390, height: 844});
+  await demo(page);
+  await page.getByLabel('주문 수량 · 주').fill('50');
+  await clickCommand(page, '매수 예약', 'orders');
+  const source = await clickCommand(page, '다음 달로 +1개월', 'advance');
+  const saved = [];
+  for (const choices of [['hold'], ['half', 'hold'], ['sell', 'hold', 'hold'], ['hold', 'hold']]) {
+    const response = await page.request.post('/api/paper-plans/' + source.plan.id + '/news-games', {data: {requestId: crypto.randomUUID(), choices}});
+    assert.equal(response.status(), 201); saved.push(await response.json());
+  }
+  await page.getByRole('button', {name: '내 투자로 뉴스 체험'}).click();
+  const game = page.locator('#newsportfolio');
+  const before = await page.evaluate(() => localStorage.getItem('money-life-news-rounds-v1'));
+  await game.getByRole('button', {name: '저장한 뉴스 기록'}).click();
+  const list = game.locator('.news-saved-records');
+  assert.equal(await list.getByRole('button', {name: '선택한 뉴스 기록 비교'}).isDisabled(), true);
+  for (const record of saved.slice(0, 3)) await list.locator(`input[value="${record.id}"]`).check();
+  await list.locator(`input[value="${saved[3].id}"]`).click();
+  assert.equal(await list.locator(`input[value="${saved[3].id}"]`).isChecked(), false);
+  assert.match(await list.locator('.news-comparison-status').innerText(), /최대 3개/);
+  await list.getByRole('button', {name: '선택한 뉴스 기록 비교'}).click();
+  await list.getByRole('heading', {name: '1라운드까지 대응을 비교했어요'}).waitFor();
+  const cards = list.locator('.news-comparison-cards');
+  assert.match(await cards.innerText(), /1,140,000원/);
+  assert.match(await cards.innerText(), /1,170,000원/);
+  assert.match(await cards.innerText(), /1,200,000원/);
+  assert.match(await cards.innerText(), /A 대비 순자산 \+60,000원/);
+  assert.equal(await list.locator('.news-round-comparison article').count(), 1);
+  assert.equal(await list.locator('svg path').count(), 3);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-news-rounds-v1')), before);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), source.plan.id);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  if (process.env.UI_SCREENSHOT_DIR) {
+    await list.locator('.news-comparison-cards').scrollIntoViewIfNeeded();
+    await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'news-comparison-mobile.png')});
+  }
+  await list.getByRole('button', {name: '게임으로 돌아가기'}).click();
+  assert.equal(await game.locator('.news-round').innerText(), '0 / 4 라운드');
+});
+
+test('뉴스 비교 실패 시 선택을 유지하고 다시 시도한다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  const planId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  for (const choices of [['hold'], ['sell']]) {
+    const response = await page.request.post('/api/paper-plans/' + planId + '/news-games', {data: {requestId: crypto.randomUUID(), choices}});
+    assert.equal(response.status(), 201);
+  }
+  await page.getByRole('button', {name: '내 투자로 뉴스 체험'}).click();
+  await page.getByRole('button', {name: '저장한 뉴스 기록'}).click();
+  const list = page.locator('.news-saved-records');
+  await list.getByRole('checkbox').first().waitFor();
+  for (const checkbox of await list.getByRole('checkbox').all()) await checkbox.check();
+  await page.route('**/api/news-game-comparisons', route => route.fulfill({status: 503, contentType: 'application/json', body: '{"detail":"NEWS_RESULT_INVALID"}'}));
+  await list.getByRole('button', {name: '선택한 뉴스 기록 비교'}).click();
+  await page.waitForFunction(() => document.querySelector('.news-comparison-status').textContent.includes('현재 선택'));
+  assert.equal(await list.locator('input:checked').count(), 2);
+  await page.unroute('**/api/news-game-comparisons');
+  await list.getByRole('button', {name: '선택한 뉴스 기록 비교'}).click();
+  await list.getByRole('heading', {name: '1라운드까지 대응을 비교했어요'}).waitFor();
+});
