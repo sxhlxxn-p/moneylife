@@ -1,4 +1,4 @@
-"""Historical import and read-only provider regression. Author: sxhlxxn / 202439688."""
+"""Historical import and read-only provider regression. Author: sxhlxxn."""
 import asyncio
 from copy import deepcopy
 from datetime import date, datetime, timezone

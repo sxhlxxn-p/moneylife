@@ -1,4 +1,4 @@
-"""Settings precedence and redacted diagnostics. Author: sxhlxxn / 202439688."""
+"""Settings precedence and redacted diagnostics. Author: sxhlxxn."""
 import asyncio
 import importlib.util
 import json

@@ -1,4 +1,4 @@
-// Shared wallet investment regression tests. Author: sxhlxxn / Student ID: 202439688.
+// Shared wallet investment regression tests. Author: sxhlxxn.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {simulateWithTrading, compareWithTrading} = require('../Engine/src/monthly-trading.cjs');

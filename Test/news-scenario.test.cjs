@@ -1,8 +1,21 @@
-// News shock arithmetic and isolation. Author: sxhlxxn / Student ID: 202439688.
+// News shock arithmetic and isolation. Author: sxhlxxn.
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const game = require('../Client/src/news-scenario.js');
+const game = require('../Engine/src/news-scenario.js');
 const seed = {cash: 500000, saved: 0, quantity: 50, price: 10000, income: 200000, expense: 100000, unpaid: 0};
+test('전체 재생이 각 라운드와 계속 보유 경로를 동일하게 재현한다', () => {
+  const choices = ['half', 'hold', 'sell', 'hold'];
+  const result = game.replay(seed, choices);
+  let current = seed, held = seed;
+  for (const [i, choice] of choices.entries()) {
+    current = game.play(current, game.events[i].id, choice).state;
+    held = game.play(held, game.events[i].id, 'hold').state;
+  }
+  assert.equal(result.finalAssets, game.total(current));
+  assert.equal(result.heldAssets, game.total(held));
+  assert.equal(game.replay(seed, ['hold']).history.length, 1);
+  assert.throws(() => game.replay(seed, ['hold', 'hold', 'hold', 'hold', 'hold']));
+});
 test('금리 충격의 손익과 월 현금흐름을 분리하고 원본을 보존한다', () => {
   const input = structuredClone(seed); const row = game.play(input, 'rates', 'hold');
   assert.equal(row.stockChange, -60000); assert.equal(row.total, 1040000);

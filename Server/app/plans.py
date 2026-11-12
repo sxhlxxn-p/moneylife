@@ -1,4 +1,4 @@
-"""Immutable plan save/load for guest sessions. Author: sxhlxxn / 202439688."""
+"""Immutable plan save/load for guest sessions. Author: sxhlxxn."""
 
 import hashlib
 import os

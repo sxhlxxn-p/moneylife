@@ -1,4 +1,4 @@
-// Server KRW calculation policy. Author: sxhlxxn / Student ID: 202439688.
+// Server KRW calculation policy. Author: sxhlxxn.
 const {createInterestCalculator} = require('./interest.cjs');
 const engine = require('./index');
 const ENGINE_VERSION = 'cash-savings-krw-v1';

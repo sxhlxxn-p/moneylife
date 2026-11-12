@@ -1,4 +1,4 @@
-// Synthetic calculation demo. Author: sxhlxxn / Student ID: 202439688.
+// Synthetic calculation demo. Author: sxhlxxn.
 const {createAccount, executeOrder, valueAccount} = require('../src/paper-trading.cjs');
 const fixture = require('../../fixtures/paper-trading/single-stock.json');
 let account = createAccount({symbol: fixture.symbol, cash: fixture.initialCash});

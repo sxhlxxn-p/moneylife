@@ -1,4 +1,4 @@
-"""Call the shared JS engine without shell execution. Author: sxhlxxn / 202439688."""
+"""Call the shared JS engine without shell execution. Author: sxhlxxn."""
 
 import asyncio
 import json

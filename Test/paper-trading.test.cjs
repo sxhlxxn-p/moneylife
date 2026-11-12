@@ -1,4 +1,4 @@
-// Paper trading accounting tests. Author: sxhlxxn / Student ID: 202439688.
+// Paper trading accounting tests. Author: sxhlxxn.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {createAccount, executeOrder, valueAccount} = require('../Engine/src/paper-trading.cjs');

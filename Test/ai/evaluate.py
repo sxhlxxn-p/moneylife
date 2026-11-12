@@ -1,4 +1,4 @@
-"""Run the frozen condition-extraction comparison. Author: sxhlxxn / 202439688."""
+"""Run the frozen condition-extraction comparison. Author: sxhlxxn."""
 import argparse
 import asyncio
 from datetime import datetime, timezone

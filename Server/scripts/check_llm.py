@@ -1,4 +1,4 @@
-"""Readiness check and opt-in one-request smoke test. Author: sxhlxxn / 202439688."""
+"""Readiness check and opt-in one-request smoke test. Author: sxhlxxn."""
 import argparse
 import asyncio
 import json

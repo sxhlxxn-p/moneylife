@@ -1,4 +1,4 @@
-"""Cancel only pending orders in a new branch. Author: sxhlxxn / 202439688."""
+"""Cancel only pending orders in a new branch. Author: sxhlxxn."""
 from uuid import uuid4
 import pytest
 from fastapi import HTTPException

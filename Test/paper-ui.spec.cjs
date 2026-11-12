@@ -1,4 +1,4 @@
-// Real browser/API integration. Author: sxhlxxn / Student ID: 202439688.
+// Real browser/API integration. Author: sxhlxxn.
 const {test, before, after} = require('node:test');
 const assert = require('node:assert/strict');
 const {spawn, spawnSync} = require('node:child_process');
@@ -7,7 +7,7 @@ const {existsSync} = require('node:fs');
 const {tmpdir} = require('node:os');
 const path = require('node:path');
 const {chromium} = require('playwright');
-const newsRules = require('../Client/src/news-scenario.js');
+const newsRules = require('../Engine/src/news-scenario.js');
 const root = path.resolve(__dirname, '..');
 const port = Number(process.env.UI_TEST_PORT || 5187);
 const apiPort = Number(process.env.UI_TEST_API_PORT || 3017);
@@ -639,4 +639,61 @@ test('저장 포트폴리오에서 시작한 뉴스 게임은 원본 주문과 �
   const after = await (await page.request.get('/api/paper-plans/' + bundle.plan.id)).json();
   assert.deepEqual(after, before);
   if (process.env.UI_SCREENSHOT_DIR) await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'news-game-desktop.png')});
+});
+
+test('뉴스 게임 서버 저장·기록 복원·이어하기와 원본 사본 보존', {timeout: 30000}, async t => {
+  const page = await pageFor(t, {width: 390, height: 844});
+  await demo(page);
+  const planId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  await page.getByRole('button', {name: '내 투자로 뉴스 체험'}).click();
+  const game = page.locator('#newsportfolio');
+  await game.getByRole('button', {name: '보유 유지', exact: true}).click();
+  await game.getByRole('button', {name: '이 선택으로 라운드 진행'}).click();
+  const savedResponse = page.waitForResponse(r => r.url().endsWith('/news-games') && r.request().method() === 'POST');
+  await game.getByRole('button', {name: '뉴스 진행 서버 저장'}).click();
+  const saved = await savedResponse; assert.equal(saved.status(), 201);
+  const record = await saved.json(); assert.equal(record.result.history.length, 1);
+  await game.getByRole('button', {name: '현재 라운드 저장됨'}).waitFor();
+  assert.equal(await game.getByRole('button', {name: '현재 라운드 저장됨'}).isDisabled(), true);
+  await game.getByRole('button', {name: '뉴스 게임 처음부터'}).click();
+  assert.equal(await game.locator('.news-round').innerText(), '0 / 4 라운드');
+  await game.getByRole('button', {name: '저장한 뉴스 기록'}).click();
+  await game.getByRole('button', {name: '이 기록 이어하기'}).click();
+  assert.equal(await game.locator('.news-round').innerText(), '1 / 4 라운드');
+  assert.match(await game.locator('.news-save-status').innerText(), /기록을 불러왔어요/);
+  await game.getByRole('button', {name: '보유 유지', exact: true}).click();
+  await game.getByRole('button', {name: '이 선택으로 라운드 진행'}).click();
+  assert.equal(await game.locator('.news-round').innerText(), '2 / 4 라운드');
+  assert.equal(await game.getByRole('button', {name: '뉴스 진행 서버 저장'}).isEnabled(), true);
+  assert.equal(await page.evaluate(() => localStorage.getItem('money-life-paper-plan')), planId);
+  if (process.env.UI_SCREENSHOT_DIR) {
+    await game.getByRole('button', {name: '뉴스 진행 서버 저장'}).scrollIntoViewIfNeeded();
+    await page.locator('#modal').screenshot({path: path.join(process.env.UI_SCREENSHOT_DIR, 'news-saved-mobile.png')});
+  }
+});
+
+test('뉴스 저장 응답 유실 후 같은 요청 번호로 다시 확인해 중복 저장을 막는다', {timeout: 30000}, async t => {
+  const page = await pageFor(t);
+  await demo(page);
+  const planId = await page.evaluate(() => localStorage.getItem('money-life-paper-plan'));
+  await page.getByRole('button', {name: '내 투자로 뉴스 체험'}).click();
+  const game = page.locator('#newsportfolio');
+  await game.getByRole('button', {name: '보유 유지', exact: true}).click();
+  await game.getByRole('button', {name: '이 선택으로 라운드 진행'}).click();
+  let originalId;
+  await page.route('**/api/paper-plans/*/news-games', async route => {
+    if (route.request().method() !== 'POST') return route.continue();
+    originalId = route.request().postDataJSON().requestId;
+    const accepted = await route.fetch(); assert.equal(accepted.status(), 201);
+    await route.fulfill({status: 503, contentType: 'application/json', body: '{"detail":"API_UNAVAILABLE"}'});
+  });
+  await game.getByRole('button', {name: '뉴스 진행 서버 저장'}).click();
+  await page.waitForFunction(() => document.querySelector('.news-save-status').textContent.includes('같은 저장 버튼'));
+  await page.unroute('**/api/paper-plans/*/news-games');
+  const retried = page.waitForResponse(r => r.url().endsWith('/news-games') && r.request().method() === 'POST');
+  await game.getByRole('button', {name: '뉴스 진행 서버 저장'}).click();
+  const response = await retried; assert.equal(response.status(), 201);
+  assert.equal(response.request().postDataJSON().requestId, originalId);
+  const records = await (await page.request.get('/api/paper-plans/' + planId + '/news-games')).json();
+  assert.equal(records.length, 1);
 });

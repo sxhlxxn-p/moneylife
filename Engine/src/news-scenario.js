@@ -1,4 +1,4 @@
-/* Fictional news round rules. Author: sxhlxxn / Student ID: 202439688. */
+/* Fictional news round rules. Author: sxhlxxn. */
 const NewsScenario = (() => {
   'use strict';
   // These are authored teaching assumptions, never inferred from news or market data.
@@ -51,6 +51,18 @@ const NewsScenario = (() => {
       incomeChange: income - state.income, expenseChange: expense - state.expense,
       total: total(next), difference: total(next) - total(state)};
   }
-  return Object.freeze({events, actions, play, total});
+  function replay(seed, choices) {
+    checked(seed);
+    if (!Array.isArray(choices) || choices.length > events.length) throw new Error('INVALID_SCENARIO_CHOICES');
+    let state = {...seed}, held = {...seed}; const history = [], heldHistory = [];
+    choices.forEach((action, index) => {
+      const row = play(state, events[index].id, action);
+      const baseline = play(held, events[index].id, 'hold');
+      history.push(row); heldHistory.push(baseline); state = row.state; held = baseline.state;
+    });
+    return {version: 'news-game-v1', seed: {...seed}, choices: [...choices], history, heldHistory,
+      finalAssets: total(state), heldAssets: total(held)};
+  }
+  return Object.freeze({events, actions, play, total, replay});
 })();
 if (typeof module !== 'undefined') module.exports = NewsScenario;

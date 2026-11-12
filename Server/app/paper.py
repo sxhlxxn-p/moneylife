@@ -1,4 +1,4 @@
-"""Immutable guest paper-trading snapshots. Author: sxhlxxn / 202439688."""
+"""Immutable guest paper-trading snapshots. Author: sxhlxxn."""
 from copy import deepcopy
 from pydantic import ValidationError
 import time

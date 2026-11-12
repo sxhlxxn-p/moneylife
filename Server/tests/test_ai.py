@@ -1,4 +1,4 @@
-"""Approval flow with mocked model and real engine/DB. Author: sxhlxxn / 202439688."""
+"""Approval flow with mocked model and real engine/DB. Author: sxhlxxn."""
 import asyncio
 import json
 import time

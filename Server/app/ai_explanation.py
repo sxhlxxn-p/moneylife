@@ -1,4 +1,4 @@
-"""Generate prose with server-bound numeric references. Author: sxhlxxn / 202439688."""
+"""Generate prose with server-bound numeric references. Author: sxhlxxn."""
 import json
 import os
 import re

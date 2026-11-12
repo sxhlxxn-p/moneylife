@@ -1,4 +1,4 @@
-// Persistence unit contract. Author: sxhlxxn / Student ID: 202439688.
+// Persistence unit contract. Author: sxhlxxn.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const codec = require('../Client/src/plan-state');

@@ -1,4 +1,4 @@
-/* Financial transition rules. Author: sxhlxxn / Student ID: 202439688. */
+/* Financial transition rules. Author: sxhlxxn. */
 const GameEngine = {
   goalMonth(path, target) {
     return path.findIndex(row => row.total >= target);

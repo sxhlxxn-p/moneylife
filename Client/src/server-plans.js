@@ -1,4 +1,4 @@
-/* Server snapshot controls. Author: sxhlxxn / Student ID: 202439688. */
+/* Server snapshot controls. Author: sxhlxxn. */
 let serverPlanId = null;
 let serverPlanBusy = false;
 try { serverPlanId = localStorage.getItem('money-life-server-plan'); } catch {}
@@ -37,6 +37,8 @@ async function apiRequest(resource, path, options = {}) {
           COMPARISON_INCOMPATIBLE: '출발 조건·가격 버전·계산 버전이 같은 사본끼리 비교해주세요.',
           COMPARISON_FUTURE_MONTH: '선택한 사본이 모두 진행한 시점까지만 비교할 수 있어요.',
           COMPARISON_INPUT_INVALID: '저장된 비교 결과를 확인하지 못했어요. 원본은 유지됩니다.',
+          NEWS_SOURCE_INVALID: '뉴스 게임의 출발 자산을 확인하지 못했어요. 원본 투자 결과는 유지됩니다.',
+          NEWS_RESULT_INVALID: '저장된 뉴스 게임 결과를 확인하지 못했어요. 현재 선택은 유지됩니다.',
           CONDITIONS_UNCHANGED: '적용 기간의 조건이 이미 같은 금액이에요. 변경할 항목을 확인해주세요.',
           CONDITIONS_INVALID: '변경할 금액·기간이나 저장된 조건 기록의 크기를 확인해주세요. 현재 사본은 유지됩니다.',
           ORDER_NOT_FOUND: '이 투자 사본에서 해당 주문을 찾을 수 없어요.',

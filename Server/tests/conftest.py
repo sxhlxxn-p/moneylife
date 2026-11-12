@@ -1,4 +1,4 @@
-"""Shared real-DB test fixtures. Author: sxhlxxn / 202439688."""
+"""Shared real-DB test fixtures. Author: sxhlxxn."""
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine

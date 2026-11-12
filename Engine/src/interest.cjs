@@ -1,4 +1,4 @@
-// Monthly KRW interest policy. Author: sxhlxxn / Student ID: 202439688.
+// Monthly KRW interest policy. Author: sxhlxxn.
 const Decimal = require('decimal.js').clone({precision: 40, rounding: 4});
 
 function createInterestCalculator() {

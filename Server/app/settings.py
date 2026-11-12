@@ -1,4 +1,4 @@
-"""Local LLM settings without overriding deployment env. Author: sxhlxxn / 202439688."""
+"""Local LLM settings without overriding deployment env. Author: sxhlxxn."""
 import os
 from pathlib import Path
 

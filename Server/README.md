@@ -192,3 +192,7 @@ Docker Compose는 호스트 `.data/market`을 읽기 전용으로 마운트한�
 ## 저장 투자 사본 비교
 
 `POST /paper-comparisons`에 `{planIds:[UUID,UUID,(UUID)], throughMonth?:정수}`를 보낸다. 본인의 같은 출발 계획·초기 조건·가격 해시·엔진 버전만 비교한다. 기본 비교 시점은 선택 사본의 진행 월 최솟값이며 그 이후를 요청하면 409다. 해당 시점까지의 저장된 행과 목표/부족 요약을 다시 집계한다. 미래 가격·미실행 결과·주문·원본 state를 반환하지 않고 엔진·모델·시세를 호출하거나 DB 사본을 생성하지 않는다. 새 의존성·DB 변경은 없다. [비교 계약](../Shared/paper-comparison-contract.md)을 따른다.
+
+## 뉴스 게임 기록
+
+[뉴스 게임 계약](../Shared/news-game-contract.md)에 따라 소유한 투자 사본의 1~4라운드를 불변 기록으로 저장한다. 공용 Node 엔진 재계산, 요청 중복 방지, 사본별 목록/소유자 조회를 제공한다. 서버 재시작 시 `news_game_records` 테이블을 생성한다.

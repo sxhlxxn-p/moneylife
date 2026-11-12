@@ -1,4 +1,4 @@
-"""Store immutable server-calculated runs. Author: sxhlxxn / 202439688."""
+"""Store immutable server-calculated runs. Author: sxhlxxn."""
 
 import time
 from uuid import UUID, uuid4

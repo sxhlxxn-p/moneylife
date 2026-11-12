@@ -1,4 +1,4 @@
-"""Only common saved months may be compared. Author: sxhlxxn / 202439688."""
+"""Only common saved months may be compared. Author: sxhlxxn."""
 from copy import deepcopy
 from uuid import uuid4
 import pytest

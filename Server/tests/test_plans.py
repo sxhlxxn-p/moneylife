@@ -1,4 +1,4 @@
-"""Persistence and tenant boundaries. Author: sxhlxxn / 202439688."""
+"""Persistence and tenant boundaries. Author: sxhlxxn."""
 from copy import deepcopy
 import pytest
 from fastapi.testclient import TestClient

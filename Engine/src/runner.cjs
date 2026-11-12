@@ -1,7 +1,8 @@
-// Fixed stdin/stdout bridge. Author: sxhlxxn / Student ID: 202439688.
+// Fixed stdin/stdout bridge. Author: sxhlxxn.
 const {calculateSnapshot} = require('./snapshot.cjs');
 const {compareWithTrading} = require('./monthly-trading.cjs');
 const {previewOrder} = require('./order-preview.cjs');
+const news = require('./news-scenario.js');
 let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', chunk => {
@@ -10,7 +11,11 @@ process.stdin.on('data', chunk => {
 });
 process.stdin.on('end', () => {
   try {
-    const {state, months, investment, mode, order} = JSON.parse(input);
+    const {state, months, investment, mode, order, choices} = JSON.parse(input);
+    if (mode === 'news-game') {
+      process.stdout.write(JSON.stringify(news.replay(state, choices)));
+      return;
+    }
     const minimum = ['monthly-investment', 'order-preview'].includes(mode) ? 0 : 1;
     if (!Number.isInteger(months) || months < minimum || months > 120) throw new Error('Invalid period');
     if (mode === 'monthly-investment') process.stdout.write(JSON.stringify(compareWithTrading(state, investment, months)));
