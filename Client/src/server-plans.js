@@ -25,7 +25,7 @@ async function apiRequest(resource, path, options = {}) {
       failureStatus = response.status;
       const body = await response.json().catch(() => ({}));
       failureCode = typeof body.detail === 'string' ? body.detail : undefined;
-      if (['paper-plans', 'paper-runs', 'paper-comparisons', 'market'].includes(resource)) {
+      if (['paper-plans', 'paper-runs', 'paper-comparisons', 'news-game-comparisons', 'market'].includes(resource)) {
         const messages = {
           INSUFFICIENT_SHARES: '현재 보유 주식에서 이미 예약한 매도 수량을 제외한 수량만 팔 수 있어요.',
           SERIES_PERIOD_EXCEEDED: '가상 가격이 지원하는 마지막 달이에요. 새 투자 연습을 시작해주세요.',
@@ -39,6 +39,8 @@ async function apiRequest(resource, path, options = {}) {
           COMPARISON_INPUT_INVALID: '저장된 비교 결과를 확인하지 못했어요. 원본은 유지됩니다.',
           NEWS_SOURCE_INVALID: '뉴스 게임의 출발 자산을 확인하지 못했어요. 원본 투자 결과는 유지됩니다.',
           NEWS_RESULT_INVALID: '저장된 뉴스 게임 결과를 확인하지 못했어요. 현재 선택은 유지됩니다.',
+          NEWS_COMPARISON_INCOMPATIBLE: '같은 투자 사본과 출발 자산·규칙 버전의 뉴스 기록을 선택해주세요.',
+          NEWS_COMPARISON_FUTURE_ROUND: '선택한 뉴스 기록이 모두 진행한 라운드까지만 비교할 수 있어요.',
           CONDITIONS_UNCHANGED: '적용 기간의 조건이 이미 같은 금액이에요. 변경할 항목을 확인해주세요.',
           CONDITIONS_INVALID: '변경할 금액·기간이나 저장된 조건 기록의 크기를 확인해주세요. 현재 사본은 유지됩니다.',
           ORDER_NOT_FOUND: '이 투자 사본에서 해당 주문을 찾을 수 없어요.',

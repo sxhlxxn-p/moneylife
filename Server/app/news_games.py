@@ -96,6 +96,15 @@ def validate(result: Result):
                 row.total != state.cash + state.saved + state.quantity * state.price - state.unpaid or
                 row.difference != row.total - previous_total):
                 raise ValueError('Invalid round identity')
+            sold = previous.quantity if row.action == 'sell' else previous.quantity // 2 if row.action == 'half' else 0
+            available = previous.cash + row.proceeds + row.income
+            if (row.sold != sold or row.proceeds != row.sold * previous.price or
+                state.cash != max(0, available - row.expense) or row.shortfall != max(0, row.expense - available) or
+                row.stockChange != state.quantity * (state.price - previous.price) or
+                row.incomeChange != row.income - result.seed.income or
+                row.expenseChange != row.expense - result.seed.expense or
+                row.difference != row.stockChange + row.income - row.expense):
+                raise ValueError('Invalid round attribution')
             previous, previous_total = state, row.total
         if rows[-1].total != final:
             raise ValueError('Invalid final assets')

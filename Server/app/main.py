@@ -16,6 +16,7 @@ from app.paper import router as paper_router
 from app.paper_comparison import router as paper_comparison_router
 from app.paper_explanation_api import router as paper_explanation_router
 from app.news_games import router as news_games_router
+from app.news_comparison import router as news_comparison_router
 
 
 class HealthResponse(BaseModel):
@@ -72,6 +73,7 @@ app.include_router(paper_router)
 app.include_router(paper_comparison_router)
 app.include_router(paper_explanation_router)
 app.include_router(news_games_router)
+app.include_router(news_comparison_router)
 
 
 @app.exception_handler(SQLAlchemyError)
