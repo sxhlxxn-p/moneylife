@@ -1,4 +1,4 @@
-// Single-stock paper trading. Author: sxhlxxn / Student ID: 202439688.
+// Single-stock paper trading. Author: sxhlxxn.
 const Decimal = require('decimal.js').clone({precision: 40, rounding: 4});
 
 function fail(code) {

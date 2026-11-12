@@ -1,4 +1,4 @@
-"""Explanations use only stored facts. Author: sxhlxxn / 202439688."""
+"""Explanations use only stored facts. Author: sxhlxxn."""
 import json
 from copy import deepcopy
 from uuid import uuid4

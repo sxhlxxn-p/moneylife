@@ -1,4 +1,4 @@
-"""Local API launcher without Docker. Author: sxhlxxn / 202439688."""
+"""Local API launcher without Docker. Author: sxhlxxn."""
 
 import os
 from pathlib import Path

@@ -1,4 +1,4 @@
-"""Persistent trading regression. Author: sxhlxxn / 202439688."""
+"""Persistent trading regression. Author: sxhlxxn."""
 from copy import deepcopy
 import json
 from pathlib import Path

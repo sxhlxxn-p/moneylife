@@ -1,4 +1,4 @@
-// Price-only assumption for order review. Author: sxhlxxn / Student ID: 202439688.
+// Price-only assumption for order review. Author: sxhlxxn.
 const {simulateWithTrading} = require('./monthly-trading.cjs');
 const {calculateOrderAmounts} = require('./paper-trading.cjs');
 

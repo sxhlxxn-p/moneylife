@@ -1,4 +1,4 @@
-"""Future-only financial edits preserve investments. Author: sxhlxxn / 202439688."""
+"""Future-only financial edits preserve investments. Author: sxhlxxn."""
 from copy import deepcopy
 from uuid import uuid4
 import pytest

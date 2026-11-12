@@ -1,4 +1,4 @@
-/* AI change approval flow. Author: sxhlxxn / Student ID: 202439688. */
+/* AI change approval flow. Author: sxhlxxn. */
 function aiSnapshot() {
   return MoneyLifePlanState.encode({start, month, baseSaving, baseRate, mods, rateMods, logs, events});
 }

@@ -1,4 +1,4 @@
-"""Compare owned saved paths without future prices. Author: sxhlxxn / 202439688."""
+"""Compare owned saved paths without future prices. Author: sxhlxxn."""
 from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession

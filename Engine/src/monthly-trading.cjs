@@ -1,4 +1,4 @@
-// Shared cash-flow and investment simulation. Author: sxhlxxn / Student ID: 202439688.
+// Shared cash-flow and investment simulation. Author: sxhlxxn.
 const engine = require('./index.js');
 const {createInterestCalculator} = require('./interest.cjs');
 const {calculateSnapshot, summarizePath} = require('./snapshot.cjs');

@@ -1,4 +1,4 @@
-/* Monthly paper trading screen. Author: sxhlxxn / Student ID: 202439688. */
+/* Monthly paper trading screen. Author: sxhlxxn. */
 const PaperTrading = (() => {
   'use strict';
   const referenceKey = 'money-life-paper-plan';
@@ -352,7 +352,7 @@ const PaperTrading = (() => {
       show('<div id="newsportfolio"></div>');
       NewsGame.start($('newsportfolio'), {cash: row.cash, saved: row.saved, quantity: row.investment.quantity,
         price: row.investment.price, unpaid: row.unpaid, income: conditions.values.income,
-        expense: conditions.values.expense}, bundle.run.id, `${bundle.plan.name} · ${bundle.plan.month}개월차`);
+        expense: conditions.values.expense}, bundle.run.id, `${bundle.plan.name} · ${bundle.plan.month}개월차`, bundle.plan.id);
       message('뉴스 게임은 별도 연습이에요. 원래 투자 사본의 시간과 주문은 유지됩니다.');
     } catch (error) { message(error.message); }
     finally { setPlanBusy(false); }

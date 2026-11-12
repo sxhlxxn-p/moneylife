@@ -1,6 +1,6 @@
 {
   "version": "moneylife-change-cases-v1",
-  "author": "sxhlxxn / Student ID: 202439688",
+  "author": "sxhlxxn",
   "provenance": "Authored synthetic draft; independent annotation review pending. No personal user data.",
   "statePolicy": "2026-10 start, income 2500000, expense 1600000, monthlySaving 700000 KRW; no events.",
   "splitPolicy": "Fixed 6 dev and 4 test cases per category. Test outcomes must not guide prompt selection.",

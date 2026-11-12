@@ -1,4 +1,4 @@
-"""Validate persisted game inputs in KRW. Author: sxhlxxn / 202439688."""
+"""Validate persisted game inputs in KRW. Author: sxhlxxn."""
 
 from typing import Annotated, Literal
 from uuid import UUID

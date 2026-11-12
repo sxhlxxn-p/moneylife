@@ -1,4 +1,4 @@
-// Review estimates must not use future quotes. Author: sxhlxxn / Student ID: 202439688.
+// Review estimates must not use future quotes. Author: sxhlxxn.
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const {previewOrder} = require('../Engine/src/order-preview.cjs');

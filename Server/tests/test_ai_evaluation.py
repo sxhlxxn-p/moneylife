@@ -1,4 +1,4 @@
-"""Dataset and evaluation protocol checks. Author: sxhlxxn / 202439688."""
+"""Dataset and evaluation protocol checks. Author: sxhlxxn."""
 import asyncio
 from collections import Counter
 import json

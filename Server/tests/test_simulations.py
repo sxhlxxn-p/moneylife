@@ -1,4 +1,4 @@
-"""Server engine execution and immutable runs. Author: sxhlxxn / 202439688."""
+"""Server engine execution and immutable runs. Author: sxhlxxn."""
 from copy import deepcopy
 from uuid import uuid4
 

@@ -1,4 +1,4 @@
-"""No-persistence order review. Author: sxhlxxn / 202439688."""
+"""No-persistence order review. Author: sxhlxxn."""
 from copy import deepcopy
 import json
 from uuid import uuid4

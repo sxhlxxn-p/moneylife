@@ -1,4 +1,4 @@
-"""Bounded numeric explanations and fallback. Author: sxhlxxn / 202439688."""
+"""Bounded numeric explanations and fallback. Author: sxhlxxn."""
 import asyncio
 import json
 

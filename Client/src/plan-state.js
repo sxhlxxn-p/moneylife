@@ -1,4 +1,4 @@
-/* Plan unit conversion. Author: sxhlxxn / Student ID: 202439688. */
+/* Plan unit conversion. Author: sxhlxxn. */
 (function (root) {
   'use strict';
   const MONEY_FIELDS = ['cash', 'saved', 'income', 'expense', 'target'];

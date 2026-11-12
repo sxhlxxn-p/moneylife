@@ -22,7 +22,7 @@ const routes = new Map(prototypeMode ? [
   ['/server-plans.js', 'Client/src/server-plans.js'],
   ['/ai-client.js', 'Client/src/ai-client.js'],
   ['/paper-client.js', 'Client/src/paper-client.js'],
-  ['/news-scenario.js', 'Client/src/news-scenario.js'],
+  ['/news-scenario.js', 'Engine/src/news-scenario.js'],
   ['/news-game.js', 'Client/src/news-game.js'],
   ['/engine.js', 'Engine/src/index.js']
 ]);

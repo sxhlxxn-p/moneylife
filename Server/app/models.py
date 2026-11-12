@@ -1,4 +1,4 @@
-"""Plan snapshots and guest sessions. Author: sxhlxxn / 202439688."""
+"""Plan snapshots and guest sessions. Author: sxhlxxn."""
 
 from sqlalchemy import JSON, BigInteger, Integer, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -110,3 +110,18 @@ class PaperExplanation(Base):
     selected_ids: Mapped[list] = mapped_column(JSON)
     attempts: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[int] = mapped_column(BigInteger)
+
+
+class NewsGameRecord(Base):
+    __tablename__ = 'news_game_records'
+    __table_args__ = (UniqueConstraint('owner_id', 'request_id'),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    paper_plan_id: Mapped[str] = mapped_column(String(36), index=True)
+    paper_run_id: Mapped[str] = mapped_column(String(36))
+    name: Mapped[str] = mapped_column(String(40))
+    source_month: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[int] = mapped_column(BigInteger)
+    result: Mapped[dict] = mapped_column(JSON)
