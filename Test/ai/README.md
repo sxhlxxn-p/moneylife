@@ -62,3 +62,11 @@ wrongApplications는 오프라인에서 서버 검증에 통과했지만 정답�
 실제 LLM은 키와 모델이 없어 호출하지 않았다. 규칙 결과와 모의 HTTP 테스트를 LLM 성능으로 해석하지 않는다. 최종 평가 40건의 모델 결과도 아직 없다.
 
 저장된 rules-dev-v1 보고서는 해당 커밋에서의 기준선이다. 이후 검증/연결 코드가 바뀌었으면 최신 코드에서 개발 보고서를 다시 생성한 뒤 최종 평가 설정으로 사용한다. 해시가 다른 과거 보고서는 의도적으로 거부한다.
+
+## 개발 실패 사례 보고서
+
+```bash
+.venv/bin/python Test/ai/review_development.py --report .data/ai-evaluation/rules-dev-current.json
+```
+
+현재 설정과 일치하는 완전한 개발 보고서만 허용한다. `summary.json`과 `failures.csv`를 `.data/ai-evaluation/development-review`에 생성한다. `reports/rules-dev-review.json`은 현재 14개 실패 문장과 범주를 공유한 결과다. 같은 문장의 세 번 반복은 한 문장으로 집계한다. 이 단계는 모델 호출이나 최종 평가를 실행하지 않으며, 독립적인 정답 검수를 뜻하지 않는다.

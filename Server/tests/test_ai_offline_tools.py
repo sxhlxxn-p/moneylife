@@ -23,9 +23,9 @@ def load_tool(name):
 def test_offline_flow_uses_real_approval_engine_and_scripted_transport():
     report = load_tool('check_offline').run_checks()
     assert report['externalApiCalls'] == 0
-    assert len(report['checks']) == 9
+    assert len(report['checks']) == 11
     assert all(check['passed'] for check in report['checks'])
-    assert report['scriptedProviderRequests'] == 11
+    assert report['scriptedProviderRequests'] == 13
 
 
 def test_preparation_exports_only_development_cases(tmp_path):
@@ -78,3 +78,44 @@ def test_model_mode_needs_explicit_live_flag_even_when_environment_has_keys(tmp_
     assert result.returncode != 0
     assert 'requires --allow-live' in result.stderr
     assert not (tmp_path/'report.json').exists()
+
+
+def test_failure_review_counts_unique_development_cases_and_keeps_final_held_out(tmp_path):
+    from app.ai_evaluation import evaluation_state, model_context, rules_extract, score
+    report, _ = development_report()
+    for row in report['attempts']:
+        case = next(case for case in DATASET['cases'] if case['id'] == row['caseId'])
+        prediction = rules_extract(case['request'], model_context(evaluation_state(case)))
+        row.update(score(case, prediction), category=case['category'])
+    source = tmp_path / 'report.json'
+    source.write_text(json.dumps(report))
+    result = load_tool('review_development').review(source, tmp_path / 'review')
+    assert result['uniqueCases'] == 60 and result['attempts'] == 180
+    assert result['casesCorrectEveryRepeat'] == 46
+    assert result['casesWithFailure'] == 14 and result['failedAttempts'] == 42
+    assert result['wrongApplications'] == 0
+    assert result['failuresByCategory'] == {
+        'bounded_period': 6, 'compound': 6, 'invalid_change': 1, 'relative_date': 1,
+    }
+    held_out = {case['id'] for case in DATASET['cases'] if case['split'] == 'test'}
+    assert not held_out.intersection(row['caseId'] for row in result['failures'])
+    assert result['externalApiCalls'] == 0
+
+
+def test_failure_review_refuses_partial_or_stale_reports(tmp_path):
+    report, _ = development_report()
+    report['attempts'].pop()
+    source = tmp_path / 'partial.json'
+    source.write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        load_tool('review_development').review(source, tmp_path / 'review')
+    assert not (tmp_path / 'review').exists()
+
+
+def test_failure_review_refuses_attempts_without_metrics(tmp_path):
+    report, _ = development_report()
+    source = tmp_path / 'incomplete-metrics.json'
+    source.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match='metrics are incomplete'):
+        load_tool('review_development').review(source, tmp_path / 'review')
+    assert not (tmp_path / 'review').exists()

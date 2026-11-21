@@ -1,0 +1,248 @@
+{
+  "kind": "development-failure-review",
+  "mode": "rules",
+  "configuration": {
+    "evaluationVersion": "change-eval-v1",
+    "datasetSha256": "a6431f91a77954e0fc683ba82db3824ded3ec12c6376926fd9a0231d295c735e",
+    "codeSha256": "2c5ae5af61d013b1a91df605787dd349cac152b59f56f38c03ed98a5de9c3913",
+    "mode": "rules",
+    "model": null,
+    "promptVersion": "plan-change-v2",
+    "maxOutputTokens": null,
+    "sampling": "deterministic"
+  },
+  "split": "dev",
+  "uniqueCases": 60,
+  "attempts": 180,
+  "repetitions": 3,
+  "casesCorrectEveryRepeat": 46,
+  "casesWithFailure": 14,
+  "failedAttempts": 42,
+  "wrongApplications": 0,
+  "failuresByCategory": {
+    "bounded_period": 6,
+    "compound": 6,
+    "invalid_change": 1,
+    "relative_date": 1
+  },
+  "failures": [
+    {
+      "caseId": "relative_date-06",
+      "category": "relative_date",
+      "request": "두 달 뒤부터 저축을 90만원으로 해줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "bounded_period-01",
+      "category": "bounded_period",
+      "request": "2027년 1월부터 2027년 6월까지 생활비를 20만원 줄여줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "bounded_period-02",
+      "category": "bounded_period",
+      "request": "다음 달부터 2027년 2월까지 저축을 100만원으로 설정해줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "bounded_period-03",
+      "category": "bounded_period",
+      "request": "2028년 3월 한 달만 소득을 50만원 늘려줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "bounded_period-04",
+      "category": "bounded_period",
+      "request": "2027년 2월부터 4월까지 생활비를 150만원으로 설정해줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "bounded_period-05",
+      "category": "bounded_period",
+      "request": "다음 달부터 세 달 동안 저축을 10만원 줄여줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "bounded_period-06",
+      "category": "bounded_period",
+      "request": "2027년 1월부터 같은 해 12월까지 월급을 20만원 올려줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "compound-01",
+      "category": "compound",
+      "request": "다음 달부터 생활비는 20만원 줄이고 저축은 10만원 늘려줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "compound-02",
+      "category": "compound",
+      "request": "월급을 300만원으로, 생활비는 150만원으로 설정해줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "compound-03",
+      "category": "compound",
+      "request": "2027년 1월부터 소득은 30만원 늘리고 지출은 10만원 늘려줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "compound-04",
+      "category": "compound",
+      "request": "2027년 3월부터 생활비를 20만원 줄이고 2027년 6월부터 저축을 100만원으로 바꿔줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "compound-05",
+      "category": "compound",
+      "request": "다음 달부터 소득은 20만원 늘리고 생활비는 10만원 줄이고 저축은 5만원 늘려줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "compound-06",
+      "category": "compound",
+      "request": "2027년 1월부터 3월까지 지출을 20만원 줄이고, 4월부터 저축을 80만원으로 해줘",
+      "expectedFinalStatus": "ready",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    },
+    {
+      "caseId": "invalid_change-06",
+      "category": "invalid_change",
+      "request": "2028년 4월부터 2028년 2월까지 생활비를 10만원 줄여줘",
+      "expectedFinalStatus": "invalid_change",
+      "observedFinalStatuses": [
+        "needs_clarification"
+      ],
+      "failedRepetitions": [
+        1,
+        2,
+        3
+      ],
+      "reason": "clarification_instead_of_resolved_request"
+    }
+  ],
+  "externalApiCalls": 0,
+  "limitations": [
+    "This report analyzes existing development attempts; it makes no model calls.",
+    "Repeated attempts use the same 60 cases, not 180 independent sentences.",
+    "Reason labels describe observed output behavior, not the cause inside a model.",
+    "Authored data is not independently annotated or representative of users.",
+    "No held-out predictions or final-test tuning are included."
+  ]
+}

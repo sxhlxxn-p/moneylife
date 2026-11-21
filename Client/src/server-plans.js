@@ -135,10 +135,16 @@ async function openServerResult() {
     }
     const run = await simulationRequest("/" + encodeURIComponent(runs[0].id));
     show(
-      '<h2>서버 계산 결과</h2><p id="runstatus"></p><div id="runsummary" class="run-summary"></div><details class="run-details"><summary>월별 자산 상세 보기</summary><div class="run-table-scroll"><table><thead><tr><th>경과 월</th><th>현금</th><th>저축</th><th>누적 미충족액</th><th>총자산</th></tr></thead><tbody id="runmonths"></tbody></table></div></details>',
+      '<h2>서버 계산 결과</h2><p id="runstatus"></p><div id="runsummary" class="run-summary"></div><div id="saved-ai-comparison" aria-label="저장된 조건 변경 전후 비교"></div><details class="run-details"><summary>월별 자산 상세 보기</summary><div class="run-table-scroll"><table><thead><tr><th>경과 월</th><th>현금</th><th>저축</th><th>누적 미충족액</th><th>총자산</th></tr></thead><tbody id="runmonths"></tbody></table></div></details>',
     );
     $("runstatus").textContent =
       `저장한 조건으로 ${run.months}개월을 계산한 결과입니다. 이자는 매월 원 단위로 반올림합니다. 화면 미리보기와 같은 원 단위 반올림 규칙을 사용해요.`;
+    if (run.inputSnapshot?.aiComparison)
+      renderAIComparison(
+        $("saved-ai-comparison"),
+        run.inputSnapshot.aiComparison,
+        run.months,
+      );
     const currency = (value) => value.toLocaleString("ko-KR") + "원";
     const goal = run.summary.goalMonth;
     const metrics = [

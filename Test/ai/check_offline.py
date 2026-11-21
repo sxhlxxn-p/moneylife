@@ -129,6 +129,30 @@ def run_checks():
             assert explanation['verifiedNumbers'] is True
             checked(client.post('/ai/explain', json={'runId': run_id}))  # Cache must not consume a response.
             checks.append({'id': 'verified-explanation-cache', 'passed': True})
+            for name, changes, goal, difference in [
+                ('compound-approved-comparison', [
+                    change(),
+                    {**change(300000), 'field': 'income', 'operation': 'add'},
+                ], 8, 60000000),
+                ('bounded-approved-comparison', [
+                    {**change(), 'endMonth': '2027-02'},
+                ], 11, 800000),
+            ]:
+                scripted.append(extraction(changes))
+                proposal = checked(ask(name))
+                assert proposal['status'] == 'ready'
+                assert len(proposal['previewDetails']) == len(changes)
+                approved = checked(client.post(
+                    '/ai/proposals/' + proposal['proposalId'] + '/apply',
+                    json={'confirmed': True},
+                ))
+                assert approved['comparison']['baseGoalMonth'] == 12
+                assert approved['comparison']['candidateGoalMonth'] == goal
+                assert approved['comparison']['finalAssetsDifference'] == difference
+                stored_run = checked(client.get('/simulations/' + approved['run']['id']))
+                assert stored_run['inputSnapshot']['aiComparison'] == approved['comparison']
+                checks.append({'id': name, 'passed': True,
+                               'comparison': approved['comparison']})
             assert not scripted
             assert checked(client.get('/plans/'+base['id'])) == base
     return {'kind': 'offline-integration-check', 'externalApiCalls': 0,

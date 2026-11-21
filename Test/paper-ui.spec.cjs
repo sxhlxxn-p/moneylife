@@ -1015,3 +1015,55 @@ test('목표 반올림 경계에서도 화면과 서버 목표 월이 일치한�
  });
  assert.deepEqual(result,{previewGoal:1,serverGoal:1});
 });
+
+for (const viewport of [{width:1440,height:1000},{width:390,height:844}]) {
+  test(`AI 적용 실패 재확인과 변경 전후 수치 표시 · ${viewport.width}px`, {timeout:30000}, async t => {
+    const page=await pageFor(t,viewport);
+    await page.evaluate(()=>closeModal());
+    if(viewport.width<700)await page.locator('#ml-mobile-toggle').click();
+    await page.locator('#ml-main-nav [data-page=dashboard]').click();
+    const before=await page.evaluate(()=>JSON.stringify(JourneyStore.snapshot()));
+    const proposalId=crypto.randomUUID();let basePlan,applyCalls=0;
+    await page.route('**/api/ai/parse-change',async route=>{
+      basePlan=await (await page.request.get('/api/plans/'+route.request().postDataJSON().planId)).json();
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'ready',proposalId,message:'다음 달부터 생활비 20만원 줄여줘',preview:['생활비 200,000원 감소'],changes:[]})});
+    });
+    await page.route('**/api/ai/proposals/*/apply',async route=>{
+      assert.ok(route.request().url().includes(proposalId));applyCalls++;
+      if(applyCalls===1){await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'ENGINE_UNAVAILABLE'})});return;}
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+        plan:basePlan,run:{id:crypto.randomUUID(),months:120},explanation:'서버에서 계산한 비교 결과입니다.',
+        comparison:{baseGoalMonth:null,candidateGoalMonth:0,finalAssetsDifference:24000000,shortageMonthsDifference:-3}
+      })});
+    });
+    await page.locator('#ask').fill('다음 달부터 생활비 20만원 줄여줘');
+    await page.getByRole('button',{name:'변경안 확인',exact:true}).click();
+    await page.getByRole('button',{name:'확인하고 새 계획 계산',exact:true}).waitFor();
+    assert.equal(await page.evaluate(()=>JSON.stringify(JourneyStore.snapshot())),before);
+    await page.getByRole('button',{name:'확인하고 새 계획 계산',exact:true}).click();
+    await page.waitForFunction(()=>!serverPlanBusy&&document.querySelector('#aistatus')?.textContent.includes('같은 확인 버튼'));
+    assert.equal(await page.evaluate(()=>JSON.stringify(JourneyStore.snapshot())),before);
+    await page.getByRole('button',{name:'확인하고 새 계획 계산',exact:true}).click();
+    await page.locator('#aicomparison').waitFor();
+    const text=await page.locator('#aicomparison').innerText();
+    for(const value of ['기간 내 미달성','시작 시점 달성','+24,000,000원','-3개월','새 계획 − 원본'])assert.ok(text.includes(value),value);
+    assert.equal(applyCalls,2);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  });
+}
+
+test('저장된 AI 계산을 다시 열면 비교 지표도 표시한다',async t=>{
+  const page=await pageFor(t);
+  const run=await page.evaluate(async()=>{
+    closeModal();await saveServerPlan();
+    const runs=await simulationRequest('?planId='+serverPlanId);
+    return simulationRequest('/'+runs[0].id);
+  });
+  run.inputSnapshot.aiComparison={baseGoalMonth:12,candidateGoalMonth:10,finalAssetsDifference:24000000,shortageMonthsDifference:0};
+  await page.route('**/api/simulations/'+run.id,route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(run)}));
+  await page.getByRole('button',{name:'계산 결과',exact:true}).click();
+  const comparison=page.locator('#saved-ai-comparison');await comparison.waitFor();
+  await page.waitForFunction(()=>document.querySelector('#saved-ai-comparison').textContent.includes('24,000,000'));
+  const text=await comparison.innerText();
+  for(const value of ['12개월차','10개월차','+24,000,000원','0개월'])assert.ok(text.includes(value),value);
+});
