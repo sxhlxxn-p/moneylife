@@ -4,6 +4,17 @@
 
 범주: 단일 설정, 증감, 금액 표기, 상대 날짜, 절대 날짜, 한정 기간, 복합 요청, 재질문, 미지원, 서버 검증에서 거부할 조건.
 
+## API 없이 진행하는 개발 검증
+
+```bash
+.venv/bin/python Test/ai/check_offline.py
+.venv/bin/python Test/ai/prepare.py
+```
+
+check_offline은 외부 HTTP 전송을 MockTransport로 대체한다. 모의 응답만 사용하고 실제 API 라우트·추출 스키마·서버 검증·승인·SQLite·공용 엔진·설명 검증을 실행한다. 개발 서버에 모의 모델 모드를 추가하지 않으며, 실제 사용자 데이터나 기존 DB를 변경하지 않는다. 모델이 자연어를 정확히 이해했다는 실험이 아니다.
+
+prepare는 100건의 ID·중복·개발/최종 분리·범주 균형·정답 스키마와 검증 라벨의 일관성을 검사한다. `.data/ai-evaluation/preparation/dev-review.csv`에 개발 60건만 내보내 독립 검수자가 reviewer/decision/notes를 작성할 수 있게 한다. 최종 40건의 모델 평가는 실행하지 않는다. 독립 검수는 현재 pending이다.
+
 ## 실행
 
 저장소 루트에서 `.venv`와 Server 의존성을 준비한다. 일반 단위 테스트는 외부 API를 호출하지 않는다.
@@ -12,26 +23,26 @@
 .venv/bin/python Test/ai/evaluate.py --mode rules --split dev --output .data/ai-evaluation/rules-dev.json
 ```
 
-모델 연결 후 먼저 개발 문장 하나로 실제 연결을 확인한다. API와 동일하게 Server/.env 또는 환경변수의 OPENAI_API_KEY, LLM_MODEL, LLM_PROVIDER=openai를 읽는다. `npm run setup:llm`과 `npm run check:llm -- --live`로 먼저 설정·연결을 확인할 수 있다. 아래 명령은 실제 외부 API 호출을 발생시킨다.
+모델 연결 후 먼저 개발 문장 하나로 실제 연결을 확인한다. API와 동일하게 Server/.env 또는 환경변수의 OPENAI_API_KEY, LLM_MODEL, LLM_PROVIDER=openai를 읽는다. `npm run setup:llm`과 `npm run check:llm -- --live`로 먼저 설정·연결을 확인할 수 있다. 모델 평가에는 명시적인 --allow-live가 필요하다. 키가 환경에 있어도 이 옵션이 없으면 실행을 중단한다. 아래 명령은 실제 외부 API 호출을 발생시킨다.
 
 ```bash
-.venv/bin/python Test/ai/evaluate.py --mode structured --split dev --case-id single_set-01 --repetitions 1 --output .data/ai-evaluation/smoke.json
+.venv/bin/python Test/ai/evaluate.py --mode structured --allow-live --split dev --case-id single_set-01 --repetitions 1 --output .data/ai-evaluation/smoke.json
 ```
 
 전체 개발 평가:
 
 ```bash
-.venv/bin/python Test/ai/evaluate.py --mode plain --split dev --output .data/ai-evaluation/plain-dev.json
-.venv/bin/python Test/ai/evaluate.py --mode structured --split dev --output .data/ai-evaluation/structured-dev.json
+.venv/bin/python Test/ai/evaluate.py --mode plain --allow-live --split dev --output .data/ai-evaluation/plain-dev.json
+.venv/bin/python Test/ai/evaluate.py --mode structured --allow-live --split dev --output .data/ai-evaluation/structured-dev.json
 ```
 
 기본 3회이므로 각 모드의 개발 평가는 60건 × 3 = 180회 요청이다. 규칙은 외부 호출이 없다. 모델 ID·프롬프트·데이터·검증 코드가 고정된 전체 개발 보고서로 최종 평가를 실행한다.
 
 ```bash
-.venv/bin/python Test/ai/evaluate.py --mode structured --split test --frozen-config .data/ai-evaluation/structured-dev.json --output .data/ai-evaluation/structured-test.json
+.venv/bin/python Test/ai/evaluate.py --mode structured --allow-live --split test --frozen-config .data/ai-evaluation/structured-dev.json --output .data/ai-evaluation/structured-test.json
 ```
 
-최종 평가는 40건 × 3회다. 일부 문장 smoke 보고서는 최종 평가 설정으로 사용할 수 없다. 데이터/코드 해시나 모델이 바뀌면 최종 평가를 거부한다. 최종 결과를 보고 프롬프트를 고친 뒤 같은 40건을 새 최종 성능으로 주장하지 않는다.
+최종 평가는 40건 × 3회다. 일부 문장 smoke 보고서는 최종 평가 설정으로 사용할 수 없다. 개발 60건×3회가 빠짐없이 기록돼야 하고, 중복·누락·최종 문장 혼입 및 반복 횟수 차이가 있으면 최종 평가를 거부한다. 데이터/코드 해시나 모델이 바뀌면 최종 평가를 거부한다. 최종 결과를 보고 프롬프트를 고친 뒤 같은 40건을 새 최종 성능으로 주장하지 않는다.
 
 ## 비교 방법과 지표
 

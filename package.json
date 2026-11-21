@@ -30,7 +30,10 @@
     "db:migrate": "python3 Server/scripts/maintain_database.py migrate",
     "db:cleanup": "python3 Server/scripts/maintain_database.py cleanup",
     "format:client": "prettier --write \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html",
-    "format:check": "prettier --check \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html"
+    "format:check": "prettier --check \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html",
+    "check:ai:offline": "python3 Test/ai/check_offline.py",
+    "prepare:ai": "python3 Test/ai/prepare.py",
+    "evaluate:ai": "python3 Test/ai/evaluate.py"
   },
   "engines": {
     "node": ">=18"

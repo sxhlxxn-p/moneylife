@@ -1,0 +1,299 @@
+{
+  "kind": "offline-readiness-summary",
+  "usableAsFrozenConfiguration": false,
+  "externalApiCalls": 0,
+  "flow": {
+    "kind": "offline-integration-check",
+    "externalApiCalls": 0,
+    "scriptedProviderRequests": 11,
+    "checks": [
+      {
+        "id": "approval-calculation-repeat",
+        "passed": true,
+        "comparison": {
+          "baseGoalMonth": 12,
+          "candidateGoalMonth": 10,
+          "finalAssetsDifference": 24000000,
+          "shortageMonthsDifference": 0
+        }
+      },
+      {
+        "id": "clarification-context",
+        "passed": true
+      },
+      {
+        "id": "relative-date-context",
+        "passed": true,
+        "limitation": "Date extraction is scripted; only reference-month transmission is verified."
+      },
+      {
+        "id": "negative-condition",
+        "passed": true
+      },
+      {
+        "id": "unsupported",
+        "passed": true
+      },
+      {
+        "id": "malformed-response",
+        "passed": true
+      },
+      {
+        "id": "provider-timeout",
+        "passed": true
+      },
+      {
+        "id": "invalid-explanation-fallback",
+        "passed": true
+      },
+      {
+        "id": "verified-explanation-cache",
+        "passed": true
+      }
+    ],
+    "limitations": [
+      "Scripted provider responses do not measure language understanding or model quality.",
+      "Uses an isolated SQLite database and the real shared calculation engine.",
+      "The production server and its provider configuration are not changed."
+    ]
+  },
+  "dataset": {
+    "datasetVersion": "moneylife-change-cases-v1",
+    "datasetSha256": "a6431f91a77954e0fc683ba82db3824ded3ec12c6376926fd9a0231d295c735e",
+    "counts": {
+      "total": 100,
+      "development": 60,
+      "finalTest": 40
+    },
+    "categories": [
+      "absolute_date",
+      "amount_forms",
+      "bounded_period",
+      "clarification",
+      "compound",
+      "invalid_change",
+      "relative_date",
+      "single_delta",
+      "single_set",
+      "unsupported"
+    ],
+    "contractAudit": "passed",
+    "independentSemanticReview": "pending",
+    "finalTestModelEvaluation": "not-run",
+    "externalApiCalls": 0,
+    "reviewFile": "dev-review.csv",
+    "plannedModes": [
+      "rules",
+      "plain",
+      "structured"
+    ],
+    "repetitions": 3,
+    "limitations": [
+      "Authored synthetic draft, not a representative user sample.",
+      "The audit checks label consistency, not independent correctness.",
+      "The final 40 cases are not exported into the development review file."
+    ]
+  },
+  "rulesDevelopment": {
+    "configuration": {
+      "evaluationVersion": "change-eval-v1",
+      "datasetSha256": "a6431f91a77954e0fc683ba82db3824ded3ec12c6376926fd9a0231d295c735e",
+      "codeSha256": "b2bd6892d5495ee4a711ba67ad74dc70b9f7cfdad95ce96e5eab10228a442105",
+      "mode": "rules",
+      "model": null,
+      "promptVersion": "plan-change-v2",
+      "maxOutputTokens": null,
+      "sampling": "deterministic"
+    },
+    "uniqueCases": 60,
+    "repetitions": 3,
+    "summary": {
+      "attempts": 180,
+      "rawExactRate": 0.7666666666666667,
+      "readyConditionExactRate": 0.7083333333333334,
+      "finalExactRate": 0.7666666666666667,
+      "wrongApplications": 0,
+      "appliedCount": 87,
+      "wrongApplicationRateOfApplied": 0.0,
+      "clarificationRecall": 1.0,
+      "errors": 0,
+      "meanLatencyMs": 0.08261666666666667,
+      "p95LatencyMs": 0.141,
+      "inputTokens": null,
+      "outputTokens": null,
+      "costUsd": null
+    },
+    "byCategory": {
+      "absolute_date": {
+        "attempts": 18,
+        "rawExactRate": 1.0,
+        "readyConditionExactRate": 1.0,
+        "finalExactRate": 1.0,
+        "wrongApplications": 0,
+        "appliedCount": 18,
+        "wrongApplicationRateOfApplied": 0.0,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.11088888888888888,
+        "p95LatencyMs": 0.133,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "amount_forms": {
+        "attempts": 18,
+        "rawExactRate": 1.0,
+        "readyConditionExactRate": 1.0,
+        "finalExactRate": 1.0,
+        "wrongApplications": 0,
+        "appliedCount": 18,
+        "wrongApplicationRateOfApplied": 0.0,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.11783333333333333,
+        "p95LatencyMs": 0.143,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "bounded_period": {
+        "attempts": 18,
+        "rawExactRate": 0.0,
+        "readyConditionExactRate": 0.0,
+        "finalExactRate": 0.0,
+        "wrongApplications": 0,
+        "appliedCount": 0,
+        "wrongApplicationRateOfApplied": null,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.03211111111111111,
+        "p95LatencyMs": 0.054,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "clarification": {
+        "attempts": 18,
+        "rawExactRate": 1.0,
+        "readyConditionExactRate": null,
+        "finalExactRate": 1.0,
+        "wrongApplications": 0,
+        "appliedCount": 0,
+        "wrongApplicationRateOfApplied": null,
+        "clarificationRecall": 1.0,
+        "errors": 0,
+        "meanLatencyMs": 0.030000000000000002,
+        "p95LatencyMs": 0.043,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "compound": {
+        "attempts": 18,
+        "rawExactRate": 0.0,
+        "readyConditionExactRate": 0.0,
+        "finalExactRate": 0.0,
+        "wrongApplications": 0,
+        "appliedCount": 0,
+        "wrongApplicationRateOfApplied": null,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.03177777777777777,
+        "p95LatencyMs": 0.043,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "invalid_change": {
+        "attempts": 18,
+        "rawExactRate": 0.8333333333333334,
+        "readyConditionExactRate": 0.8333333333333334,
+        "finalExactRate": 0.8333333333333334,
+        "wrongApplications": 0,
+        "appliedCount": 0,
+        "wrongApplicationRateOfApplied": null,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.06305555555555556,
+        "p95LatencyMs": 0.089,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "relative_date": {
+        "attempts": 18,
+        "rawExactRate": 0.8333333333333334,
+        "readyConditionExactRate": 0.8333333333333334,
+        "finalExactRate": 0.8333333333333334,
+        "wrongApplications": 0,
+        "appliedCount": 15,
+        "wrongApplicationRateOfApplied": 0.0,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.10366666666666667,
+        "p95LatencyMs": 0.155,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "single_delta": {
+        "attempts": 18,
+        "rawExactRate": 1.0,
+        "readyConditionExactRate": 1.0,
+        "finalExactRate": 1.0,
+        "wrongApplications": 0,
+        "appliedCount": 18,
+        "wrongApplicationRateOfApplied": 0.0,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.13183333333333336,
+        "p95LatencyMs": 0.279,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "single_set": {
+        "attempts": 18,
+        "rawExactRate": 1.0,
+        "readyConditionExactRate": 1.0,
+        "finalExactRate": 1.0,
+        "wrongApplications": 0,
+        "appliedCount": 18,
+        "wrongApplicationRateOfApplied": 0.0,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.177,
+        "p95LatencyMs": 1.119,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      },
+      "unsupported": {
+        "attempts": 18,
+        "rawExactRate": 1.0,
+        "readyConditionExactRate": null,
+        "finalExactRate": 1.0,
+        "wrongApplications": 0,
+        "appliedCount": 0,
+        "wrongApplicationRateOfApplied": null,
+        "clarificationRecall": null,
+        "errors": 0,
+        "meanLatencyMs": 0.028,
+        "p95LatencyMs": 0.081,
+        "inputTokens": null,
+        "outputTokens": null,
+        "costUsd": null
+      }
+    }
+  },
+  "pending": [
+    "Independent semantic annotation review",
+    "Live model extraction and explanation comparison",
+    "Final 40-case model evaluation"
+  ],
+  "reproduce": [
+    "npm run check:ai:offline",
+    "npm run prepare:ai",
+    "npm run evaluate:ai -- --mode rules --split dev --output .data/ai-evaluation/rules-dev-current.json"
+  ]
+}
