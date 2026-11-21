@@ -1,0 +1,314 @@
+/* Screen layout adapted from the yebin branch. */
+/* 머니 라이프 통합 화면 기본 스타일 */
+
+* {
+  box-sizing: border-box;
+}
+html {
+  min-width: 320px;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #f5f4f9;
+  color: #292841;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 13px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+
+/* =========================================================
+   머니 라이프 통합 화면
+   기존 MY FINANCE 사이드바는 고정하고 오른쪽 콘텐츠만 전환합니다.
+   ========================================================= */
+#app {
+  display: none !important;
+}
+#money-life-app {
+  min-height: 100vh;
+  background: #f5f4f9;
+  color: #292841;
+  font:
+    13px "Noto Sans KR",
+    sans-serif;
+}
+#money-life-app * {
+  box-sizing: border-box;
+}
+#money-life-app button,
+#money-life-app input,
+#money-life-app select {
+  font: inherit;
+}
+#money-life-app button {
+  cursor: pointer;
+}
+.ml-topbar {
+  height: 68px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #e9e6f0;
+  position: sticky;
+  top: 0;
+  z-index: 6;
+}
+.ml-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+}
+.ml-brand-mark {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  background: #7563df;
+  font-size: 19px;
+}
+.ml-top-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #67647b;
+  font-size: 12px;
+}
+.ml-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f0edfd;
+  font-size: 18px;
+}
+.ml-layout {
+  display: grid;
+  grid-template-columns: 215px minmax(0, 1fr);
+  min-height: calc(100vh - 68px);
+}
+.ml-sidebar {
+  position: sticky;
+  top: 68px;
+  height: calc(100vh - 68px);
+  padding: 26px 15px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid #e9e6f0;
+  overflow: auto;
+}
+.ml-side-caption {
+  padding: 0 14px;
+  margin: 6px 0 15px;
+  color: #a4aec1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.ml-mobile-menu {
+  display: none;
+}
+.ml-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.ml-nav button {
+  width: 100%;
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #6e7b95;
+  text-align: left;
+  transition: 0.2s;
+}
+.ml-nav button:hover {
+  background: #f6f8ff;
+}
+.ml-nav button.active {
+  color: #7563df;
+  background: #f0edfd;
+  font-weight: 800;
+}
+.ml-nav-icon {
+  width: 23px;
+  text-align: center;
+  font-size: 19px;
+}
+.ml-side-bottom {
+  margin-top: auto;
+  padding: 19px 13px;
+  border-radius: 14px;
+  background: #f5f4fc;
+}
+.ml-side-bottom .plant {
+  font-size: 28px;
+}
+.ml-side-bottom strong {
+  display: block;
+  margin: 10px 0 7px;
+  line-height: 1.7;
+}
+.ml-side-bottom p {
+  margin: 0;
+  color: #8b899b;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.ml-main {
+  min-width: 0;
+  padding: 28px;
+}
+.ml-page {
+  display: none;
+  max-width: 1450px;
+  margin: 0 auto;
+}
+.ml-page.active {
+  display: block;
+  animation: mlAppear 0.18s ease-out;
+}
+@keyframes mlAppear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ml-page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.ml-eyebrow {
+  color: #9d91bd;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+.ml-page-head h1 {
+  margin: 7px 0 6px;
+  font-size: 26px;
+  letter-spacing: -1px;
+}
+.ml-page-head p {
+  margin: 0;
+  color: #8b899b;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.ml-btn {
+  padding: 10px 15px;
+  border: 1px solid #e9e6f0;
+  border-radius: 9px;
+  background: #fff;
+  color: #57536d;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.ml-btn.primary {
+  border-color: #7563df;
+  background: #7563df;
+  color: #fff;
+}
+.ml-btn.dark {
+  border-color: #333149;
+  background: #333149;
+  color: #fff;
+}
+.ml-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ml-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 265px;
+  gap: 20px;
+  align-items: start;
+}
+.ml-stack {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+@media (min-width: 1101px) and (min-height: 560px) {
+  .ml-finance-summary {
+    position: sticky;
+    top: 88px;
+  }
+}
+.ml-card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #e9e6f0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(39, 61, 112, 0.035);
+}
+.ml-card h2,
+.ml-card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  letter-spacing: -0.3px;
+}
+.ml-desc {
+  margin: 0 0 19px;
+  color: #8b899b;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.ml-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.ml-card-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f0edfd;
+  font-size: 21px;
+}
+.ml-card-title p {
+  margin: 4px 0 0;
+  color: #8b899b;
+  font-size: 11px;
+}
+.ml-section-label {
+  margin: 19px 0 11px;
+  color: #716c88;
+  font-size: 11px;
+  font-weight: 800;
+}

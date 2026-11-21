@@ -1,4 +1,4 @@
-/* Fictional news round rules. Author: sxhlxxn. */
+/* Fictional news round rules. */
 const NewsScenario = (() => {
   'use strict';
   // These are authored teaching assumptions, never inferred from news or market data.

@@ -1,4 +1,4 @@
-"""Normalize private daily market data. Author: sxhlxxn."""
+"""Normalize private daily market data."""
 import calendar
 from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation

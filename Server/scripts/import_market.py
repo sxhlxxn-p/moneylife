@@ -1,4 +1,4 @@
-"""Collect and validate historical prices locally. Author: sxhlxxn."""
+"""Collect and validate historical prices locally."""
 import argparse
 import asyncio
 import csv

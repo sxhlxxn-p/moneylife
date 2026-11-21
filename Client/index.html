@@ -1,9 +1,5 @@
 <!doctype html>
-<!--
-  파일 목적: 머니 라이프 통합 금융 시뮬레이터의 기본 HTML 구조입니다.
-  화면 구성: MY FINANCE 사이드바는 고정하고 오른쪽 메인 콘텐츠만 메뉴에 따라 전환합니다.
-  파일 구성: styles.css(디자인), engine.js(금융 계산), app.js(화면 및 기능 제어).
--->
+<!-- Money Life: page structure. Scripts are loaded in dependency order below. -->
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -933,11 +929,34 @@
     <div id="toast" class="toast hidden" role="status"></div>
     <script src="engine.js"></script>
     <script src="plan-state.js"></script>
+    <script src="journey-defaults.js"></script>
+    <script src="journey-store.js"></script>
+    <script src="ui-common.js"></script>
+    <script src="journey-storage.js"></script>
+    <script src="journey-simulation.js"></script>
+    <script src="journey-events.js"></script>
+    <script src="report-screen.js"></script>
+    <script src="dashboard-screen.js"></script>
+    <script src="finance-screen.js"></script>
+    <script src="api-errors.js"></script>
+    <script src="api-client.js"></script>
     <script src="server-plans.js"></script>
+    <script src="server-events.js"></script>
+    <script src="session-recovery.js"></script>
     <script src="ai-client.js"></script>
-    <script src="app.js"></script>
     <script src="news-scenario.js"></script>
     <script src="news-game.js"></script>
+    <script src="paper-requests.js"></script>
+    <script src="paper-context.js"></script>
+    <script src="paper-view.js"></script>
+    <script src="paper-charts.js"></script>
+    <script src="paper-explanation.js"></script>
+    <script src="paper-orders.js"></script>
+    <script src="paper-comparison.js"></script>
+    <script src="paper-conditions.js"></script>
+    <script src="paper-session.js"></script>
+    <script src="paper-commands.js"></script>
     <script src="paper-client.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

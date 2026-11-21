@@ -1,4 +1,4 @@
-"""Facts bound to immutable investment results. Author: sxhlxxn."""
+"""Facts bound to immutable investment results."""
 import json
 import os
 from typing import Literal

@@ -1,4 +1,4 @@
-// Monthly paper-trading demo. Author: sxhlxxn.
+// Monthly paper-trading demo.
 const {compareWithTrading} = require('../src/monthly-trading.cjs');
 const fixture = require('../../fixtures/paper-trading/monthly-run.json');
 const result = compareWithTrading(fixture.state, fixture.investment, fixture.months);

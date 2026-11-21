@@ -1,4 +1,4 @@
-// Price-only assumption for order review. Author: sxhlxxn.
+// Price-only assumption for order review.
 const {simulateWithTrading} = require('./monthly-trading.cjs');
 const {calculateOrderAmounts} = require('./paper-trading.cjs');
 

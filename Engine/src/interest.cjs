@@ -1,4 +1,4 @@
-// Monthly KRW interest policy. Author: sxhlxxn.
+// Monthly KRW interest policy.
 const Decimal = require('decimal.js').clone({precision: 40, rounding: 4});
 
 function createInterestCalculator() {

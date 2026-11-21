@@ -1,4 +1,4 @@
-"""Owned, optionally ranked result explanations. Author: sxhlxxn."""
+"""Owned, optionally ranked result explanations."""
 import asyncio
 import os
 import time

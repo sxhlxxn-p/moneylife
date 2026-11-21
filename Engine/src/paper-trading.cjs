@@ -1,4 +1,4 @@
-// Single-stock paper trading. Author: sxhlxxn.
+// Single-stock paper trading.
 const Decimal = require('decimal.js').clone({precision: 40, rounding: 4});
 
 function fail(code) {

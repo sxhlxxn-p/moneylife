@@ -1,4 +1,4 @@
-"""Plan snapshots and guest sessions. Author: sxhlxxn."""
+"""Plan snapshots and guest sessions."""
 
 from sqlalchemy import JSON, BigInteger, Integer, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column

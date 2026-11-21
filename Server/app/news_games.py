@@ -1,4 +1,4 @@
-"""Immutable news-game records from owned portfolio runs. Author: sxhlxxn."""
+"""Immutable news-game records from owned portfolio runs."""
 import time
 from typing import Annotated, Literal
 from uuid import UUID, uuid4

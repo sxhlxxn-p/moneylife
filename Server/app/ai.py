@@ -1,4 +1,4 @@
-"""User-approved AI plan changes. Author: sxhlxxn."""
+"""User-approved AI plan changes."""
 import os
 import time
 from uuid import UUID, uuid4

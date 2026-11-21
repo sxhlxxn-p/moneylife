@@ -1,4 +1,4 @@
-"""Offline readiness and opt-in historical market smoke test. Author: sxhlxxn."""
+"""Offline readiness and opt-in historical market smoke test."""
 import argparse
 import asyncio
 from datetime import date

@@ -1,4 +1,4 @@
-"""Compare saved responses over common news rounds. Author: sxhlxxn."""
+"""Compare saved responses over common news rounds."""
 from typing import Annotated
 from uuid import UUID
 
