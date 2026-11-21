@@ -10,7 +10,8 @@ from pathlib import Path
 from fastapi import HTTPException
 
 from app import llm
-from app.ai_changes import build_candidate, model_context, month_name, month_number
+from app.ai_changes import model_context
+from app.financial_conditions import build_candidate, month_name, month_number
 from app.ai_schemas import Extraction
 from app.schemas import GameState
 
@@ -209,7 +210,15 @@ def configuration(dataset_path: Path, mode: str, model: str | None):
     source = Path(__file__).parent
     code = b"".join(
         (source / name).read_bytes()
-        for name in ["ai_evaluation.py", "ai_changes.py", "ai_schemas.py", "schemas.py", "llm.py"]
+        for name in [
+            "ai_evaluation.py",
+            "ai_changes.py",
+            "financial_conditions.py",
+            "condition_schemas.py",
+            "ai_schemas.py",
+            "schemas.py",
+            "llm.py",
+        ]
     )
     code += (source.parent.parent / "Test/ai/evaluate.py").read_bytes()
     return {

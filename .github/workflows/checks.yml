@@ -37,10 +37,12 @@ jobs:
         run: |
           npm run check
           npm run format:check
+          npm run check:server
+          npm run format:server:check
       - name: Unit and server tests
         run: |
           npm test
-          .venv/bin/python -m pytest Server/tests -q
+          npm run test:server
       - name: Browser regression tests
         run: npm run test:ui
 

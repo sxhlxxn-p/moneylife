@@ -10,8 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
 from app.models import NewsGameRecord
-from app.news_games import Strict, Amount, Signed, Round, detail
-from app.plans import get_owner
+from app.news_records import Strict, Amount, Signed, Round, detail
+from app.sessions import get_owner
 
 router = APIRouter(tags=["news-games"])
 

@@ -1,8 +1,7 @@
 # Shared
 
-웹·서버·계산 엔진·AI 모듈이 공유하는 타입과 런타임 검증 스키마의 소유 경로다.
+Client·Server·Engine이 함께 사용하는 데이터 계약과 규칙을 관리한다. 계획·서버 계산·AI 변경·모의투자·뉴스 게임의 명세와 `life-events.json`이 있다.
 
-Plan, Event, Run, AIRequest의 필드명·단위·오류 코드는 이 영역에서 한 번만 정의한다. 현재 기술 스택이 확정되지 않아 구현 파일은 만들지 않았으며, 합의 후 검증 스키마와 함께 추가한다.
+Shared 전체가 실행 가능한 공통 타입 패키지인 것은 아니다. 현재 런타임 검증은 서버 Pydantic, Client의 plan-state 변환, Engine 입력 검사에 구현되어 있다. 생애 이벤트 규칙은 공통 JSON을 실제로 읽는다.
 
-공통 계약을 변경할 때는 Client·Server·Engine 담당자가 함께 검토하고 `../docs/api-contract.md`와 관련 테스트를 같은 변경에 포함한다. 구현 전에는 필드명·금액 단위·반올림·오류 코드와 스키마 라이브러리를 합의한다. 결정 내용은 [결정 기록](../docs/decisions.md)에 남긴다.
-
+필드·단위·오류 코드 변경 시 해당 명세와 실제 검증 코드·fixture·테스트를 함께 수정한다. 특히 금액은 API에서 정수 원이며 화면 표시 단위와 구분한다. 현재 실행 구조는 [개발 구조](../docs/architecture.md), 구현 상태는 [현재 상태](../docs/project-status.md)를 따른다.

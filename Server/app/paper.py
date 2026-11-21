@@ -2,19 +2,19 @@
 
 from copy import deepcopy
 from pydantic import ValidationError
-import time
 from uuid import UUID, uuid4
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
-from app.ai_changes import effective, build_candidate, month_name, month_number
-from app.ai_schemas import ChangeIntent
+from app.financial_conditions import effective, build_candidate, month_name, month_number
+from app.condition_schemas import ChangeIntent
 from app.models import PaperPlan, PaperRun
-from app.plans import get_owner, owned_plan
+from app.sessions import get_owner
+from app.plan_store import owned_plan
 from app.market import load_series, source, catalog_sources
-from app.investment_engine import calculate_investment, calculate_order_preview
+from app.investment_engine import calculate_order_preview
+from app.paper_store import owned_paper, stored_run, detail, run_detail, existing, save, list_owned
 from app.paper_schemas import (
     PaperCreate,
     PaperOrderCreate,
@@ -33,124 +33,6 @@ from app.paper_schemas import (
 )
 
 router = APIRouter(tags=["paper-trading"])
-
-
-async def owned_paper(plan_id: str, owner: str, session: AsyncSession) -> PaperPlan:
-    plan = await session.scalar(
-        select(PaperPlan).where(PaperPlan.id == plan_id, PaperPlan.owner_id == owner)
-    )
-    if plan is None:
-        raise HTTPException(404, "PAPER_PLAN_NOT_FOUND")
-    return plan
-
-
-async def stored_run(plan: PaperPlan, session: AsyncSession) -> PaperRun:
-    run = await session.scalar(
-        select(PaperRun).where(
-            PaperRun.paper_plan_id == plan.id, PaperRun.owner_id == plan.owner_id
-        )
-    )
-    if run is None:
-        raise HTTPException(503, "PAPER_RUN_UNAVAILABLE")
-    return run
-
-
-def detail(plan: PaperPlan, run: PaperRun, *, include_state=True) -> dict:
-    action = plan.command.get("kind")
-    result = {
-        "id": plan.id,
-        "parentPaperPlanId": plan.parent_id,
-        "action": action
-        if action in ("create", "order", "advance", "cancel", "conditions")
-        else None,
-        "financialPlanId": plan.financial_plan_id,
-        "name": plan.state["initial"]["name"],
-        "month": plan.state["month"],
-        "source": source(plan.market_snapshot),
-        "runId": run.id,
-        "createdAt": plan.created_at,
-    }
-    if include_state:
-        result.update(state=plan.state, orders=plan.orders)
-    return result
-
-
-def run_detail(run: PaperRun) -> dict:
-    return {
-        "id": run.id,
-        "paperPlanId": run.paper_plan_id,
-        "engineVersion": run.engine_version,
-        "createdAt": run.created_at,
-        "source": source(run.input_snapshot["market"]),
-        "result": run.result,
-    }
-
-
-def bundle(plan: PaperPlan, run: PaperRun) -> dict:
-    return {"plan": detail(plan, run), "run": run_detail(run)}
-
-
-async def existing(owner: str, request_id: str, command: dict, session: AsyncSession):
-    plan = await session.scalar(
-        select(PaperPlan).where(PaperPlan.owner_id == owner, PaperPlan.request_id == request_id)
-    )
-    if plan is None:
-        return None
-    if plan.command != command:
-        raise HTTPException(409, "REQUEST_ID_CONFLICT")
-    return bundle(plan, await stored_run(plan, session))
-
-
-async def save(
-    owner: str,
-    request_id: str,
-    command: dict,
-    financial_plan_id: str,
-    parent_id: str | None,
-    state: dict,
-    orders: list,
-    market: dict,
-    session: AsyncSession,
-):
-    investment = {key: market[key] for key in ("symbol", "priceSeriesId", "prices", "costs")}
-    investment["orders"] = orders
-    calculated = await calculate_investment(state, investment, state["month"])
-    now = time.time_ns() // 1000
-    plan = PaperPlan(
-        id=str(uuid4()),
-        owner_id=owner,
-        request_id=request_id,
-        command=command,
-        financial_plan_id=financial_plan_id,
-        parent_id=parent_id,
-        state=deepcopy(state),
-        orders=deepcopy(orders),
-        market_snapshot=deepcopy(market),
-        created_at=now,
-    )
-    run = PaperRun(
-        id=str(uuid4()),
-        owner_id=owner,
-        paper_plan_id=plan.id,
-        engine_version=calculated.invested.engineVersion,
-        created_at=now,
-        input_snapshot={
-            "state": deepcopy(state),
-            "orders": deepcopy(orders),
-            "market": deepcopy(market),
-        },
-        result=calculated.model_dump(mode="json"),
-    )
-    session.add_all([plan, run])
-    try:
-        await session.commit()
-    except IntegrityError:
-        await session.rollback()
-        prior = await existing(owner, request_id, command, session)
-        if prior is not None:
-            return prior
-        raise
-    return bundle(plan, run)
 
 
 @router.get("/market/series", response_model=list[MarketSource])
@@ -189,14 +71,8 @@ async def listing(
     session: AsyncSession = Depends(get_session),
 ):
     response.headers["Cache-Control"] = "no-store"
-    plans = await session.scalars(
-        select(PaperPlan)
-        .where(PaperPlan.owner_id == owner)
-        .order_by(PaperPlan.created_at.desc(), PaperPlan.id.desc())
-        .limit(limit)
-        .offset(offset)
-    )
-    return [detail(plan, await stored_run(plan, session), include_state=False) for plan in plans]
+    pairs = await list_owned(owner, limit, offset, session)
+    return [detail(plan, run_id, include_state=False) for plan, run_id in pairs]
 
 
 @router.get("/paper-plans/{plan_id}", response_model=PaperDetail)
@@ -208,7 +84,7 @@ async def get_plan(
 ):
     response.headers["Cache-Control"] = "no-store"
     plan = await owned_paper(str(plan_id), owner, session)
-    return detail(plan, await stored_run(plan, session))
+    return detail(plan, (await stored_run(plan, session)).id)
 
 
 @router.get("/paper-plans/{plan_id}/market", response_model=MarketView)

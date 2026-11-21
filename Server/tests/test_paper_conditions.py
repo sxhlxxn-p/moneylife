@@ -5,8 +5,8 @@ import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from app.main import app
-from app import paper, llm
-from app.ai_changes import effective
+from app import paper_store, paper, llm
+from app.financial_conditions import effective
 from test_paper_trading import start, order, advance
 
 
@@ -112,7 +112,7 @@ def test_retry_is_stored_and_conflicting_request_id_rejected(client, payload, mo
     first = change(client, current, values, request_id)
     assert first.status_code == 201
     async def unavailable(*args, **kwargs): raise HTTPException(503, 'ENGINE_UNAVAILABLE')
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     assert change(client, current, {'monthlySaving': 0, 'income': 300000}, request_id).json() == first.json()
     assert change(client, current, {'income': 310000}, request_id).status_code == 409
     assert change(client, first.json(), values, request_id).status_code == 409
@@ -123,7 +123,7 @@ def test_retry_is_stored_and_conflicting_request_id_rejected(client, payload, mo
 def test_engine_failure_has_no_partial_save(client, payload, monkeypatch):
     current, _, _ = start(client, payload)
     async def unavailable(*args, **kwargs): raise HTTPException(503, 'ENGINE_UNAVAILABLE')
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     assert change(client, current, {'expense': 80000}).status_code == 503
     assert client.get(f"/paper-plans/{current['plan']['id']}").json() == current['plan']
     assert len(client.get('/paper-plans').json()) == 1
@@ -136,7 +136,7 @@ def test_get_does_not_call_engine_and_handles_large_existing_value(client, paylo
     base = client.post('/plans', json={'state': state}).json()
     current = client.post('/paper-plans', json={'requestId': str(uuid4()), 'planId': base['id'], 'priceSeriesId': 'synthetic-monthly-v1'}).json()
     async def unavailable(*args, **kwargs): raise AssertionError('read conditions must not run engine')
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     response = client.get(path(current))
     assert response.status_code == 200
     assert response.json()['values']['income'] == 20000000000

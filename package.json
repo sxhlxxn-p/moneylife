@@ -34,7 +34,12 @@
     "check:ai:offline": "python3 Test/ai/check_offline.py",
     "prepare:ai": "python3 Test/ai/prepare.py",
     "evaluate:ai": "python3 Test/ai/evaluate.py",
-    "review:ai": "python3 Test/ai/review_development.py"
+    "review:ai": "python3 Test/ai/review_development.py",
+    "check:server": "node scripts/run-python.cjs Server/scripts/check_source.py && node scripts/run-python.cjs -m ruff check Server",
+    "test:server": "node scripts/run-python.cjs -m pytest Server/tests -q",
+    "verify:backend": "npm run check:server && npm run format:server:check && npm test && npm run test:server",
+    "format:server": "node scripts/run-python.cjs -m ruff format Server/app",
+    "format:server:check": "node scripts/run-python.cjs -m ruff format --check Server/app"
   },
   "engines": {
     "node": ">=18"

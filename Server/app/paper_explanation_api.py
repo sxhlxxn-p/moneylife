@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
 from app.models import PaperRun, PaperExplanation
-from app.plans import get_owner
+from app.sessions import get_owner
 from app.request_limits import limited_ai_owner
 from app.paper_schemas import PaperExplainCreate, PaperExplainDetail
 from app import paper_explanation as explanation

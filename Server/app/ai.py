@@ -13,7 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.request_limits import limited_ai_owner
 from app import llm
 from app import ai_explanation
-from app.ai_changes import build_candidate, model_context, describe_changes
+from app.ai_changes import model_context, describe_changes
+from app.financial_conditions import build_candidate
 from app.ai_schemas import (
     ApplyChange,
     ApplyResult,
@@ -25,7 +26,8 @@ from app.ai_schemas import (
 from app.database import get_session
 from app.engine import calculate
 from app.models import AIProposal, AIExplanation, AIClarification, Plan, Run
-from app.plans import get_owner, owned_plan, summary as plan_summary
+from app.sessions import get_owner
+from app.plan_store import owned_plan, summary as plan_summary
 from app.simulations import detail as run_detail
 
 

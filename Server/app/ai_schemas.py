@@ -6,14 +6,7 @@ from uuid import UUID
 from pydantic import Field, field_validator
 
 from app.schemas import StrictModel, Money, CalculatedMoney, PlanDetail, RunDetail
-
-
-class ChangeIntent(StrictModel):
-    field: Literal["income", "expense", "monthlySaving"]
-    operation: Literal["set", "add", "subtract"]
-    amount: Money
-    startMonth: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
-    endMonth: str | None
+from app.condition_schemas import ChangeIntent
 
 
 class Extraction(StrictModel):

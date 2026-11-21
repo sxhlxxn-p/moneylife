@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
 from app.models import Plan, PlanSave
-from app.plans import get_owner, owned_plan, summary
+from app.sessions import get_owner
+from app.plan_store import owned_plan, summary
 from app.schemas import StrictModel, PlanCreate, PlanDetail
 
 router = APIRouter(prefix="/plan-saves", tags=["plans"])

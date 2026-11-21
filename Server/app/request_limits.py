@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import insert as postgres_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
 from app.models import RequestQuota
-from app.plans import get_owner
+from app.sessions import get_owner
 
 
 async def consume(session, identity, limit, seconds=60):

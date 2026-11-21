@@ -9,7 +9,8 @@ import sys
 import pytest
 from fastapi import HTTPException
 
-from app.ai_changes import build_candidate, model_context
+from app.ai_changes import model_context
+from app.financial_conditions import build_candidate
 from app.ai_evaluation import evaluation_state, rules_extract, score, summarize
 from app.ai_schemas import Extraction
 from app import llm

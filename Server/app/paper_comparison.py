@@ -5,8 +5,8 @@ from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
-from app.plans import get_owner
-from app.paper import owned_paper, stored_run
+from app.sessions import get_owner
+from app.paper_store import owned_paper, stored_run
 from app.market import source
 from app.investment_engine import validate_result
 from app.paper_schemas import PaperComparisonCreate, PaperComparisonDetail, PaperEngineComparison

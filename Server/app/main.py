@@ -18,6 +18,7 @@ from app.database import (
     prepare_database,
 )
 from app.plans import router as plans_router
+from app.session_api import router as session_router
 from app.plan_saves import router as plan_saves_router
 from app.simulations import router as simulations_router
 from app.ai import router as ai_router
@@ -78,6 +79,7 @@ app.add_middleware(
 from app.events import router as events_router
 
 app.include_router(events_router)
+app.include_router(session_router)
 app.include_router(plans_router)
 app.include_router(plan_saves_router)
 app.include_router(simulations_router)

@@ -11,7 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
 from app.engine import calculate
 from app.models import Run
-from app.plans import get_owner, owned_plan
+from app.sessions import get_owner
+from app.plan_store import owned_plan
 from app.schemas import RunDetail, RunSummary, SimulationCreate
 
 
