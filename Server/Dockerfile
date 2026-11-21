@@ -31,6 +31,7 @@ COPY Server/migrations ./migrations
 COPY Server/tests ./tests
 COPY Engine /app/Engine
 COPY fixtures /app/fixtures
+COPY Shared/life-events.json /app/Shared/life-events.json
 
 EXPOSE 8000
 

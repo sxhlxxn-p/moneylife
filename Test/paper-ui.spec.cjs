@@ -915,3 +915,65 @@ test('AI 승인 전 항목별 변경 금액·기간과 요청 수정은 현재 �
   assert.deepEqual(await page.evaluate(() => aiSnapshot()), before);
   assert.equal(applyCalls, 0);
 });
+
+test('저장한 여정을 불러오면 목표 이름과 기한도 해당 계획으로 돌아온다', async t => {
+  const page=await pageFor(t);
+  const id=await page.evaluate(async()=>{
+    closeModal();JourneyStore.set('goalName','목표 A');JourneyStore.set('goalMonths',24);
+    await saveServerPlan();return serverPlanId;
+  });
+  await page.evaluate(async id=>{
+    JourneyStore.set('goalName','목표 B');JourneyStore.set('goalMonths',60);render();
+    await loadServerPlan(id);
+  },id);
+  assert.equal(await page.evaluate(()=>JourneyStore.current.goalName),'목표 A');
+  assert.equal(await page.evaluate(()=>JourneyStore.current.goalMonths),24);
+  assert.equal(await page.locator('#ml-goal-months').inputValue(),'24');
+});
+
+test('모의투자 미확인 요청이 남아도 새 세션에서 새 연습을 시작할 수 있다', async t => {
+  const page=await pageFor(t);await demo(page);
+  const oldId=await page.evaluate(()=>localStorage.getItem('money-life-paper-plan'));
+  await page.route('**/api/paper-plans/*/orders',route=>route.abort());
+  await page.getByLabel('주문 수량 · 주').fill('1');
+  await page.getByRole('button',{name:'매수 예약',exact:true}).click();
+  await page.getByRole('button',{name:'예약 확정',exact:true}).click();
+  await page.waitForFunction(()=>!serverPlanBusy && !!localStorage.getItem('money-life-paper-pending'));
+  await page.context().addCookies([{name:'moneylife_guest',value:'expired-session',url}]);
+  await page.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
+  // The order route above simulates an uncertain transport failure; allow the real 401 next.
+  await page.unroute('**/api/paper-plans/*/orders');
+  await page.waitForFunction(()=>!serverPlanBusy);
+  await page.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
+  await page.getByRole('button',{name:'새 세션으로 계속하기',exact:true}).click();
+  await page.waitForFunction(()=>!serverPlanBusy && !localStorage.getItem('money-life-paper-pending'));
+  assert.equal(await page.evaluate(()=>localStorage.getItem('money-life-paper-plan')),null);
+  const archive=await page.evaluate(()=>JSON.parse(localStorage.getItem('money-life-paper-pending-archive')));
+  assert.equal(archive[0].request.parentId,oldId);
+  assert.equal(await page.getByRole('button',{name:'새 투자 연습',exact:true}).isEnabled(),true);
+  await page.getByRole('button',{name:'새 투자 연습',exact:true}).click();await demo(page);
+});
+
+test('이벤트 저장 응답이 유실돼도 새로고침 후 같은 ID로 결과를 복원한다', async t => {
+  const page=await pageFor(t);
+  await page.evaluate(()=>{closeModal();JourneyStore.set('month',12);render();eventPreview(12);});
+  let firstId,secondId;
+  await page.route('**/api/event-branches',async route=>{
+    firstId=route.request().postDataJSON().requestId;
+    await route.fetch();await route.abort();
+  });
+  await page.getByRole('button',{name:'지금 독립할래요',exact:true}).click();
+  await page.waitForFunction(()=>!serverPlanBusy && !!localStorage.getItem('money-life-event-pending'));
+  await page.unroute('**/api/event-branches');
+  await page.reload();await page.getByRole('button',{name:'닫기',exact:true}).click();
+  const response=page.waitForResponse(r=>r.url().endsWith('/api/event-branches')&&r.status()===201);
+  page.on('request',request=>{if(request.url().endsWith('/api/event-branches'))secondId=request.postDataJSON().requestId;});
+  await page.getByRole('button',{name:'이전 선택 결과 확인',exact:true}).click();
+  const result=await (await response).json();
+  await page.waitForFunction(()=>!serverPlanBusy && JourneyStore.current.events.has(12));
+  assert.equal(firstId,secondId);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('money-life-event-pending')),null);
+  assert.equal(result.plan.state.changes.find(c=>c.type==='once').v,3000000);
+  const plans=await page.evaluate(()=>planRequest(''));
+  assert.equal(plans.length,2);
+});

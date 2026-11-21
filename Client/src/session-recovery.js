@@ -10,7 +10,9 @@ async function recoverGuestSession() {
       try {
         localStorage.removeItem("money-life-server-plan");
       } catch {}
-      pendingEventRequest = null;
+      eventRequests.archive("session-renewed");
+      renderEventRecovery();
+      window.dispatchEvent(new Event("moneylife:session-renewed"));
     }
     closeModal();
     $("serverstatus").textContent =

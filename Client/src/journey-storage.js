@@ -6,6 +6,8 @@ function persist() {
       "money-life-v1",
       JSON.stringify({
         start: JourneyStore.current.start,
+        goalName: JourneyStore.current.goalName,
+        goalMonths: JourneyStore.current.goalMonths,
         month: JourneyStore.current.month,
         baseSaving: JourneyStore.current.baseSaving,
         baseRate: JourneyStore.current.baseRate,
@@ -52,9 +54,10 @@ function restoreLocalJourney() {
       JourneyStore.restore(decoded);
     }
     const profile = JSON.parse(localStorage.getItem("money-life-goal-v1"));
-    if (typeof profile?.goalName === "string")
+    if (!stored?.goalName && typeof profile?.goalName === "string")
       JourneyStore.set("goalName", profile.goalName.slice(0, 40));
     if (
+      stored?.goalMonths === undefined &&
       Number.isInteger(profile?.goalMonths) &&
       profile.goalMonths >= 1 &&
       profile.goalMonths <= 120

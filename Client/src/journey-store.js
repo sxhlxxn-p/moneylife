@@ -68,6 +68,8 @@ const JourneyStore = (() => {
   function restore(game) {
     for (const key of [
       "start",
+      "goalName",
+      "goalMonths",
       "month",
       "baseSaving",
       "baseRate",
@@ -80,5 +82,8 @@ const JourneyStore = (() => {
       set(key, game[key]);
     set("events", new Set(game.events));
   }
-  return { current: view, get, set, increment, mutate, restore };
+  function snapshot() {
+    return MoneyLifePlanState.encode(state);
+  }
+  return { current: view, get, set, increment, mutate, restore, snapshot };
 })();

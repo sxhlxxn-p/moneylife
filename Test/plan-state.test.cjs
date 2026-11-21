@@ -40,3 +40,15 @@ test('지원하지 않는 스냅샷은 복원하지 않는다', () => {
   assert.throws(() => codec.decode({schemaVersion: 99, goalBasis: 'net_assets'}));
   assert.throws(() => codec.decode({schemaVersion: 1, goalBasis: 'net_assets', state: {startMonth: '2027-01'}}));
 });
+
+test('서버 계획의 목표 이름과 기한을 복원하며 과거 자료는 고정 기본값을 사용한다', () => {
+  const game = {start:{name:'A',age:25,avatar:'test',cash:1000,saved:0,income:250,expense:160,target:2000},
+    goalName:'독립 자금',goalMonths:24,month:0,baseSaving:70,baseRate:0,mods:[],rateMods:[],events:new Set(),logs:[]};
+  const state = codec.encode(game);
+  assert.deepEqual(state.goal, {name:'독립 자금',months:24});
+  const restored = codec.decode({schemaVersion:1,goalBasis:'net_assets',state});
+  assert.equal(restored.goalName,'독립 자금'); assert.equal(restored.goalMonths,24);
+  delete state.goal;
+  const legacy=codec.decode({schemaVersion:1,goalBasis:'net_assets',state});
+  assert.equal(legacy.goalName,'나만의 공간 마련하기');assert.equal(legacy.goalMonths,60);
+});

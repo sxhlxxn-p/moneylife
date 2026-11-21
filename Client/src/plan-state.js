@@ -16,6 +16,20 @@
     return value / 10000;
   }
 
+  function checkedGoal(goal) {
+    if (
+      !goal ||
+      typeof goal.name !== "string" ||
+      !goal.name.trim() ||
+      goal.name.length > 40 ||
+      !Number.isInteger(goal.months) ||
+      goal.months < 1 ||
+      goal.months > 120
+    )
+      throw new Error("저장된 목표 정보를 확인해주세요.");
+    return { name: goal.name, months: goal.months };
+  }
+
   function encode(game) {
     const initial = { ...game.start };
     for (const field of MONEY_FIELDS) initial[field] = toWon(initial[field]);
@@ -23,6 +37,11 @@
       startMonth: "2026-10",
       months: 120,
       initial,
+      ...(game.goalName !== undefined && game.goalMonths !== undefined
+        ? {
+            goal: checkedGoal({ name: game.goalName, months: game.goalMonths }),
+          }
+        : {}),
       monthlySaving: toWon(game.baseSaving),
       annualRate: game.baseRate,
       month: game.month,
@@ -52,6 +71,10 @@
     ) {
       throw new Error("저장된 진행 기간을 확인할 수 없습니다.");
     }
+    const goal =
+      s.goal === undefined || s.goal === null
+        ? { name: "나만의 공간 마련하기", months: 60 }
+        : checkedGoal(s.goal);
     const start = { ...s.initial };
     for (const field of MONEY_FIELDS) start[field] = fromWon(start[field]);
     const baseSaving = fromWon(s.monthlySaving);
@@ -71,6 +94,8 @@
     for (const x of rateMods) if (x.m <= s.month + 1) rate = x.v;
     return {
       start,
+      goalName: goal.name,
+      goalMonths: goal.months,
       month: s.month,
       baseSaving,
       baseRate: s.annualRate,

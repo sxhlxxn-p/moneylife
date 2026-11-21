@@ -40,5 +40,11 @@
   "/styles/investment.css": "Client/src/styles/investment.css",
   "/styles/layout.css": "Client/src/styles/layout.css",
   "/styles/overrides.css": "Client/src/styles/overrides.css",
-  "/ai-preview.js": "Client/src/ai-preview.js"
+  "/ai-preview.js": "Client/src/ai-preview.js",
+  "/request-journal.js": "Client/src/request-journal.js",
+  "/life-events.json": "Shared/life-events.json",
+  "/news-view.js": "Client/src/news-view.js",
+  "/news-round.js": "Client/src/news-round.js",
+  "/news-records.js": "Client/src/news-records.js",
+  "/news-comparison.js": "Client/src/news-comparison.js"
 }

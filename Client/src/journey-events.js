@@ -1,106 +1,26 @@
-const EV = {
-  12: {
-    emoji: "🏡",
-    title: "나만의 공간, 시작해볼까요?",
-    body: "혼자만의 작은 집을 구할 기회가 생겼습니다. 자유로운 일상과 늘어나는 생활비, 당신의 선택은?",
-    a: "지금 독립할래요",
-    ad: "다음 달부터 월 생활비 +30만 원, 일회성 이사 비용 300만 원.",
-    b: "조금 더 준비할래요",
-    bd: "현재의 생활비를 유지하고 목표 자금을 더 모읍니다.",
-    mods: [
-      {
-        type: "expense",
-        v: 30,
-      },
-      {
-        type: "once",
-        v: 300,
-      },
-    ],
-    mood: "나만의 공간을 선택한 당신.<br>일상에도 새로운 장이 열립니다.",
-  },
-  30: {
-    emoji: "🌿",
-    title: "잠깐 쉬어가도 괜찮을까요?",
-    body: "3개월의 휴식이 가능한 시점입니다. 잠시 일을 내려놓으면 금융 계획은 어떻게 바뀔까요?",
-    a: "나를 위한 휴식",
-    ad: "다음 달부터 3개월 동안 소득을 0원으로 가정합니다.",
-    b: "지금의 일상 유지",
-    bd: "휴식으로 인한 소득 변화 없이 계획을 이어갑니다.",
-    mods: [
-      {
-        type: "income",
-        v: -250,
-        duration: 3,
-      },
-    ],
-    mood: "조금 느리게 가는 시간.<br>당신만의 속도를 찾고 있어요.",
-  },
-  48: {
-    emoji: "💼",
-    title: "새로운 기회가 찾아왔어요",
-    body: "새로운 직장의 제안을 받았습니다. 준비 비용이 들지만 월 소득이 늘어납니다.",
-    a: "새로운 도전 시작",
-    ad: "다음 달부터 월 소득 +40만 원, 준비 비용 200만 원.",
-    b: "지금의 자리에서",
-    bd: "현재 직장과 소득을 유지하며 계획을 이어갑니다.",
-    mods: [
-      {
-        type: "income",
-        v: 40,
-      },
-      {
-        type: "once",
-        v: 200,
-      },
-    ],
-    mood: "새로운 일을 시작합니다.<br>앞으로의 가능성도 넓어져요.",
-  },
-  72: {
-    emoji: "✈️",
-    title: "꿈꿔왔던 여행을 떠날까요?",
-    body: "오랫동안 마음속에 담아둔 여행입니다. 오늘의 경험과 내일의 목표 사이에서 선택해보세요.",
-    a: "지금 떠날래요",
-    ad: "다음 달에 여행 비용 400만 원을 지출합니다.",
-    b: "다음을 기약할래요",
-    bd: "추가 지출 없이 목표 자금을 유지합니다.",
-    mods: [
-      {
-        type: "once",
-        v: 400,
-      },
-    ],
-    mood: "낯선 곳에서 얻은 기억.<br>삶은 숫자보다 더 넓으니까요.",
-  },
-  96: {
-    emoji: "🎓",
-    title: "배움에 투자할 시간",
-    body: "새로운 역량을 배울 수 있는 과정이 열렸습니다. 미래 소득 증가는 가정하지 않고 교육 비용만 반영합니다.",
-    a: "배움을 시작할래요",
-    ad: "다음 달에 교육 비용 200만 원을 지출합니다.",
-    b: "지금 계획을 유지",
-    bd: "현재의 지출과 저축 계획을 유지합니다.",
-    mods: [
-      {
-        type: "once",
-        v: 200,
-      },
-    ],
-    mood: "새로운 것을 배우는 당신.<br>또 다른 내일을 준비합니다.",
-  },
-};
+let EV = {};
+let LifeEventCatalog;
+async function loadLifeEvents() {
+  const response = await fetch("/life-events.json");
+  if (!response.ok) throw new Error("생애 이벤트 규칙을 불러오지 못했어요.");
+  const catalog = await response.json();
+  if (catalog.version !== "life-events-v1" || catalog.unit !== "KRW")
+    throw new Error("생애 이벤트 규칙 버전을 확인해주세요.");
+  LifeEventCatalog = catalog;
+  EV = Object.fromEntries(catalog.events.map((event) => [event.month, event]));
+}
 function eventMods(m) {
-  if (m !== 30)
-    return EV[m].mods.map((value) => ({
-      ...value,
+  const rule = EV[m].rule;
+  if (rule.kind === "effects")
+    return rule.effects.map((effect) => ({
+      type: effect.type,
+      v: effect.value / 10000,
       m: JourneyStore.current.month + 1,
       end: null,
     }));
   const path = simulate();
   return Array.from(
-    {
-      length: Math.min(3, 120 - JourneyStore.current.month),
-    },
+    { length: Math.min(rule.months, 120 - JourneyStore.current.month) },
     (_, i) => ({
       type: "income",
       v: -path[JourneyStore.current.month + i + 1].income,
