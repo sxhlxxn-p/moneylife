@@ -64,9 +64,32 @@ async function requestAIChange(message, followup = null) {
       return;
     }
     show(
-      '<h2>AI 조건 변경안</h2><p id="airequest"></p><div id="aipreview"></div><p id="aistatus" role="status"></p><div class="modalactions"><button class="btn" onclick="closeModal()">취소</button><button id="aiapply" class="btn primary" data-plan-action="ai">확인하고 새 계획 계산</button></div>',
+      '<h2>AI 조건 변경안</h2><p id="airequest"></p><div id="aipreview"></div><p id="aistatus" role="status"></p><div class="modalactions"><button class="btn" onclick="closeModal()">취소</button><button id="aiedit" class="btn" type="button" data-plan-action="ai">요청 수정</button><button id="aiapply" class="btn primary" data-plan-action="ai">확인하고 새 계획 계산</button></div>',
     );
     $("airequest").textContent = proposal.message;
+    $("aiedit").onclick = () => {
+      closeModal();
+      const answers =
+        followup?.history?.map((turn) => turn.answer) ||
+        (followup ? [message] : []);
+      $("ask").value = [
+        proposal.message,
+        ...answers.map((answer, index) => `보충 조건 ${index + 1}: ${answer}`),
+      ].join("\n");
+      $("ask").focus();
+      toast(
+        "항목·금액·적용 시점을 수정한 뒤 다시 요청해주세요. 현재 계획은 바뀌지 않았어요.",
+      );
+    };
+    if (followup) {
+      for (const turn of followup.history || [{ answer: message }]) {
+        const answer = document.createElement("p");
+        answer.className = "ai-followup-answer";
+        answer.textContent =
+          (turn.question ? turn.question + " → " : "보충 답변: ") + turn.answer;
+        $("aipreview").append(answer);
+      }
+    }
     if (proposal.status !== "ready") {
       $("aistatus").textContent = proposal.question;
       $("aiapply").remove();
@@ -89,12 +112,20 @@ async function requestAIChange(message, followup = null) {
               id: proposal.clarificationId,
               planId: plan.id,
               snapshot,
+              history: [
+                ...(followup?.history || []),
+                { question: proposal.question, answer },
+              ],
             });
         };
         $("aipreview").append(label, send);
       }
     } else {
-      for (const line of proposal.preview) {
+      if (proposal.previewDetails?.length)
+        renderAIChangeDetails($("aipreview"), proposal.previewDetails);
+      for (const line of proposal.previewDetails?.length
+        ? []
+        : proposal.preview) {
         const node = document.createElement("p");
         node.textContent = line;
         $("aipreview").append(node);

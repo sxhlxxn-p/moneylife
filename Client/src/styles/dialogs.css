@@ -104,3 +104,37 @@ button:disabled {
     gap: 6px;
   }
 }
+
+.ai-change-detail {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf9fd;
+}
+.ai-change-detail h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.ai-change-detail p {
+  margin: 4px 0;
+}
+.ai-change-detail dl {
+  margin: 12px 0 0;
+}
+.ai-change-detail dt {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--sub);
+}
+.ai-change-detail dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.ai-followup-answer {
+  padding: 8px 12px;
+  border-left: 3px solid var(--purple);
+}

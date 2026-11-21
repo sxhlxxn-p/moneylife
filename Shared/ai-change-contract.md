@@ -5,7 +5,7 @@
 - `POST /ai/parse-change`: `{planId, message}`. 본인 소유의 불변 Plan을 기준으로 해석한다. ready이면 DB에 30분 유효한 변경안과 검증된 후보 상태를 보관하고 proposalId·원문·항목·기간·요약을 반환한다. 이 단계에서는 새 Plan·Run을 만들지 않는다.
 - 정보가 부족하면 `needs_clarification`과 question, 미지원 요청은 `unsupported`를 반환한다. 질문에 대한 답은 원래 요청과 함께 완성된 문장으로 재요청한다. 채팅 이력을 자동 추측하지 않는다.
 - `POST /ai/proposals/{id}/apply`: `{confirmed: true}`. 저장된 변경안만 적용한다. 사용자가 보낸 변경 상태를 신뢰하지 않는다. 원본과 후보를 엔진으로 계산한 뒤 새 Plan·Run과 적용 상태를 한 트랜잭션으로 저장한다. 원본은 보존한다. 같은 변경안의 재확인은 기존 Plan·Run을 반환한다.
-- 응답에는 같은 120개월 시점의 비교 수치와 정형 설명을 포함한다. 승인 직후 설명은 정형 문장이다. 별도 설명 API에서 모델은 지표 자리표시자로 문장을 작성하고 서버가 수치를 채운다.
+- 응답에는 같은 120개월 시점의 비교 수치와 정형 설명을 포함한다. 승인 직후 설명은 정형 문장이다. 별도 설명 API에서 서버가 사실 문장을 작성하고 모델은 사실 ID의 순서만 선택한다.
 
 ## 월·금액과 변경 의미
 
@@ -21,6 +21,11 @@ OpenAI Responses API의 strict JSON Schema 출력을 사용한다. 서버가 허
 
 ## 설명 API
 
-`POST /ai/explain`: `{runId}`. 본인 소유이며 aiComparison이 있는 Run만 허용한다. `text, source: llm|template, attempts, fallbackReason, verifiedNumbers`를 반환한다. 성공한 LLM 설명은 별도 테이블에 저장하며 Run은 불변이다. 기준/변경 목표·자산 차이·부족 기간 차이를 각 한 번 참조해야 한다. 미달성은 null에 대응한 문구, 시작 시점 달성은 0개월 의미를 보존한다. 숫자 직접 작성과 미지원 참조는 재요청 한 번 후 정형 설명으로 대체한다. 모델 호출은 8초 제한을 적용하며 HTTP 장애는 즉시 대체한다. 수치 연결 검증이 모든 자연어 인과 해석의 정확성을 보장하지는 않는다.
+`POST /ai/explain`: `{runId}`. 본인 소유이며 aiComparison이 있는 Run만 허용한다. `text, source: llm|template, attempts, fallbackReason, verifiedNumbers`를 반환한다. 성공한 모델 선택 순서의 설명은 별도 테이블에 저장하며 Run은 불변이다. goal/assets/liquidity/assumptions의 네 ID를 중복·누락 없이 선택해야 한다. 문장과 수치는 서버가 작성한다. ID 중복·누락이나 직접 작성한 문장은 한 번 재요청한 뒤 정형 설명으로 대체한다. 모델 호출은 8초 제한을 적용하며 HTTP 장애는 즉시 대체한다. source=llm은 사실 문장의 순서 선택에 모델이 참여했다는 의미다.
+
+## 승인 화면 상세
+
+ready 응답은 기존 preview 문자열과 함께 previewDetails를 제공한다. 각 항목은 field/label/operation/amount/startMonth/endMonth와 segments를 포함한다. 각 segment는 startMonth/endMonth/before/after이며 금액은 정수 원이다. 기존 미래 변경으로 값이 달라지는 구간을 나누어 표시하고, 복합 요청은 앞선 변경을 반영한 순서대로 보여준다. 직접 모델 출력이 아닌 서버 계산 조건이다. 세부 대화·수정 정책은 docs/ai-clarification-policy.md를 따른다. 보충 답변은 clarificationId를 통해 원래 요청과 같은 계획에 연결한다.
+
 
 조건 추출 평가 데이터와 실행기는 `Test/ai/README.md`를 따른다. 실제 모델 평가와 오프라인 규칙 기준선 결과를 구분한다.

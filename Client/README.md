@@ -26,7 +26,7 @@ Python 의존성과 DB 설정은 [서버 안내](../Server/README.md)를 따른�
 - `src/ui-common.js`: 모달·포커스·화면 전환·표시 도구.
 - `src/api-client.js`, `api-errors.js`: HTTP·시간 초과·오류 코드와 안내 문구. HTTP 계층은 모달을 직접 만들지 않는다.
 - `src/server-plans.js`, `server-events.js`, `session-recovery.js`: 저장 계획·계산 결과·이벤트 분기·세션 복구.
-- `src/ai-client.js`: 자연어 변경 요청·보충 답변·사용자 승인.
+- `src/ai-client.js`, `ai-preview.js`: 자연어 변경 요청·보충 답변·조건별 변경 전후와 적용 기간 표시·수정·사용자 승인.
 - `src/paper-client.js`: 모의투자 기능 조립. 각 화면은 `paper-view`, `paper-orders`, `paper-conditions`, `paper-comparison`, `paper-explanation`, `paper-charts`로 나뉜다.
 - `src/paper-requests.js`: 미확인 명령의 로컬 보관과 복원. 요청 ID는 재시도 시 새로 만들지 않는다.
 - `src/paper-commands.js`, `paper-session.js`, `paper-context.js`: 명령 전송·결과 확인·저장 목록과 모의투자 전용 상태.

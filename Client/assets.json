@@ -39,5 +39,6 @@
   "/styles/forms.css": "Client/src/styles/forms.css",
   "/styles/investment.css": "Client/src/styles/investment.css",
   "/styles/layout.css": "Client/src/styles/layout.css",
-  "/styles/overrides.css": "Client/src/styles/overrides.css"
+  "/styles/overrides.css": "Client/src/styles/overrides.css",
+  "/ai-preview.js": "Client/src/ai-preview.js"
 }
