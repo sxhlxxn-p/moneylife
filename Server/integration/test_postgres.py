@@ -70,3 +70,33 @@ def test_restart_preserves_goal_and_owner():
 def test_production_start_does_not_automatically_migrate():
     with patch.object(database,'initialize_database',side_effect=AssertionError('Unexpected migration')):
         with api() as client:assert client.get('/health/db').json()['database']=='postgresql'
+
+
+def test_investment_listing_keeps_owned_paging_in_one_query():
+    from sqlalchemy import event
+
+    with api() as client:
+        base = client.post('/plan-saves', json=command()).json()
+        created = client.post('/paper-plans', json={
+            'requestId': str(uuid4()), 'planId': base['id'],
+            'priceSeriesId': 'synthetic-monthly-v1',
+        })
+        assert created.status_code == 201, created.text
+        current = created.json()
+        child = client.post('/paper-plans/' + current['plan']['id'] + '/orders',
+                            json={'requestId': str(uuid4()), 'side': 'buy', 'quantity': 1})
+        assert child.status_code == 201, child.text
+        queries = []
+
+        def record(_connection, _cursor, statement, _parameters, _context, _many):
+            if statement.lstrip().upper().startswith('SELECT') and 'paper_' in statement:
+                queries.append(statement)
+
+        event.listen(database.engine.sync_engine, 'before_cursor_execute', record)
+        try:
+            page = client.get('/paper-plans?limit=1&offset=1')
+        finally:
+            event.remove(database.engine.sync_engine, 'before_cursor_execute', record)
+        assert page.status_code == 200
+        assert [item['id'] for item in page.json()] == [current['plan']['id']]
+        assert len(queries) == 1

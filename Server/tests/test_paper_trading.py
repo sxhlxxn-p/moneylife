@@ -7,7 +7,7 @@ import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from app.main import app
-from app import paper, investment_engine
+from app import paper_store, paper, investment_engine
 
 FIXTURE = json.loads((Path(__file__).resolve().parents[2] / 'fixtures/paper-trading/monthly-run.json').read_text())
 
@@ -69,7 +69,7 @@ def test_retries_and_reads_skip_engine_and_catalog(client, payload, monkeypatch)
     current, _, command = start(client, payload)
     request_id = uid()
     created = order(client, current, 'buy', 50, request_id).json()
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     monkeypatch.setattr(paper, 'load_series', lambda _: (_ for _ in ()).throw(RuntimeError('not read')))
     assert client.post('/paper-plans', json=command).json() == current
     assert order(client, current, 'buy', 50, request_id).json() == created
@@ -132,7 +132,7 @@ def test_series_limits(client, payload):
 
 def test_failed_engine_no_child(client, payload, monkeypatch):
     current, _, _ = start(client, payload)
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     assert order(client, current, 'buy', 1).status_code == 503
     assert client.post(f"/paper-plans/{current['plan']['id']}/advance", json={'requestId': uid()}).status_code == 503
     assert len(client.get('/paper-plans').json()) == 1
@@ -174,7 +174,7 @@ def test_advance_retry_is_stored(client, payload, monkeypatch):
     command = {'requestId': uid(), 'months': 1}
     response = client.post(path, json=command)
     assert response.status_code == 201
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     assert client.post(path, json=command).json() == response.json()
     assert client.post(path, json={**command, 'months': 2}).status_code == 409
 
@@ -200,7 +200,7 @@ def test_concurrent_retry_has_one_child(client, payload):
 
 def test_read_survives_new_app_lifespan(client, payload, monkeypatch):
     current, _, _ = start(client, payload)
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     with TestClient(app) as reopened:
         reopened.cookies.update(client.cookies)
         assert reopened.get(f"/paper-runs/{current['run']['id']}").json() == current['run']

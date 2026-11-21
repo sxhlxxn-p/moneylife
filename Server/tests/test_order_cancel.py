@@ -4,7 +4,7 @@ import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from app.main import app
-from app import paper
+from app import paper, paper_store
 from test_paper_trading import start, order, advance
 
 
@@ -74,7 +74,7 @@ def test_retry_is_stored_and_request_id_conflicts_are_rejected(client, payload, 
     first = cancel(client, current, order_id, request_id)
     assert first.status_code == 201
     async def unavailable(*args, **kwargs): raise HTTPException(503, 'ENGINE_UNAVAILABLE')
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     assert cancel(client, current, order_id, request_id).json() == first.json()
     assert cancel(client, current, str(uuid4()), request_id).status_code == 409
     assert cancel(client, first.json(), order_id, request_id).status_code == 409
@@ -105,14 +105,14 @@ def test_cancel_does_not_accept_order_changes(client, payload, extra):
 def test_engine_failure_writes_no_cancellation(client, payload, monkeypatch):
     current, _, _ = start(client, payload)
     current = order(client, current, 'buy', 10).json()
-    original = paper.calculate_investment
+    original = paper_store.calculate_investment
     async def unavailable(*args, **kwargs): raise HTTPException(503, 'ENGINE_UNAVAILABLE')
-    monkeypatch.setattr(paper, 'calculate_investment', unavailable)
+    monkeypatch.setattr(paper_store, 'calculate_investment', unavailable)
     request_id = str(uuid4()); order_id = current['plan']['orders'][0]['id']
     assert cancel(client, current, order_id, request_id).status_code == 503
     assert len(client.get('/paper-plans').json()) == 2
     assert client.get(f"/paper-plans/{current['plan']['id']}").json() == current['plan']
-    monkeypatch.setattr(paper, 'calculate_investment', original)
+    monkeypatch.setattr(paper_store, 'calculate_investment', original)
     assert cancel(client, current, order_id, request_id).status_code == 201
 
 

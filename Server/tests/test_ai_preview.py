@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 from app import llm
 from app.ai_changes import describe_changes
-from app.ai_schemas import ChangeIntent, Extraction, ChangePreview
+from app.condition_schemas import ChangeIntent
+from app.ai_schemas import Extraction, ChangePreview
 
 ROOT = Path(__file__).resolve().parents[2]
 DIALOGUES = json.loads((ROOT/'Test/ai/dialogues-v1.json').read_text())['cases']

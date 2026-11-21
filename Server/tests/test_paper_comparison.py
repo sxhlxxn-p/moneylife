@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app import paper, llm
+from app import paper_store, paper, llm
 from test_paper_trading import start, order, advance
 from test_paper_conditions import change
 
@@ -21,7 +21,7 @@ def test_three_paths_same_month_preserve_all_sources(client, payload, monkeypatc
     c = advance(client, change(client, parent, {'monthlySaving': 0}).json())
     before = client.get('/paper-plans?limit=100').json()
     async def forbidden(*args, **kwargs): raise AssertionError('comparison must not invoke engine/model')
-    monkeypatch.setattr(paper, 'calculate_investment', forbidden)
+    monkeypatch.setattr(paper_store, 'calculate_investment', forbidden)
     monkeypatch.setattr(llm, 'call_response', forbidden)
     response = compare(client, a, b, c)
     assert response.status_code == 200, response.text

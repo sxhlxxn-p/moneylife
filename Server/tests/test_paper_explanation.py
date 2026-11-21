@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from app.main import app
 from app import llm, paper_explanation as explanation
-from app import paper
+from app import paper, paper_store
 from test_paper_trading import start, order, advance
 
 SELECTED = ['comparison', 'pnl', 'goal', 'assumptions']
@@ -30,7 +30,7 @@ def test_basic_zero_month_never_calls_llm_or_engine(client, payload, monkeypatch
     current, _, _ = start(client, payload)
     enabled(monkeypatch)
     monkeypatch.setattr(llm, 'call_response', no_external)
-    monkeypatch.setattr(paper, 'calculate_investment', no_external)
+    monkeypatch.setattr(paper_store, 'calculate_investment', no_external)
     response = client.get(path(current))
     assert response.status_code == 200, response.text
     assert response.json()['source'] == 'template'

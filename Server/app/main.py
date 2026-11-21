@@ -11,8 +11,14 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.database import check_database_connection, close_database_connection, database_kind, prepare_database
+from app.database import (
+    check_database_connection,
+    close_database_connection,
+    database_kind,
+    prepare_database,
+)
 from app.plans import router as plans_router
+from app.session_api import router as session_router
 from app.plan_saves import router as plan_saves_router
 from app.simulations import router as simulations_router
 from app.ai import router as ai_router
@@ -71,7 +77,9 @@ app.add_middleware(
 )
 
 from app.events import router as events_router
+
 app.include_router(events_router)
+app.include_router(session_router)
 app.include_router(plans_router)
 app.include_router(plan_saves_router)
 app.include_router(simulations_router)
@@ -83,24 +91,37 @@ app.include_router(news_games_router)
 app.include_router(news_comparison_router)
 
 
-logger = logging.getLogger('moneylife.requests')
+logger = logging.getLogger("moneylife.requests")
 logger.setLevel(logging.INFO)
 
-@app.middleware('http')
+
+@app.middleware("http")
 async def request_logging(request: Request, call_next):
     request_id = str(uuid4())
     started = time.monotonic()
     try:
         response = await call_next(request)
     except Exception:
-        logger.error('request_id=%s method=%s route=%s status=500', request_id,
-                     request.method, getattr(request.scope.get('route'), 'path', 'unmatched'))
-        return JSONResponse(status_code=500, content={'detail': 'INTERNAL_ERROR'},
-                            headers={'X-Request-ID': request_id})
-    response.headers['X-Request-ID'] = request_id
-    logger.info('request_id=%s method=%s route=%s status=%s duration_ms=%.1f',
-                request_id, request.method, getattr(request.scope.get('route'), 'path', 'unmatched'),
-                response.status_code, (time.monotonic()-started)*1000)
+        logger.error(
+            "request_id=%s method=%s route=%s status=500",
+            request_id,
+            request.method,
+            getattr(request.scope.get("route"), "path", "unmatched"),
+        )
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "INTERNAL_ERROR"},
+            headers={"X-Request-ID": request_id},
+        )
+    response.headers["X-Request-ID"] = request_id
+    logger.info(
+        "request_id=%s method=%s route=%s status=%s duration_ms=%.1f",
+        request_id,
+        request.method,
+        getattr(request.scope.get("route"), "path", "unmatched"),
+        response.status_code,
+        (time.monotonic() - started) * 1000,
+    )
     return response
 
 

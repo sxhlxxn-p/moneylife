@@ -11,8 +11,10 @@ from fastapi import HTTPException
 from sqlalchemy import update
 
 from app import database, llm
-from app.ai_changes import build_candidate, effective, model_context
-from app.ai_schemas import ChangeIntent, Extraction
+from app.ai_changes import model_context
+from app.financial_conditions import build_candidate, effective
+from app.condition_schemas import ChangeIntent
+from app.ai_schemas import Extraction
 from app.models import AIProposal
 from app.schemas import GameState
 from sqlalchemy.ext.asyncio import AsyncSession

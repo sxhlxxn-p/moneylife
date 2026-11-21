@@ -57,17 +57,19 @@ async def close_database_connection() -> None:
 
 def migrate_database(connection):
     config = Config()
-    config.set_main_option('script_location', str(Path(__file__).resolve().parents[1] / 'migrations'))
-    config.attributes['connection'] = connection
-    command.upgrade(config, 'head')
+    config.set_main_option(
+        "script_location", str(Path(__file__).resolve().parents[1] / "migrations")
+    )
+    config.attributes["connection"] = connection
+    command.upgrade(config, "head")
 
 
 async def prepare_database():
-    if os.getenv('AUTO_MIGRATE', 'true').strip().lower() == 'true':
+    if os.getenv("AUTO_MIGRATE", "true").strip().lower() == "true":
         await initialize_database()
         return
     if engine is None:
-        raise RuntimeError('DATABASE_URL is required when automatic migrations are disabled.')
+        raise RuntimeError("DATABASE_URL is required when automatic migrations are disabled.")
     async with engine.connect() as connection:
         await connection.run_sync(verify_schema)
 
@@ -78,11 +80,11 @@ def verify_schema(connection):
 
     config = Config()
     config.set_main_option(
-        'script_location', str(Path(__file__).resolve().parents[1] / 'migrations')
+        "script_location", str(Path(__file__).resolve().parents[1] / "migrations")
     )
     expected = set(ScriptDirectory.from_config(config).get_heads())
     actual = set(MigrationContext.configure(connection).get_current_heads())
     if actual != expected:
         raise RuntimeError(
-            'Database schema is not current. Run the migration command before starting the API.'
+            "Database schema is not current. Run the migration command before starting the API."
         )
