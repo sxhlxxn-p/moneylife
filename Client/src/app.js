@@ -1,33 +1,952 @@
+/* Integrated screen and shared game state. Layout: yebin branch. Author: sxhlxxn. */
+"use strict";
+const escapeHtml = (value) =>
+  String(value).replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+const aliases = { worldtitle: "ml-world-title", worlddesc: "ml-world-desc" };
+const $ = (id) => document.getElementById(aliases[id] || id);
+const defaults = {
+  income: 250,
+  expense: 160,
+  cash: 300,
+  saved: 700,
+  age: 25,
+  name: "나의 첫 번째 인생",
+  target: 5000,
+  avatar: "🌱",
+};
+let start = { ...defaults },
+  month = 0,
+  baseSaving = 70,
+  baseRate = 3,
+  saving = 70,
+  rate = 3,
+  mods = [],
+  rateMods = [],
+  logs = [],
+  events = new Set(),
+  speed = 1,
+  timer = null,
+  focusBefore;
+let goalName = "나만의 공간 마련하기",
+  goalMonths = 60,
+  activePage = "dashboard",
+  mlFinance = {};
+const money = (value) =>
+  Math.round(value * 10000).toLocaleString("ko-KR") + "원";
+const dates = (m) => {
+  const d = new Date(2026, 9 + m, 1);
+  return d.getFullYear() + "년 " + (d.getMonth() + 1) + "월";
+};
+const mlEl = $,
+  mlFormatAmount = (value) => Math.round(value).toLocaleString("ko-KR");
+const mlFormatMan = (value) => mlFormatKoreanWon(Math.round(value * 10000));
+function simulate(ms = mods, rs = rateMods, sv = baseSaving, rt = baseRate) {
+  return GameEngine.simulate({
+    initial: start,
+    changes: ms,
+    rateChanges: rs,
+    monthlySaving: sv,
+    annualRate: rt,
+    months: 120,
+  });
+}
+const mlSimulation = simulate;
+function syncFinance() {
+  mlFinance = {
+    ...start,
+    income: start.income * 10000,
+    expense: start.expense * 10000,
+    cash: start.cash * 10000,
+    saved: start.saved * 10000,
+    goalAmount: start.target * 10000,
+    goalName,
+    goalMonths,
+    annualRate: baseRate,
+  };
+}
+function persist() {
+  try {
+    localStorage.setItem(
+      "money-life-v1",
+      JSON.stringify({
+        start,
+        month,
+        baseSaving,
+        baseRate,
+        saving,
+        rate,
+        mods,
+        rateMods,
+        logs,
+        events: [...events],
+      }),
+    );
+    localStorage.setItem(
+      "money-life-goal-v1",
+      JSON.stringify({ goalName, goalMonths }),
+    );
+  } catch {}
+}
+function log(text) {
+  logs.unshift({ month, text });
+  if (logs.length > 80) logs.pop();
+}
+function stop() {
+  clearInterval(timer);
+  timer = null;
+  if ($("ml-play"))
+    $("ml-play").textContent = month >= 120 ? "여정 완료" : "▶ 시간 시작";
+}
+function toast(message) {
+  $("toast").textContent = message;
+  $("toast").classList.remove("hidden");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => $("toast").classList.add("hidden"), 3500);
+}
+const mlToast = toast;
+function show(html) {
+  stop();
+  focusBefore = document.activeElement;
+  $("modal").innerHTML =
+    '<button class="close" onclick="closeModal()" aria-label="닫기">×</button>' +
+    html;
+  $("overlay").classList.remove("hidden");
+  $("modal").querySelector("button,input")?.focus();
+}
+function closeModal() {
+  $("overlay").classList.add("hidden");
+  if (focusBefore?.isConnected) focusBefore.focus();
+}
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeModal();
+  if (event.key === "Tab" && !$("overlay").classList.contains("hidden")) {
+    const nodes = [
+      ...$("modal").querySelectorAll("button,input,select,textarea,a[href]"),
+    ].filter((node) => !node.disabled);
+    if (event.shiftKey && document.activeElement === nodes[0]) {
+      event.preventDefault();
+      nodes.at(-1)?.focus();
+    } else if (!event.shiftKey && document.activeElement === nodes.at(-1)) {
+      event.preventDefault();
+      nodes[0]?.focus();
+    }
+  }
+});
+function mlShowPage(page) {
+  if (page !== "dashboard") stop();
+  activePage = page;
+  document
+    .querySelectorAll(".ml-page")
+    .forEach((node) =>
+      node.classList.toggle("active", node.id === "ml-page-" + page),
+    );
+  document.querySelectorAll("#ml-main-nav [data-page]").forEach((node) => {
+    const selected = node.dataset.page === page;
+    node.classList.toggle("active", selected);
+    if (selected) {
+      node.setAttribute("aria-current", "page");
+      $("ml-mobile-current").textContent =
+        node.querySelector(".ml-nav-label").textContent;
+    } else node.removeAttribute("aria-current");
+  });
+  $("ml-mobile-toggle").setAttribute("aria-expanded", "false");
+  if (page === "finance") fillFinance();
+  if (page === "settings") {
+    $("ml-setting-saving").value = Math.round(saving * 10000);
+    $("ml-setting-rate").value = rate;
+  }
+}
+function stressChanges() {
+  const path = simulate();
+  return [
+    ...mods,
+    ...Array.from({ length: Math.min(6, 120 - month) }, (_, i) => ({
+      type: "income",
+      v: -Math.min(100, path[month + i + 1].income),
+      m: month + i + 1,
+      end: month + i + 1,
+    })),
+  ];
+}
 
-const escapeHtml=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const $=id=>document.getElementById(id);let start={income:250,expense:160,cash:300,saved:700,age:25,name:'나의 첫 번째 인생',target:5000,avatar:'🌱'},month=0,baseSaving=70,baseRate=3,saving=70,rate=3,mods=[],rateMods=[],logs=[],events=new Set(),playing=false,speed=1,timer,focusBefore;
-const fmt=x=>Math.round(x).toLocaleString('ko-KR'),money=x=>fmt(x)+'만 원';const dates=m=>{const d=new Date(2026,9+m,1);return d.getFullYear()+'년 '+(d.getMonth()+1)+'월';};
-const EV={12:{emoji:'🏡',title:'나만의 공간, 시작해볼까요?',body:'혼자만의 작은 집을 구할 기회가 생겼습니다. 자유로운 일상과 늘어나는 생활비, 당신의 선택은?',a:'지금 독립할래요',ad:'다음 달부터 월 생활비 +30만 원, 일회성 이사 비용 300만 원.',b:'조금 더 준비할래요',bd:'현재의 생활비를 유지하고 목표 자금을 더 모읍니다.',mods:[{type:'expense',v:30},{type:'once',v:300}],mood:'나만의 공간을 선택한 당신.<br>일상에도 새로운 장이 열립니다.'},30:{emoji:'🌿',title:'잠깐 쉬어가도 괜찮을까요?',body:'3개월의 휴식이 가능한 시점입니다. 잠시 일을 내려놓으면 금융 계획은 어떻게 바뀔까요?',a:'나를 위한 휴식',ad:'다음 달부터 3개월 동안 월 소득이 250만 원 감소합니다.',b:'지금의 일상 유지',bd:'휴식으로 인한 소득 변화 없이 계획을 이어갑니다.',mods:[{type:'income',v:-250,duration:3}],mood:'조금 느리게 가는 시간.<br>당신만의 속도를 찾고 있어요.'},48:{emoji:'💼',title:'새로운 기회가 찾아왔어요',body:'새로운 직장의 제안을 받았습니다. 준비 비용이 들지만 월 소득이 늘어납니다.',a:'새로운 도전 시작',ad:'다음 달부터 월 소득 +40만 원, 준비 비용 200만 원.',b:'지금의 자리에서',bd:'현재 직장과 소득을 유지하며 계획을 이어갑니다.',mods:[{type:'income',v:40},{type:'once',v:200}],mood:'새로운 일을 시작합니다.<br>앞으로의 가능성도 넓어져요.'},72:{emoji:'✈️',title:'꿈꿔왔던 여행을 떠날까요?',body:'오랫동안 마음속에 담아둔 여행입니다. 오늘의 경험과 내일의 목표 사이에서 선택해보세요.',a:'지금 떠날래요',ad:'다음 달에 여행 비용 400만 원을 지출합니다.',b:'다음을 기약할래요',bd:'추가 지출 없이 목표 자금을 유지합니다.',mods:[{type:'once',v:400}],mood:'낯선 곳에서 얻은 기억.<br>삶은 숫자보다 더 넓으니까요.'},96:{emoji:'🎓',title:'배움에 투자할 시간',body:'새로운 역량을 배울 수 있는 과정이 열렸습니다. 미래 소득 증가는 가정하지 않고 교육 비용만 반영합니다.',a:'배움을 시작할래요',ad:'다음 달에 교육 비용 200만 원을 지출합니다.',b:'지금 계획을 유지',bd:'현재의 지출과 저축 계획을 유지합니다.',mods:[{type:'once',v:200}],mood:'새로운 것을 배우는 당신.<br>또 다른 내일을 준비합니다.'}};
-function simulate(ms=mods,rs=rateMods,sv=baseSaving,rt=baseRate){return GameEngine.simulate({initial:start,changes:ms,rateChanges:rs,monthlySaving:sv,annualRate:rt,months:120});}
-function hit(path){return GameEngine.goalMonth(path,start.target);}function log(text){logs.unshift({month,text});if(logs.length>80)logs.pop();}
-function persist(){try{localStorage.setItem('money-life-v1',JSON.stringify({start,month,baseSaving,baseRate,saving,rate,mods,rateMods,logs,events:[...events]}));}catch{}}
-function chartSVG(paths,at=month,large=false){const w=large?540:420,h=large?180:127,pad=large?35:25,colors=['#8c75ce','#cdc9d7','#dbb27b'];let vals=paths.flatMap(p=>p.map(x=>x.total)),min=Math.min(0,...vals),max=Math.max(5000,...vals),range=max-min||1;const xy=(v,i)=>`${pad+i/120*(w-pad-10)},${h-22-(v-min)/range*(h-40)}`;let z=[0,.5,1].map(f=>{let v=min+f*range,y=xy(v,0).split(',')[1];return `<line x1="${pad}" x2="${w-10}" y1="${y}" y2="${y}" stroke="#eeeaf3"/><text x="0" y="${+y+3}" font-size="8" fill="#bab1c4">${fmt(v/1000)}천</text>`}).join('');paths.forEach((p,j)=>{z+=`<path d="${p.map((x,i)=>(i?'L':'M')+xy(x.total,i)).join(' ')}" fill="none" stroke="${colors[j]}" stroke-width="${j?1.5:2.5}" ${j?'stroke-dasharray="4 4"':''}/>`;});let [x,y]=xy(paths[0][at].total,at).split(',');return z+`<line x1="${x}" x2="${x}" y1="10" y2="${h-22}" stroke="#c7b5e3" stroke-dasharray="3 4"/><circle cx="${x}" cy="${y}" r="4" fill="#8c75ce" stroke="white" stroke-width="2"/><text x="${pad}" y="${h-4}" font-size="8" fill="#b2a8bf">${start.age}세</text><text x="${w-27}" y="${h-4}" font-size="8" fill="#b2a8bf">${start.age+10}세</text>`;}
-function render(){let path=simulate(),s=path[month],goal=Math.max(0,s.total),pct=Math.min(100,goal/start.target*100),h=hit(path);for(const [id,val]of Object.entries({asset:s.total,cash:s.cash,income:s.income,expense:s.expense}))$(id).innerHTML=fmt(val)+'<small>만 원</small>';$('date').textContent=dates(month);$('season').textContent=['겨울','겨울','봄','봄','봄','여름','여름','여름','가을','가을','가을','겨울'][(9+month)%12];$('monthlabel').textContent=month+' / 120개월';$('age').textContent=start.age+Math.floor(month/12);$('profileage').textContent=start.age+Math.floor(month/12);$('goalcurrent').textContent=fmt(goal);$('target').textContent=fmt(start.target);$('goalpct').textContent=Math.round(pct)+'%';$('goalbar').style.width=pct+'%';$('timeprogress').style.width=month/120*100+'%';$('eta').textContent=h<0?'기간 내 목표 미도달':h<=month?'첫 번째 목표에 도달했어요!':'목표까지 '+Math.floor((h-month)/12)+'년 '+(h-month)%12+'개월';$('chart').innerHTML=chartSVG([path,simulate([],[])]);$('log').innerHTML=logs.slice(0,5).map(x=>`<div class="entry"><small>${dates(x.month)}</small><p>${escapeHtml(x.text)}</p></div>`).join('');$('health').textContent=s.short?'지출 부족 발생':s.cash<300?'비상금 확인 필요':'차근차근 안정적으로';$('health').style.background=s.short?'#fbe9e6':'#eaf4eb';$('health').style.color=s.short?'#bc7a70':'#669776';$('username').textContent=start.name;$('profilename').textContent=start.name;$('topavatar').textContent=start.avatar;$('profileavatar').textContent=start.avatar;$('character').setAttribute('transform',`translate(${450+Math.sin(month/120*Math.PI)*100} ${342-Math.sin(month/120*Math.PI)*18})`);document.querySelectorAll('#milestones span').forEach((x,i)=>{x.textContent=[start.age+'세 출발',start.age+1+'세 독립',start.age+4+'세 이직',start.age+6+'세 여행',start.age+10+'세 다음 장'][i];x.classList.toggle('reached',month>=[0,12,48,72,120][i]);});const next=Object.keys(EV).map(Number).find(m=>m>month&&!events.has(m));if(next){$('nexttitle').innerHTML=EV[next].title;$('nextdesc').textContent=(start.age+Math.floor(next/12))+'세에 만나는 선택. 현재 조건으로 다음 순간까지 살아볼까요?';$('nextbtn').textContent='다음 순간 만나보기 →';}else{$('nexttitle').textContent='당신의 10년이 쌓였어요';$('nextdesc').textContent='끝까지 살아보거나 다른 선택의 미래를 비교해보세요.';$('nextbtn').textContent='10년의 끝으로 →';}const ch=month<12?1:month<48?2:month<96?3:4;$('chapter').textContent=`CHAPTER 0${ch} · `+['새로운 출발','나만의 일상','선택이 쌓이는 시간','다음 장을 준비하며'][ch-1];persist();}
-function stop(){playing=false;clearInterval(timer);$('play').textContent=month>=120?'여정 완료':'▶ 시간 시작';}function toggle(){if(playing)stop();else if(month<120){playing=true;$('play').textContent='Ⅱ 잠시 멈춤';timer=setInterval(()=>step(false),1500/speed);}}
-function setSpeed(n,b){speed=n;document.querySelectorAll('#speeds .speed').forEach(x=>x.classList.remove('on'));b.classList.add('on');if(playing){stop();toggle();}}
-function step(manual){if(manual)stop();if(EV[month]&&!events.has(month)){stop();eventPreview(month);return;}if(month>=120)return;month++;render();if(EV[month]&&!events.has(month)){stop();eventPreview(month);}if(month===120){stop();$('worldtitle').innerHTML='당신만의 10년이<br>한 편의 이야기가 되었어요.';$('worlddesc').textContent='다른 선택으로 다시 살아보거나 지나온 기록을 확인해보세요.';log('10년의 여정을 마쳤습니다.');render();compare();}}
-function nextEvent(){stop();if(EV[month]&&!events.has(month)){eventPreview(month);return;}if(month>=120){compare();return;}const n=Object.keys(EV).map(Number).find(m=>m>month&&!events.has(m))||120;month=n;render();if(EV[n])eventPreview(n);else{log('10년의 여정을 마쳤습니다.');render();compare();}}
-function show(html){stop();focusBefore=document.activeElement;$('modal').innerHTML='<button class="close" onclick="closeModal()" aria-label="닫기">×</button>'+html;$('overlay').classList.remove('hidden');$('modal').querySelector('button').focus();}
-function closeModal(){$('overlay').classList.add('hidden');if(focusBefore&&focusBefore.focus)focusBefore.focus();}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Tab'&&!$('overlay').classList.contains('hidden')){const f=[...$('modal').querySelectorAll('button,input')].filter(x=>!x.disabled);if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus();}}});
-function eventMods(m){return EV[m].mods.map(x=>({...x,m:month+1,end:x.duration?month+x.duration:null}));}
-function eventPreview(m){const e=EV[m];if(month<m){show(`<div class="eyebrow">A FUTURE LIFE MOMENT</div><h2>${e.emoji} ${e.title}</h2><p>${e.body}</p><p class="note">${dates(m)}에 찾아오는 예시 이벤트입니다. 현재 시점에서 바로 선택하지 않고 해당 시점으로 이동합니다.</p><div class="modalactions"><button class="btn" onclick="closeModal()">지금의 일상으로</button><button class="btn primary" onclick="month=${m};render();eventPreview(${m})">이 시점으로 이동 →</button></div>`);return;}if(events.has(m)){toast('이미 지나온 선택이에요. 나의 기록에서 확인할 수 있어요.');return;}const base=simulate(),withEvent=simulate([...mods,...eventMods(m)]),impact=withEvent[month+1].total-base[month+1].total;show(`<div class="eyebrow">A CHOICE THAT SHAPES YOUR LIFE · ${dates(month)}</div><h2>${e.emoji} ${e.title}</h2><p>${e.body}</p><div class="eventoptions"><button class="choice" onclick="choose(${m},true)"><span class="emoji">${e.emoji}</span><strong>${e.a}</strong><small>${e.ad}</small><span class="impact">다음 달 순자산 ${impact>=0?'+':''}${money(impact)}</span></button><button class="choice" onclick="choose(${m},false)"><span class="emoji">🌱</span><strong>${e.b}</strong><small>${e.bd}</small><span class="impact">추가 변화 없이 계획 유지</span></button></div><p class="note">금액은 예시 가정입니다. 선택은 다음 달부터 반영되며 현금이 부족하면 미충족 지출을 기록합니다.</p>`);}
-function choose(m,yes){if(events.has(m))return;events.add(m);if(yes)mods.push(...eventMods(m));log((start.age+Math.floor(month/12))+'세, '+(yes?EV[m].a:EV[m].b));$('worldtitle').innerHTML=yes?EV[m].mood:'지금의 일상을 이어가며<br>다음 기회를 준비합니다.';$('worlddesc').textContent='이 선택은 다음 달부터 금융 계획에 반영돼요.';closeModal();render();toast('선택을 기록했어요. 시간을 이어서 진행해보세요.');}
-function compare(){const cur=simulate(),base=simulate([],[]),from=Math.min(120,month+1),stress=simulate([...mods,{m:from,end:Math.min(120,from+5),type:'income',v:-100}]);const timing=p=>{let h=hit(p);return h<0?'기간 내 미달성':dates(h);};show(`<div class="eyebrow">SAME BEGINNING, DIFFERENT POSSIBILITIES</div><h2>다르게 선택했다면,<br>어떤 미래가 기다릴까요?</h2><p>현재 설정을 기준으로 계산한 ${start.age+10}세의 순자산입니다.</p><div class="comparecards">${[[base,'처음의 계획',''],[cur,'나의 선택','em'],[stress,'소득 공백 가정','']].map(([p,n,c])=>`<div class="comparecard ${c}"><label>${n}</label><strong>${money(p[120].total)}</strong><p>목표 도달<br>${timing(p)}</p><p style="margin-top:8px">지출 부족 ${p.filter(x=>x.short>0).length}개월</p></div>`).join('')}</div><svg class="comparisonchart" viewBox="0 0 540 180" aria-label="세 계획의 미래 자산 비교">${chartSVG([cur,base,stress],month,true)}</svg><p>나의 선택은 처음 계획보다 최종 순자산이 <strong>${money(Math.abs(cur[120].total-base[120].total))}</strong> ${cur[120].total>=base[120].total?'높습니다':'낮습니다'}.</p><p class="note">소득 공백 가정은 다음 달부터 최대 6개월간 월 소득 100만 원 감소를 추가한 경로입니다. 최악의 모든 결과를 뜻하지 않습니다. 목표는 현금과 저축에서 미충족 지출을 뺀 총자산 기준입니다. 비상금 경고는 별도로 표시합니다.</p><div class="modalactions"><button class="btn primary" onclick="closeModal()">나의 마을로 돌아가기</button></div>`);}
-function assets(){let s=simulate()[month];show(`<div class="eyebrow">MY WALLET</div><h2>내 자산을 차근차근 살펴봐요</h2><div class="assumptions"><div><small>가용 현금</small><strong>${money(s.cash)}</strong></div><div><small>저축 잔액</small><strong>${money(s.saved)}</strong></div><div><small>미충족 지출 누적</small><strong>${money(s.unpaid)}</strong></div><div><small>순자산</small><strong>${money(s.total)}</strong></div></div><div class="range"><label>다음 달부터 월 저축액 <strong id="savPreview">${money(saving)}</strong></label><input id="savInput" aria-label="월 저축액" type="number" min="0" max="1000000" step="0.0001" value="${saving}" oninput="$('savPreview').textContent=money(+this.value)"></div><div class="range"><label>다음 달부터 연 저축 수익률 <strong id="ratePreview">${rate}%</strong></label><input id="rateInput" aria-label="연 수익률" type="range" min="0" max="8" step="0.5" value="${rate}" oninput="$('ratePreview').textContent=this.value+'%'"></div><p class="note">저축은 현금의 이동이며 이체만으로 순자산이 늘지 않습니다. 실제 계좌·투자 수익률은 연결되지 않았습니다.</p><div class="modalactions"><button class="btn" onclick="closeModal()">취소</button><button class="btn primary" onclick="updateAssets()">조건 변경 적용</button></div>`);}
-function updateAssets(){if(month>=120){toast('완료한 여정은 시작 설정에서 다시 시작할 수 있어요.');return;}let nextSaving=+$('savInput').value;if($('savInput').value.trim()===''||!Number.isFinite(nextSaving)||nextSaving<0||nextSaving>1000000){toast('저축액은 0~100억원 범위에서 입력해주세요.');return;}saving=nextSaving;rate=+$('rateInput').value;mods.push({type:'saving',v:saving,m:month+1});rateMods.push({v:rate,m:month+1});log(`저축 ${money(saving)}, 연 수익률 ${rate}%로 다음 달 조건을 변경했습니다.`);closeModal();render();}
-function journal(){show(`<div class="eyebrow">MY LIFE RECORD</div><h2>선택은 이야기가 됩니다.</h2><p>지금까지 살아온 ${month}개월의 기록이에요.</p><div>${logs.map(x=>`<div class="entry"><small>${dates(x.month)}</small><p>${escapeHtml(x.text)}</p></div>`).join('')}</div><div class="modalactions"><button class="btn primary" onclick="closeModal()">나의 일상으로</button></div>`);}
-function ask(){return askServer();}
-function customEvent(){show(`<div class="eyebrow">AN UNEXPECTED MOMENT</div><h2>계획에 없던 지출도<br>미리 경험할 수 있어요.</h2><p>가전 구매나 이사 준비 등 일회성 비용을 다음 달에 반영합니다.</p><div class="fields"><label>지출 금액 · 만 원<input id="costInput" type="number" min="1" max="100000" value="200"></label><label>적용 시점<input value="다음 달" disabled></label></div><p id="err" class="note">지출로 인한 현금 부족도 계산합니다.</p><div class="modalactions"><button class="btn" onclick="closeModal()">취소</button><button class="btn primary" onclick="applyCost()">지출 반영하기</button></div>`);}
-function applyCost(){let v=Number($('costInput').value);if(!Number.isFinite(v)||v<=0||v>100000||month>=120){$('err').textContent='진행 중인 여정에서 1~100,000만 원을 입력해주세요.';return;}mods.push({type:'once',v,m:month+1});log(`다음 달에 ${money(v)}의 일회성 지출을 추가했습니다.`);closeModal();render();}
-function settings(){show(`<div class="eyebrow">CREATE YOUR NEXT CHAPTER</div><h2>당신의 이야기는<br>어디에서 시작하나요?</h2><p>변경한 조건으로 새로운 여정을 시작합니다. 현재 기록은 초기화됩니다.</p><div class="fields"><label class="wide">나의 이름<input id="nameIn" maxlength="20" value="" placeholder="예: 차근차근 모으는 나"></label><label>시작 나이<input id="ageIn" type="number" min="18" max="80" value="${start.age}"></label><label>목표 자금 · 만 원<input id="targetIn" type="number" min="1" value="${start.target}"></label><label>월 순소득 · 만 원<input id="incomeIn" type="number" min="0" value="${start.income}"></label><label>월 생활비 · 만 원<input id="expenseIn" type="number" min="0" value="${start.expense}"></label><label>초기 현금 · 만 원<input id="cashIn" type="number" min="0" value="${start.cash}"></label><label>초기 저축 · 만 원<input id="savedIn" type="number" min="0" value="${start.saved}"></label><label>월 저축 이체 · 만 원<input id="savingIn" type="number" min="0" value="${baseSaving}"></label><label>연 유효 수익률 · %<input id="rateIn" type="number" min="0" max="8" step="0.5" value="${baseRate}"></label></div><p id="err" class="note">진행 상태는 이 기기에 저장하며, 서버 저장 버튼으로 사본을 남길 수 있습니다. 예시 조건이며 실제 금융 데이터가 아닙니다.</p><div class="modalactions"><button class="btn" onclick="closeModal()">돌아가기</button><button class="btn primary" onclick="restart()">이 조건으로 새로 시작 →</button></div>`);$('nameIn').value=start.name;}
-function restart(){let ids=['ageIn','targetIn','incomeIn','expenseIn','cashIn','savedIn','savingIn','rateIn'],v=ids.map(id=>Number($(id).value));if(v.some((x,i)=>!Number.isFinite(x)||$(ids[i]).value.trim()===''||x<0||x>1000000)||v[0]<18||v[0]>80||!Number.isInteger(v[0])||v[1]<1||v[7]>8){$('err').textContent='나이 18~80세, 양수 목표, 수익률 0~8%, 유효한 금액을 입력해주세요.';return;}start={...start,name:$('nameIn').value.trim()||'나의 첫 번째 인생',age:v[0],target:v[1],income:v[2],expense:v[3],cash:v[4],saved:v[5]};baseSaving=saving=v[6];baseRate=rate=v[7];month=0;mods=[];rateMods=[];events=new Set();logs=[];serverPlanId=null;try{localStorage.removeItem('money-life-server-plan');}catch{}$('serverstatus').textContent='새 조건은 아직 서버에 저장하지 않았어요.';log('새로운 10년의 여정을 시작합니다.');$('worldtitle').innerHTML='작은 시작에도<br>커다란 가능성이 있어요.';$('worlddesc').textContent='오늘은 어떤 미래를 만들어볼까요?';closeModal();render();toggle();}
-function toast(s){$('toast').textContent=s;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),3500);}
-function welcome(resume=false){show(`<div class="eyebrow">WELCOME TO MONEY LIFE</div><h2>돈을 모으는 시간도,<br>당신의 인생이니까요.</h2><p>작은 마을에서 일하고, 독립하고, 쉬어가며 10년을 살아보세요. 오늘의 선택이 만드는 미래를 직접 경험할 수 있어요.</p><div class="setupinfo"><div><small>시작 나이</small><strong>${start.age}세</strong></div><div><small>초기 자산</small><strong>${money(start.cash+start.saved)}</strong></div><div><small>플레이 기간</small><strong>10년</strong></div></div><div class="modalactions"><button class="btn" onclick="settings()">시작 조건 설정</button><button class="btn primary" onclick="closeModal();toggle()">${resume?'저장된 여정 이어하기':'예시로 시작하기'} →</button></div><p class="note">디자인·개발용 프로토타입 · 이 기기에 진행 상태 저장 · 실제 계좌 미연결 · AI는 서버 설정 필요</p>`);}
-let resumed=false;try{const x=JSON.parse(localStorage.getItem('money-life-v1'));if(x&&Number.isInteger(x.month)&&x.month>=0&&x.month<=120&&Array.isArray(x.mods)){start=x.start;month=x.month;baseSaving=x.baseSaving;baseRate=x.baseRate;saving=x.saving;rate=x.rate;mods=x.mods;rateMods=x.rateMods;logs=x.logs;events=new Set(x.events);resumed=true;}}catch{}if(!logs.length)log('25세, 새로운 일상을 시작합니다.');render();welcome(resumed);
-/* Money Life browser client. Game UI, state, and API calls belong in client. */
+const EV = {
+  12: {
+    emoji: "🏡",
+    title: "나만의 공간, 시작해볼까요?",
+    body: "혼자만의 작은 집을 구할 기회가 생겼습니다. 자유로운 일상과 늘어나는 생활비, 당신의 선택은?",
+    a: "지금 독립할래요",
+    ad: "다음 달부터 월 생활비 +30만 원, 일회성 이사 비용 300만 원.",
+    b: "조금 더 준비할래요",
+    bd: "현재의 생활비를 유지하고 목표 자금을 더 모읍니다.",
+    mods: [
+      { type: "expense", v: 30 },
+      { type: "once", v: 300 },
+    ],
+    mood: "나만의 공간을 선택한 당신.<br>일상에도 새로운 장이 열립니다.",
+  },
+  30: {
+    emoji: "🌿",
+    title: "잠깐 쉬어가도 괜찮을까요?",
+    body: "3개월의 휴식이 가능한 시점입니다. 잠시 일을 내려놓으면 금융 계획은 어떻게 바뀔까요?",
+    a: "나를 위한 휴식",
+    ad: "다음 달부터 3개월 동안 소득을 0원으로 가정합니다.",
+    b: "지금의 일상 유지",
+    bd: "휴식으로 인한 소득 변화 없이 계획을 이어갑니다.",
+    mods: [{ type: "income", v: -250, duration: 3 }],
+    mood: "조금 느리게 가는 시간.<br>당신만의 속도를 찾고 있어요.",
+  },
+  48: {
+    emoji: "💼",
+    title: "새로운 기회가 찾아왔어요",
+    body: "새로운 직장의 제안을 받았습니다. 준비 비용이 들지만 월 소득이 늘어납니다.",
+    a: "새로운 도전 시작",
+    ad: "다음 달부터 월 소득 +40만 원, 준비 비용 200만 원.",
+    b: "지금의 자리에서",
+    bd: "현재 직장과 소득을 유지하며 계획을 이어갑니다.",
+    mods: [
+      { type: "income", v: 40 },
+      { type: "once", v: 200 },
+    ],
+    mood: "새로운 일을 시작합니다.<br>앞으로의 가능성도 넓어져요.",
+  },
+  72: {
+    emoji: "✈️",
+    title: "꿈꿔왔던 여행을 떠날까요?",
+    body: "오랫동안 마음속에 담아둔 여행입니다. 오늘의 경험과 내일의 목표 사이에서 선택해보세요.",
+    a: "지금 떠날래요",
+    ad: "다음 달에 여행 비용 400만 원을 지출합니다.",
+    b: "다음을 기약할래요",
+    bd: "추가 지출 없이 목표 자금을 유지합니다.",
+    mods: [{ type: "once", v: 400 }],
+    mood: "낯선 곳에서 얻은 기억.<br>삶은 숫자보다 더 넓으니까요.",
+  },
+  96: {
+    emoji: "🎓",
+    title: "배움에 투자할 시간",
+    body: "새로운 역량을 배울 수 있는 과정이 열렸습니다. 미래 소득 증가는 가정하지 않고 교육 비용만 반영합니다.",
+    a: "배움을 시작할래요",
+    ad: "다음 달에 교육 비용 200만 원을 지출합니다.",
+    b: "지금 계획을 유지",
+    bd: "현재의 지출과 저축 계획을 유지합니다.",
+    mods: [{ type: "once", v: 200 }],
+    mood: "새로운 것을 배우는 당신.<br>또 다른 내일을 준비합니다.",
+  },
+};
+
+function mlFormatKoreanWon(value) {
+  let remainder = Math.round(Math.abs(value));
+  const parts = [];
+  for (const [size, unit] of [
+    [1e12, "조"],
+    [1e8, "억"],
+    [1e4, "만"],
+  ]) {
+    const count = Math.floor(remainder / size);
+    if (count) parts.push(mlFormatAmount(count) + unit);
+    remainder %= size;
+  }
+  const sign = value < 0 && (parts.length || remainder) ? "−" : "";
+  parts.push(
+    remainder || !parts.length ? mlFormatAmount(remainder) + "원" : "원",
+  );
+  return sign + parts.join(" ");
+}
+function mlFormatDuration(months) {
+  const years = Math.floor(months / 12);
+  const remaining = months % 12;
+  return [years ? years + "년" : "", remaining ? remaining + "개월" : ""]
+    .filter(Boolean)
+    .join(" ");
+}
+function mlCompareNetWorth(difference, baseline) {
+  if (Math.round(Math.abs(difference)) === 0) return baseline + "과 같아요.";
+  return (
+    baseline +
+    "보다 " +
+    mlFormatMan(Math.abs(difference)) +
+    (difference < 0 ? " 낮아요." : " 높아요.")
+  );
+}
+function mlGoalMonth(path) {
+  return path.findIndex((point) => point.total >= mlFinance.goalAmount / 10000);
+}
+function mlShowGoalDeadline(id, hit, prefix = "") {
+  const label = mlEl(id);
+  const delay = hit - mlFinance.goalMonths;
+  label.dataset.goalStatus =
+    hit < 0 ? "unreached" : delay > 0 ? "late" : "on-time";
+  label.textContent =
+    prefix +
+    (hit < 0
+      ? "10년 내 미도달"
+      : delay > 0
+        ? delay + "개월 초과"
+        : "기한 내 도달");
+}
+function mlCompareGoalTiming(base, current) {
+  if (base < 0 && current < 0) return "두 계획 모두 10년 내 미도달";
+  if (base < 0) return "내 선택만 10년 내 도달";
+  if (current < 0) return "처음 계획만 10년 내 도달";
+  const difference = current - base;
+  if (difference === 0) return "같은 시점에 도달";
+  return (
+    mlFormatDuration(Math.abs(difference)) +
+    (difference > 0 ? " 늦어짐" : " 빨라짐")
+  );
+}
+function mlDrawChart(svgId, paths, large = false) {
+  const svg = mlEl(svgId);
+  const width = large ? 520 : 420;
+  const height = large ? 250 : 127;
+  const pad = {
+    left: large ? 106 : 46,
+    right: 15,
+    top: large ? 18 : 14,
+    bottom: large ? 30 : 25,
+  };
+  const all = paths.flatMap((path) => path.map((point) => point.total));
+  let minimum = Math.min(0, ...all) * 1.12;
+  let maximum =
+    Math.max(large ? 0 : mlFinance.goalAmount / 10000, ...all, 1) * 1.12;
+  let tickCount = 3;
+  if (large) {
+    const desiredStep = Math.max(1, (maximum - minimum) / 5);
+    const unit = 10 ** Math.floor(Math.log10(desiredStep));
+    const step =
+      [1, 2, 5, 10].find((factor) => desiredStep <= factor * unit * 1.5) * unit;
+    minimum = Math.floor(minimum / step) * step;
+    maximum = Math.ceil(maximum / step) * step;
+    tickCount = Math.round((maximum - minimum) / step);
+  }
+  const x = (month) =>
+    pad.left + (month / 120) * (width - pad.left - pad.right);
+  const y = (value) =>
+    height -
+    pad.bottom -
+    ((value - minimum) / (maximum - minimum)) * (height - pad.top - pad.bottom);
+  let html = "";
+  for (let i = 0; i <= tickCount; i++) {
+    const value = minimum + ((maximum - minimum) * i) / tickCount;
+    html +=
+      '<line x1="' +
+      pad.left +
+      '" y1="' +
+      y(value) +
+      '" x2="' +
+      (width - pad.right) +
+      '" y2="' +
+      y(value) +
+      '" stroke="#eeeaf3" stroke-dasharray="3 4"/>';
+    if (large)
+      html +=
+        '<text class="ml-chart-axis-label" x="' +
+        (pad.left - 8) +
+        '" y="' +
+        y(value) +
+        '" text-anchor="end" dominant-baseline="middle">' +
+        mlFormatKoreanWon(value * 10000).replace(/ ?원$/, "") +
+        "</text>";
+  }
+  const goal = mlFinance.goalAmount / 10000;
+  const showGoal = large && goal <= maximum;
+  if (showGoal) {
+    html +=
+      '<line class="ml-chart-goal ml-series-goal" x1="' +
+      pad.left +
+      '" y1="' +
+      y(goal) +
+      '" x2="' +
+      (width - pad.right) +
+      '" y2="' +
+      y(goal) +
+      '" stroke-dasharray="8 4"/>';
+  }
+  const series = ["current", "base", "stress"];
+  const dashes = ["none", "5 4", "1 4"];
+  paths.forEach((path, index) => {
+    const points = path
+      .map((point, month) => x(month) + "," + y(point.total))
+      .join(" ");
+    html +=
+      '<polyline class="ml-series-' +
+      series[index] +
+      '" points="' +
+      points +
+      '" fill="none" stroke-width="' +
+      (index === 0 ? 2.7 : 1.8) +
+      '" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="' +
+      dashes[index] +
+      '"/>';
+  });
+  const current = paths[0][Math.min(month, 120)];
+  html +=
+    '<line x1="' +
+    x(month) +
+    '" x2="' +
+    x(month) +
+    '" y1="' +
+    pad.top +
+    '" y2="' +
+    (height - pad.bottom) +
+    '" stroke="#c7b5e3" stroke-dasharray="3 4"/>';
+  html +=
+    '<circle cx="' +
+    x(month) +
+    '" cy="' +
+    y(current.total) +
+    '" r="4" fill="#8c75ce" stroke="white" stroke-width="2"/>';
+  const milestones = large ? [0, 24, 48, 72, 96, 120] : [0, 120];
+  milestones.forEach((month) => {
+    const anchor = month === 0 ? "start" : month === 120 ? "end" : "middle";
+    const label = month === 0 ? "시작" : month / 12 + "년";
+    html +=
+      '<text class="ml-chart-axis-label" x="' +
+      x(month) +
+      '" y="' +
+      (height - 8) +
+      '" text-anchor="' +
+      anchor +
+      '">' +
+      label +
+      "</text>";
+  });
+  svg.innerHTML = html;
+  return showGoal;
+}
+function mlRenderGoal() {
+  mlEl("ml-goal-name").value = mlFinance.goalName;
+  mlEl("ml-goal-amount").value = mlFormatAmount(mlFinance.goalAmount);
+  mlEl("ml-goal-months").value = mlFinance.goalMonths;
+
+  const path = mlSimulation();
+  const state = path[month];
+  mlEl("ml-goal-current-page").textContent = mlFormatMan(state.total);
+  mlEl("ml-goal-target-page").textContent = mlFormatKoreanWon(
+    mlFinance.goalAmount,
+  );
+  const pct = Math.max(
+    0,
+    Math.min(100, (state.total / (mlFinance.goalAmount / 10000)) * 100),
+  );
+  mlEl("ml-goal-bar-page").style.width = pct + "%";
+  const hit = mlGoalMonth(path);
+  mlEl("ml-goal-deadline").textContent = mlFinance.goalMonths + "개월차";
+  mlEl("ml-goal-status").textContent =
+    hit < 0 ? "10년 내 미도달" : hit === 0 ? "시작 시점" : hit + "개월차";
+  mlShowGoalDeadline("ml-goal-deadline-status", hit);
+}
+function mlRenderReport() {
+  const base = mlSimulation([], [], baseSaving);
+  const current = mlSimulation();
+  const stressMonths = Math.min(6, 120 - month);
+  const stress = simulate(stressChanges());
+  const goalAmount = mlFormatKoreanWon(mlFinance.goalAmount);
+  const goalMonths = {
+    base: mlGoalMonth(base),
+    current: mlGoalMonth(current),
+    stress: mlGoalMonth(stress),
+  };
+  mlEl("ml-report-goal-amount").textContent = goalAmount;
+  mlEl("ml-report-goal-deadline").textContent = mlFinance.goalMonths + "개월차";
+  mlEl("ml-report-stress-description").textContent =
+    stressMonths > 0
+      ? "내 선택에 " +
+        (month + 1) +
+        "개월차부터 " +
+        stressMonths +
+        "개월간 월 소득 최대 100만 원 감소를 추가한 경우"
+      : "10년 진행이 끝나 내 선택과 같아요.";
+  Object.entries({ base, current, stress }).forEach(([id, path]) => {
+    const hit = goalMonths[id];
+    mlEl("ml-report-" + id).textContent = mlFormatKoreanWon(
+      Math.round(path[120].total) * 10000,
+    );
+    mlEl("ml-report-" + id + "-goal").textContent =
+      hit < 0
+        ? "10년 내 미도달"
+        : hit === 0
+          ? "시작 시점"
+          : "시작 후 " + mlFormatDuration(hit);
+    const month = mlEl("ml-report-" + id + "-month");
+    month.textContent = hit > 0 ? hit + "개월차" : "";
+    month.hidden = hit <= 0;
+    mlShowGoalDeadline("ml-report-" + id + "-deadline", hit);
+    const shortage = mlEl("ml-report-" + id + "-shortage");
+    const shortageMonths = path.flatMap((state, index) =>
+      Math.round(state.short * 10000) > 0 ? [index] : [],
+    );
+    shortage.toggleAttribute("data-shortage", shortageMonths.length > 0);
+    shortage.querySelector("span").textContent = shortageMonths.length
+      ? shortageMonths.length + "개월 발생"
+      : "없음";
+    shortage.querySelector("small").textContent = shortageMonths.length
+      ? "첫 부족 " +
+        shortageMonths[0] +
+        "개월차 · 미충족 지출 누적 " +
+        mlFormatKoreanWon(path[120].unpaid * 10000)
+      : "";
+  });
+  const difference =
+    Math.round(current[120].total) - Math.round(base[120].total);
+  mlEl("ml-report-net-difference").textContent =
+    difference === 0
+      ? "차이 없음"
+      : mlFormatKoreanWon(Math.abs(difference) * 10000) +
+        (difference < 0 ? " 감소" : " 증가");
+  mlEl("ml-report-goal-difference").textContent = mlCompareGoalTiming(
+    goalMonths.base,
+    goalMonths.current,
+  );
+  const showGoal = mlDrawChart(
+    "ml-report-chart",
+    [current, base, stress],
+    true,
+  );
+  const goalLegend = mlEl("ml-report-goal-legend");
+  const chartNote = mlEl("ml-report-chart-note");
+  goalLegend.hidden = !showGoal;
+  goalLegend.textContent = showGoal ? "목표 " + goalAmount : "";
+  chartNote.hidden = showGoal;
+  chartNote.textContent = showGoal
+    ? ""
+    : "목표 " + goalAmount + "은 차트의 표시 범위보다 높아요.";
+}
+
+function render() {
+  syncFinance();
+  const path = simulate(),
+    row = path[month],
+    goal = mlGoalMonth(path);
+  for (const [id, value] of Object.entries({
+    "ml-game-net": row.total,
+    "ml-game-income": row.income,
+    "ml-game-expense": row.expense,
+    "ml-game-cash": row.cash,
+    "ml-game-goal-current": row.total,
+  }))
+    $(id).textContent = money(value);
+  $("ml-user-name").textContent = start.name;
+  $("ml-user-avatar").textContent = start.avatar;
+  $("ml-profile-name").textContent = start.name;
+  $("ml-profile-avatar").textContent = start.avatar;
+  $("ml-profile-age").textContent = start.age + Math.floor(month / 12);
+  $("ml-game-date").textContent = dates(month);
+  $("ml-game-month-label").textContent = month + " / 120개월";
+  $("ml-game-age").textContent = start.age + Math.floor(month / 12) + "세";
+  $("ml-time-progress").style.width = (month / 120) * 100 + "%";
+  $("ml-game-goal-name").textContent = goalName;
+  $("ml-game-goal-target").textContent = money(start.target);
+  $("ml-game-goal-bar").style.width =
+    Math.max(0, Math.min(100, (row.total / start.target) * 100)) + "%";
+  $("ml-game-goal-eta").textContent =
+    goal < 0
+      ? "기간 내 목표 미도달"
+      : goal <= month
+        ? "첫 번째 목표에 도달했어요!"
+        : "목표까지 " + (goal - month) + "개월";
+  mlShowGoalDeadline("ml-game-goal-deadline", goal);
+  $("ml-game-health").textContent =
+    row.short > 0
+      ? "생활비 부족 발생"
+      : row.cash < 300
+        ? "비상금 확인 필요"
+        : "차근차근 안정적으로";
+  $("ml-game-chart-current").textContent = "현재 " + money(row.total);
+  mlDrawChart("ml-game-chart", [path, simulate([], [])]);
+  $("ml-game-log").replaceChildren();
+  for (const item of logs.slice(0, 5)) {
+    const line = document.createElement("p");
+    line.textContent = dates(item.month) + " · " + item.text;
+    $("ml-game-log").append(line);
+  }
+  const next = Object.keys(EV)
+    .map(Number)
+    .find((m) => m >= month && !events.has(m));
+  $("ml-event-title").textContent = next
+    ? EV[next].title
+    : "당신의 10년이 쌓였어요";
+  $("ml-event-desc").textContent = next
+    ? dates(next) + "에 만나는 선택이에요."
+    : "다른 선택과 비교해보세요.";
+  $("ml-event-yes").textContent = next ? "이벤트 만나보기" : "분석 리포트 보기";
+  $("ml-event-later").textContent = "시간 계속 진행";
+  $("ml-one-month").disabled = month >= 120;
+  for (const [i, node] of [...$("ml-milestones").children].entries())
+    node.textContent = [
+      start.age + "세 출발",
+      start.age + 1 + "세 독립",
+      start.age + 4 + "세 이직",
+      start.age + 6 + "세 여행",
+      start.age + 10 + "세 다음 장",
+    ][i];
+  const assets = $("ml-live-assets");
+  assets.replaceChildren();
+  for (const [label, value] of [
+    ["가용 현금", row.cash],
+    ["예금·저축", row.saved],
+    ["미충족 생활비 누적", row.unpaid],
+    ["순자산", row.total],
+  ]) {
+    const item = document.createElement("div");
+    item.className = "ml-summary-row";
+    const title = document.createElement("span");
+    title.textContent = label;
+    const amount = document.createElement("strong");
+    amount.textContent = money(value);
+    item.append(title, amount);
+    assets.append(item);
+  }
+  mlRenderGoal();
+  mlRenderReport();
+  persist();
+}
+function eventMods(m) {
+  if (m !== 30)
+    return EV[m].mods.map((value) => ({ ...value, m: month + 1, end: null }));
+  const path = simulate();
+  return Array.from({ length: Math.min(3, 120 - month) }, (_, i) => ({
+    type: "income",
+    v: -path[month + i + 1].income,
+    m: month + i + 1,
+    end: month + i + 1,
+  }));
+}
+function eventPreview(m) {
+  if (events.has(m)) return;
+  const event = EV[m];
+  const reference = simulate(),
+    candidate = simulate([...mods, ...eventMods(m)]),
+    next = month + 1;
+  show(
+    '<div class="eyebrow">' +
+      dates(month) +
+      " · 인생 이벤트</div><h2>" +
+      event.emoji +
+      " " +
+      event.title +
+      "</h2><p>" +
+      event.body +
+      '</p><div class="eventoptions"><button class="choice" aria-label="' +
+      event.a +
+      '" onclick="choose(' +
+      m +
+      ',true)"><strong>' +
+      event.a +
+      "</strong><small>" +
+      event.ad +
+      "</small><span>다음 달 순자산 " +
+      money(candidate[next].total - reference[next].total) +
+      '</span></button><button class="choice" aria-label="' +
+      event.b +
+      '" onclick="choose(' +
+      m +
+      ',false)"><strong>' +
+      event.b +
+      "</strong><small>" +
+      event.bd +
+      '</small></button></div><p class="note">선택은 다음 달부터 반영해요. 원본을 보관하려면 선택 전 서버에 저장해주세요.</p>',
+  );
+}
+function choose(m, accepted) {
+  if (serverPlanBusy || events.has(m)) return;
+  if (accepted) mods.push(...eventMods(m));
+  events.add(m);
+  log(accepted ? EV[m].a : EV[m].b);
+  closeModal();
+  render();
+}
+function step() {
+  if (serverPlanBusy) return;
+  stop();
+  if (EV[month] && !events.has(month)) {
+    eventPreview(month);
+    return;
+  }
+  if (month >= 120) return;
+  month++;
+  render();
+  if (EV[month] && !events.has(month)) eventPreview(month);
+}
+function toggle() {
+  if (serverPlanBusy) return;
+  if (timer) {
+    stop();
+    return;
+  }
+  if (EV[month] && !events.has(month)) {
+    eventPreview(month);
+    return;
+  }
+  if (month >= 120) return;
+  $("ml-play").textContent = "Ⅱ 잠시 멈춤";
+  timer = setInterval(() => {
+    if (serverPlanBusy || month >= 120) {
+      stop();
+      return;
+    }
+    month++;
+    render();
+    if (EV[month] && !events.has(month)) {
+      stop();
+      eventPreview(month);
+    }
+  }, 1500 / speed);
+}
+function nextEvent() {
+  if (serverPlanBusy) return;
+  stop();
+  const next = Object.keys(EV)
+    .map(Number)
+    .find((m) => m >= month && !events.has(m));
+  if (next === undefined) {
+    mlShowPage("report");
+    return;
+  }
+  month = next;
+  render();
+  eventPreview(next);
+}
+function fillFinance() {
+  for (const key of ["cash", "saved", "income", "expense"])
+    $("ml-" + key).value = Math.round(start[key] * 10000);
+  $("ml-saving").value = Math.round(baseSaving * 10000);
+  $("ml-start-name").value = start.name;
+  $("ml-start-age").value = start.age;
+  $("ml-start-rate").value = baseRate;
+  financeSummary();
+}
+function financeSummary() {
+  const value = (key) => Number($("ml-" + key).value) || 0;
+  $("ml-total-assets").textContent =
+    (value("cash") + value("saved")).toLocaleString("ko-KR") + "원";
+  $("ml-month-balance").textContent =
+    (value("income") - value("expense")).toLocaleString("ko-KR") + "원";
+}
+function applyFinance(values) {
+  start = { ...start, ...values.initial };
+  baseSaving = values.saving;
+  baseRate = values.rate;
+  saving = baseSaving;
+  rate = baseRate;
+  month = 0;
+  mods = [];
+  rateMods = [];
+  events = new Set();
+  logs = [];
+  serverPlanId = null;
+  try {
+    localStorage.removeItem("money-life-server-plan");
+  } catch {}
+  log("새로운" + " 여정을 시작했어요.");
+  closeModal();
+  render();
+  mlShowPage("dashboard");
+}
+function startFinance(event) {
+  event.preventDefault();
+  if (serverPlanBusy) return;
+  const initial = {
+    ...start,
+    name: $("ml-start-name").value.trim() || defaults.name,
+    age: Number($("ml-start-age").value),
+  };
+  for (const key of ["cash", "saved", "income", "expense", "saving"]) {
+    const input = $("ml-" + key),
+      value = Number(input.value);
+    if (
+      input.value.trim() === "" ||
+      !Number.isSafeInteger(value) ||
+      value < 0 ||
+      value > 10000000000
+    ) {
+      $("ml-finance-error").textContent =
+        "금액은 0~100억원의 정수 원으로 입력해주세요.";
+      input.focus();
+      return;
+    }
+    if (key !== "saving") initial[key] = value / 10000;
+  }
+  const annualRate = Number($("ml-start-rate").value);
+  if (
+    !Number.isInteger(initial.age) ||
+    initial.age < 18 ||
+    initial.age > 80 ||
+    !Number.isFinite(annualRate) ||
+    annualRate < 0 ||
+    annualRate > 8
+  ) {
+    $("ml-finance-error").textContent = "나이와 금리를 확인해주세요.";
+    return;
+  }
+  const values = {
+    initial,
+    saving: Number($("ml-saving").value) / 10000,
+    rate: annualRate,
+  };
+  if (month || mods.length) {
+    show(
+      '<h2>새 여정을 시작할까요?</h2><p>현재 기록은 초기화됩니다. 남겨둘 기록은 먼저 서버에 저장해주세요.</p><button class="btn primary" id="confirmjourney">새 여정 시작</button>',
+    );
+    $("confirmjourney").onclick = () => applyFinance(values);
+  } else applyFinance(values);
+}
+function settings() {
+  mlShowPage("finance");
+}
+function compare() {
+  mlShowPage("report");
+}
+function assets() {
+  mlShowPage("assets");
+}
+function journal() {
+  show(
+    "<h2>나의 선택 기록</h2>" +
+      logs.map((item) => "<p>" + escapeHtml(item.text) + "</p>").join(""),
+  );
+}
+function welcome() {
+  show(
+    '<div class="eyebrow">WELCOME TO MONEY LIFE</div><h2>돈을 모으는 시간도,<br>당신의 인생이니까요.</h2><p>개인의 조건으로 선택 전후의 계획을 비교해요. 저장한 진행은 같은 기기에서 이어집니다.</p><div class="modalactions"><button class="btn" onclick="closeModal();settings()">재무 정보 입력</button><button class="btn primary" onclick="closeModal()">마을로 시작하기 →</button></div>',
+  );
+}
+// Restore the established version-1 game snapshot; do not reinterpret legacy stock inputs as deposits.
+try {
+  const stored = JSON.parse(localStorage.getItem("money-life-v1"));
+  if (stored) {
+    const decoded = MoneyLifePlanState.decode({
+      schemaVersion: 1,
+      goalBasis: "net_assets",
+      state: MoneyLifePlanState.encode({
+        ...stored,
+        events: new Set(stored.events),
+      }),
+    });
+    ({
+      start,
+      month,
+      baseSaving,
+      baseRate,
+      saving,
+      rate,
+      mods,
+      rateMods,
+      logs,
+    } = decoded);
+    events = new Set(decoded.events);
+  }
+  const profile = JSON.parse(localStorage.getItem("money-life-goal-v1"));
+  if (typeof profile?.goalName === "string")
+    goalName = profile.goalName.slice(0, 40);
+  if (
+    Number.isInteger(profile?.goalMonths) &&
+    profile.goalMonths >= 1 &&
+    profile.goalMonths <= 120
+  )
+    goalMonths = profile.goalMonths;
+} catch {}
+document.querySelectorAll("[data-page]").forEach((node) =>
+  node.addEventListener("click", () => {
+    mlShowPage(node.dataset.page);
+    if (node.dataset.page === "investment") PaperTrading.open();
+  }),
+);
+$("ml-mobile-toggle").onclick = () => {
+  const button = $("ml-mobile-toggle");
+  button.setAttribute(
+    "aria-expanded",
+    String(button.getAttribute("aria-expanded") !== "true"),
+  );
+};
+$("ml-play").onclick = toggle;
+$("ml-one-month").onclick = step;
+$("ml-next-event").onclick = nextEvent;
+$("ml-event-yes").onclick = nextEvent;
+$("ml-event-later").onclick = toggle;
+document.querySelectorAll("[data-speed]").forEach(
+  (node) =>
+    (node.onclick = () => {
+      speed = Number(node.dataset.speed);
+      document.querySelectorAll("[data-speed]").forEach((item) => {
+        item.classList.toggle("active", item === node);
+        item.setAttribute("aria-pressed", String(item === node));
+      });
+      if (timer) {
+        stop();
+        toggle();
+      }
+    }),
+);
+$("ml-finance-form").onsubmit = startFinance;
+$("ml-finance-form").oninput = financeSummary;
+$("ml-finance-reset").onclick = () => {
+  for (const key of ["cash", "saved", "income", "expense"])
+    $("ml-" + key).value = defaults[key] * 10000;
+  $("ml-saving").value = 700000;
+  $("ml-start-rate").value = 3;
+  financeSummary();
+};
+$("ml-goal-form").onsubmit = (event) => {
+  event.preventDefault();
+  if (serverPlanBusy) return;
+  const target = Number($("ml-goal-amount").value.replaceAll(",", "")),
+    months = Number($("ml-goal-months").value);
+  if (
+    !Number.isSafeInteger(target) ||
+    target < 1 ||
+    target > 10000000000 ||
+    !Number.isInteger(months) ||
+    months < 1 ||
+    months > 120
+  ) {
+    toast("목표" + " 금액·기한을 확인해주세요.");
+    return;
+  }
+  goalName = $("ml-goal-name").value.trim() || "나의 목표";
+  goalMonths = months;
+  start.target = target / 10000;
+  render();
+  toast("목표를 저장했어요.");
+};
+$("ml-refresh-report").onclick = () => {
+  syncFinance();
+  mlRenderReport();
+};
+$("ml-apply-settings").onclick = () => {
+  if (serverPlanBusy || month >= 120) return;
+  const value = Number($("ml-setting-saving").value),
+    nextRate = Number($("ml-setting-rate").value);
+  if (
+    !Number.isSafeInteger(value) ||
+    value < 0 ||
+    value > 10000000000 ||
+    !Number.isFinite(nextRate) ||
+    nextRate < 0 ||
+    nextRate > 8
+  ) {
+    toast("저축액과 금리를 확인해주세요.");
+    return;
+  }
+  saving = value / 10000;
+  rate = nextRate;
+  mods.push({ type: "saving", v: saving, m: month + 1 });
+  rateMods.push({ m: month + 1, v: rate });
+  log("다음 달 저축·금리 조건을 변경했어요.");
+  render();
+};
+$("ml-reset-all").onclick = () => {
+  settings();
+  toast(
+    "재무 입력에서 새 여정을 시작할 수 있어요. 기존 서버 기록은 보존됩니다.",
+  );
+};
+render();
+fillFinance();
+mlShowPage("dashboard");
+welcome();

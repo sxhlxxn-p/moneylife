@@ -39,8 +39,8 @@ def test_retry_once_then_return_verified_text_or_template(monkeypatch, recover):
     async def fake(body, **kwargs):
         calls.append(body)
         assert body['text']['format']['strict']
-        text = TEXT if recover and len(calls) == 2 else TEXT+' 999원'
-        return {'text': json.dumps({'text': text})}
+        value = {'selectedIds': ['goal', 'assets', 'liquidity', 'assumptions']} if recover and len(calls) == 2 else {'text': TEXT+' 999원'}
+        return {'text': json.dumps(value)}
     monkeypatch.setattr(llm, 'call_response', fake)
     result = asyncio.run(ai_explanation.generate(METRICS, '정형 설명'))
     assert len(calls) == 2

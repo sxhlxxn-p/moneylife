@@ -24,6 +24,7 @@ class Extraction(StrictModel):
 class ParseChange(StrictModel):
     planId: UUID
     message: str = Field(min_length=1, max_length=2000)
+    clarificationId: UUID | None = None
 
 
 class ApplyChange(StrictModel):
@@ -68,6 +69,7 @@ class ApplyResult(StrictModel):
 class ProposalResponse(StrictModel):
     status: Literal['ready', 'needs_clarification', 'unsupported', 'invalid_change']
     proposalId: UUID | None = None
+    clarificationId: UUID | None = None
     basePlanId: UUID
     message: str
     changes: list[ChangeIntent] = Field(default_factory=list)

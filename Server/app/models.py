@@ -73,6 +73,17 @@ class AIExplanation(Base):
     attempts: Mapped[int] = mapped_column(Integer)
 
 
+class AIClarification(Base):
+    __tablename__ = 'ai_clarifications'
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    plan_id: Mapped[str] = mapped_column(String(36))
+    expires_at: Mapped[int] = mapped_column(BigInteger)
+    original_message: Mapped[str] = mapped_column(String(2000))
+    question: Mapped[str] = mapped_column(String(1000))
+    turns: Mapped[list] = mapped_column(JSON)
+
+
 class PaperPlan(Base):
     __tablename__ = "paper_plans"
     __table_args__ = (UniqueConstraint("owner_id", "request_id"),)

@@ -15,3 +15,7 @@ npm run prototype
 
 새 기능은 이 경로가 아니라 `client`, `server`, `engine`, `shared`에 구현한다.
 
+
+## 참고본 고정
+
+2026-11-22 이후 실제 개발/실행 화면은 Client/index.html이다. 예빈 브랜치의 디자인은 Client에 이식했으며 이 디렉터리에 신규 기능/별도 계산 엔진을 추가하지 않는다.
