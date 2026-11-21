@@ -149,3 +149,21 @@ def configuration(dataset_path: Path, mode: str, model: str | None):
             'codeSha256': hashlib.sha256(code).hexdigest(), 'mode': mode, 'model': model,
             'promptVersion': llm.PROMPT_VERSION, 'maxOutputTokens': 2500 if mode != 'rules' else None,
             'sampling': 'provider-default' if mode != 'rules' else 'deterministic'}
+
+
+def validate_frozen_development(report, config, dataset, repetitions):
+    """A final run must use the same complete, three-repeat development configuration."""
+    from collections import Counter
+    if (report.get('split') != 'dev' or report.get('uniqueCases') != 60
+            or report.get('configuration') != config):
+        raise ValueError('Configuration differs from the frozen development report.')
+    if repetitions != 3 or report.get('repetitions') != 3:
+        raise ValueError('Final evaluation requires three repetitions in both development and test.')
+    expected = Counter((case['id'], repetition) for case in dataset['cases']
+                       if case['split'] == 'dev' for repetition in range(1, 4))
+    attempts = report.get('attempts')
+    if not isinstance(attempts, list) or any(not isinstance(row, dict) for row in attempts):
+        raise ValueError('Development attempt records are missing.')
+    observed = Counter((row.get('caseId'), row.get('repetition')) for row in attempts)
+    if observed != expected:
+        raise ValueError('Development report must contain all 60 cases exactly three times.')

@@ -1,4 +1,4 @@
-"""Run the frozen condition-extraction comparison. Author: sxhlxxn."""
+"""Run the frozen condition-extraction comparison."""
 import argparse
 import asyncio
 from datetime import datetime, timezone
@@ -9,10 +9,12 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'Server'))
-from app.ai_evaluation import configuration, evaluate_case, summarize
+from app.ai_evaluation import configuration, evaluate_case, summarize, validate_frozen_development
 
 
 async def run(args):
+    if args.mode != 'rules' and not args.allow_live:
+        raise SystemExit('Live model evaluation requires --allow-live. No external requests were made.')
     dataset_path = ROOT / 'Test/ai/cases-v1.json'
     dataset = json.loads(dataset_path.read_text())
     model = os.getenv('LLM_MODEL') if args.mode != 'rules' else None
@@ -25,8 +27,10 @@ async def run(args):
         if not args.frozen_config:
             raise SystemExit('Final test requires --frozen-config pointing to a development report.')
         frozen = json.loads(Path(args.frozen_config).read_text())
-        if frozen.get('split') != 'dev' or frozen.get('uniqueCases') != 60 or frozen['configuration'] != config:
-            raise SystemExit('Configuration differs from the frozen development report. Do not tune on the final test.')
+        try:
+            validate_frozen_development(frozen, config, dataset, args.repetitions)
+        except ValueError as error:
+            raise SystemExit(str(error) + ' Do not tune on the final test.') from None
     cases = [case for case in dataset['cases'] if case['split'] == args.split]
     if args.case_id:
         cases = [case for case in cases if case['id'] == args.case_id]
@@ -38,6 +42,7 @@ async def run(args):
             rows.append(await evaluate_case(case, args.mode, repetition))
         print(f'{args.mode}: repetition {repetition}/{args.repetitions}, {len(rows)} attempts', file=sys.stderr)
     report = {'createdAt': datetime.now(timezone.utc).isoformat(), 'datasetVersion': dataset['version'],
+              'executionKind': 'rules-baseline' if args.mode == 'rules' else 'live-model-evaluation',
               'split': args.split, 'uniqueCases': len(cases), 'repetitions': args.repetitions,
               'configuration': config, 'summary': summarize(rows),
               'byCategory': {category: summarize([row for row in rows if row['category'] == category])
@@ -57,6 +62,7 @@ if __name__ == '__main__':
     parser.add_argument('--mode', required=True, choices=['rules', 'plain', 'structured'])
     parser.add_argument('--split', default='dev', choices=['dev', 'test'])
     parser.add_argument('--repetitions', type=int, default=3, choices=range(1, 4))
+    parser.add_argument('--allow-live', action='store_true', help='Explicitly enable external provider calls; never needed for rules.')
     parser.add_argument('--frozen-config')
     parser.add_argument('--case-id', help='Development-only single-case live smoke check')
     parser.add_argument('--output', default=str(ROOT / '.data/ai-evaluation/latest.json'))
