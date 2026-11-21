@@ -192,7 +192,7 @@ test('모의투자 이후 기존 여정 저장·계산 결과·AI 오류 안내 
   const page = await pageFor(t);
   await demo(page);
   await page.getByRole('button', {name: '서버 계산·저장', exact: true}).click();
-  await page.waitForFunction(() => document.getElementById('serverstatus').textContent.includes('서버 저장 완료'));
+  await page.waitForFunction(() => document.getElementById('serverstatus').textContent.includes('계획과 계산 결과를 저장'));
   await page.getByRole('button', {name: '계산 결과', exact: true}).click();
   await page.locator('#runsummary strong').first().waitFor();
   assert.equal(await page.locator('#runmonths tr').count(), 121);
@@ -776,7 +776,7 @@ test('새 재무 화면의 원 단위 입력·공용 계산·서버 저장·복�
   await page.getByRole('button', {name: '이 조건으로 시뮬레이션 시작'}).click();
   await page.locator('#ml-one-month').click();
   assert.equal(await page.locator('#ml-game-net').innerText(), '500,000원');
-  const response = page.waitForResponse(r => r.url().endsWith('/api/plans') && r.request().method() === 'POST');
+  const response = page.waitForResponse(r => r.url().endsWith('/api/plan-saves') && r.request().method() === 'POST');
   await page.getByRole('button', {name: '서버 계산·저장', exact: true}).click();
   const plan = await (await response).json();
   assert.equal(plan.state.initial.income, 1000000);
@@ -841,6 +841,7 @@ test('늦은 AI 적용 응답은 그동안 바꾼 최신 조건을 덮어쓰지 
   await page.getByRole('button', {name: '변경안 확인', exact: true}).click();
   await page.waitForFunction(() => !serverPlanBusy);
   await page.getByRole('button', {name: '확인하고 새 계획 계산'}).click();
+  await page.waitForFunction(() => serverPlanBusy);
   await page.evaluate(() => { JourneyStore.set("start",{...JourneyStore.get("start"),income:123}); render(); });
   release();
   await page.waitForFunction(() => !serverPlanBusy);
@@ -939,11 +940,8 @@ test('모의투자 미확인 요청이 남아도 새 세션에서 새 연습을 
   await page.getByRole('button',{name:'매수 예약',exact:true}).click();
   await page.getByRole('button',{name:'예약 확정',exact:true}).click();
   await page.waitForFunction(()=>!serverPlanBusy && !!localStorage.getItem('money-life-paper-pending'));
-  await page.context().addCookies([{name:'moneylife_guest',value:'expired-session',url}]);
-  await page.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
-  // The order route above simulates an uncertain transport failure; allow the real 401 next.
   await page.unroute('**/api/paper-plans/*/orders');
-  await page.waitForFunction(()=>!serverPlanBusy);
+  await page.context().addCookies([{name:'moneylife_guest',value:'expired-session',url}]);
   await page.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
   await page.getByRole('button',{name:'새 세션으로 계속하기',exact:true}).click();
   await page.waitForFunction(()=>!serverPlanBusy && !localStorage.getItem('money-life-paper-pending'));
@@ -976,4 +974,44 @@ test('이벤트 저장 응답이 유실돼도 새로고침 후 같은 ID로 결�
   assert.equal(result.plan.state.changes.find(c=>c.type==='once').v,3000000);
   const plans=await page.evaluate(()=>planRequest(''));
   assert.equal(plans.length,2);
+});
+
+test('계산 실패 후 새로고침해도 같은 계획과 계산 요청으로 재시도한다',async t=>{
+ const page=await pageFor(t);let saveIds=[],runIds=[];
+ page.on('request',r=>{if(r.method()!=='POST')return;if(r.url().endsWith('/api/plan-saves'))saveIds.push(r.postDataJSON().requestId);if(r.url().endsWith('/api/simulations'))runIds.push(r.postDataJSON().requestId);});
+ await page.route('**/api/simulations',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'ENGINE_UNAVAILABLE'})}));
+ await page.evaluate(()=>saveServerPlan());
+ assert.match(await page.locator('#serverstatus').innerText(),/계획은 저장/);
+ await page.unroute('**/api/simulations');
+ await page.reload();await page.getByRole('button',{name:'닫기',exact:true}).click();
+ await page.getByRole('button',{name:'이전 저장 결과 확인',exact:true}).click();
+ await page.waitForFunction(()=>!serverPlanBusy&&!planSaves.get());
+ assert.equal(saveIds.length,2);assert.equal(saveIds[0],saveIds[1]);assert.equal(runIds[0],runIds[1]);
+ const plans=await page.evaluate(()=>planRequest(''));assert.equal(plans.length,1);
+ const runs=await page.evaluate(id=>simulationRequest('?planId='+id),plans[0].id);assert.equal(runs.length,1);
+});
+
+test('두 탭에서 같은 모의투자 요청을 동시에 보내지 않는다',async t=>{
+ const page=await pageFor(t);await demo(page);
+ let release,seen;const waiting=new Promise(resolve=>{release=resolve;});const requested=new Promise(resolve=>{seen=resolve;});
+ await page.route('**/api/paper-plans/*/advance',async route=>{seen();await waiting;const response=await route.fetch();await route.fulfill({response});});
+ await page.getByRole('button',{name:'다음 달로 +1개월',exact:true}).click();await requested;
+ const other=await page.context().newPage();await other.goto(url);await other.getByRole('button',{name:'닫기',exact:true}).click();await other.getByRole('button',{name:'모의투자 열기'}).click();
+ const before=await page.evaluate(()=>localStorage.getItem('money-life-paper-pending'));
+ await other.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
+ await other.waitForFunction(()=>document.querySelector('#paperstatus').textContent.includes('다른 탭'));
+ assert.match(await other.locator('#paperstatus').innerText(),/다른 탭/);
+ assert.equal(await other.evaluate(()=>localStorage.getItem('money-life-paper-pending')),before);
+ release();await page.waitForFunction(()=>!serverPlanBusy&&!localStorage.getItem('money-life-paper-pending'));
+ const plans=await page.evaluate(()=>apiRequest('paper-plans',''));assert.equal(plans.length,2);
+});
+
+test('목표 반올림 경계에서도 화면과 서버 목표 월이 일치한다',async t=>{
+ const page=await pageFor(t);
+ const result=await page.evaluate(async()=>{
+  closeModal();JourneyStore.set('start',{...JourneyStore.current.start,cash:989.9753,saved:10,income:0,expense:0,target:1000});JourneyStore.set('baseSaving',0);JourneyStore.set('baseRate',3);render();
+  const previewGoal=GameEngine.goalMonth(simulate(),JourneyStore.current.start.target);
+  await saveServerPlan();const runs=await simulationRequest('?planId='+serverPlanId);return {previewGoal,serverGoal:runs[0].summary.goalMonth};
+ });
+ assert.deepEqual(result,{previewGoal:1,serverGoal:1});
 });

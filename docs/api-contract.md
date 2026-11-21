@@ -33,3 +33,7 @@
 ## 모의투자 연결
 
 월별 모의투자 저장 API와 Client 투자 연습실은 [모의투자 계약](../Shared/paper-api-contract.md)을 따른다. 기존 `/plans`와 `/simulations` 흐름은 유지하며, 투자 화면은 `/paper-plans` 명령과 `/paper-runs` 저장 결과를 사용한다. 가격 원본은 서버 내부에 고정하고 현재 시점 이후의 가격/계산 경로는 화면에 제공하지 않는다.
+
+## 재시도 가능한 계획 저장
+
+`POST /plan-saves`는 `{requestId: UUID, plan: PlanCreate}`를 받고 201 PlanDetail을 반환한다. 동일 소유자·동일 ID·동일 내용은 같은 계획으로 복원한다. 내용이 다르면 409 REQUEST_ID_CONFLICT, 타인 또는 없는 부모 계획은 404를 반환한다. 이후 `/simulations`에 별도 고정 requestId를 전달한다. 상세 동작은 [write-recovery.md](write-recovery.md)를 참고한다.

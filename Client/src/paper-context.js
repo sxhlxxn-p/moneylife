@@ -20,12 +20,26 @@ function createPaperContext() {
     paper.reference = localStorage.getItem(paper.referenceKey);
   } catch {}
   paper.resetForSession = function (reason = "session-renewed") {
-    paper.queue.archive(reason);
-    localStorage.removeItem(paper.referenceKey);
+    let failed = false;
+    try {
+      paper.queue.archive(reason);
+    } catch {
+      paper.queue.suspend();
+      failed = true;
+    }
+    try {
+      localStorage.removeItem(paper.referenceKey);
+    } catch {
+      failed = true;
+    }
     paper.current = null;
     paper.reference = null;
     paper.explanations.clear();
     if (paper.render) paper.render();
+    if (failed)
+      throw new Error(
+        "이전 요청은 전송을 중지했어요. 보관하려면 브라우저 저장 공간을 확인해주세요.",
+      );
   };
   return paper;
 }

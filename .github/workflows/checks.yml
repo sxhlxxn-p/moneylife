@@ -43,3 +43,73 @@ jobs:
           .venv/bin/python -m pytest Server/tests -q
       - name: Browser regression tests
         run: npm run test:ui
+
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: Server
+      TEST_DATABASE_URL: postgresql+psycopg://moneylife:ci-password@127.0.0.1:5432/moneylife_test
+      OPENAI_API_KEY: ""
+      LLM_MODEL: ""
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: moneylife_test
+          POSTGRES_USER: moneylife
+          POSTGRES_PASSWORD: ci-password
+        ports: [5432:5432]
+        options: --health-cmd "pg_isready -U moneylife -d moneylife_test" --health-interval 3s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: { node-version: "22", cache: npm }
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with: { python-version: "3.12" }
+      - run: |
+          npm ci
+          python -m venv .venv
+          .venv/bin/python -m pip install -r Server/requirements-dev.txt
+          .venv/bin/python -m pytest Server/integration -q
+
+  deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      POSTGRES_PASSWORD: ci-password
+      DATABASE_URL: postgresql+psycopg://moneylife:ci-password@db:5432/moneylife
+      CLIENT_ORIGIN: https://localhost:8443
+      HTTPS_PORT: "8443"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: { node-version: "22", cache: npm }
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with: { python-version: "3.12" }
+      - name: Prepare isolated HTTPS stack
+        run: |
+          mkdir -p .data/tls .data/market
+          openssl req -x509 -newkey rsa:2048 -nodes -keyout .data/tls/server.key -out .data/tls/server.crt -days 1 -subj /CN=localhost -addext subjectAltName=DNS:localhost,IP:127.0.0.1
+          docker compose -f Server/compose.production.yaml build
+          docker compose -f Server/compose.production.yaml up -d
+          python -m pip install 'httpx>=0.28,<1'
+          python Server/scripts/smoke_deployment.py --url https://localhost:8443 --insecure-localhost
+      - name: Restart and restore database
+        run: |
+          docker compose -f Server/compose.production.yaml restart api
+          python Server/scripts/smoke_deployment.py --url https://localhost:8443 --insecure-localhost --resume
+          docker compose -f Server/compose.production.yaml exec -T db pg_dump -U moneylife -d moneylife -Fc > .data/backup.dump
+          docker compose -f Server/compose.production.yaml exec -T db createdb -U moneylife moneylife_restore
+          docker compose -f Server/compose.production.yaml exec -T db pg_restore -U moneylife -d moneylife_restore --exit-on-error < .data/backup.dump
+          DATABASE_URL=postgresql+psycopg://moneylife:ci-password@db:5432/moneylife_restore docker compose -f Server/compose.production.yaml up -d --no-deps --force-recreate api
+          docker compose -f Server/compose.production.yaml restart web
+          python Server/scripts/smoke_deployment.py --url https://localhost:8443 --insecure-localhost --resume
+      - name: Browser over HTTPS
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          node scripts/check-deployed-ui.cjs https://localhost:8443
+      - name: Cleanup
+        if: always()
+        run: docker compose -f Server/compose.production.yaml down -v

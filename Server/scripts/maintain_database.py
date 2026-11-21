@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 root = Path(__file__).resolve().parents[2]
+if os.getenv('AUTO_MIGRATE', 'true').lower() == 'false' and not os.getenv('DATABASE_URL'):
+    raise SystemExit('DATABASE_URL is required for explicit production migration.')
 os.environ.setdefault('DATABASE_URL', f"sqlite+aiosqlite:///{root / '.data' / 'dev.db'}")
 from app import database
 from app.maintenance import cleanup

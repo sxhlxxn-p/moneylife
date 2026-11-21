@@ -11,8 +11,9 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.database import check_database_connection, close_database_connection, initialize_database, database_kind
+from app.database import check_database_connection, close_database_connection, database_kind, prepare_database
 from app.plans import router as plans_router
+from app.plan_saves import router as plan_saves_router
 from app.simulations import router as simulations_router
 from app.ai import router as ai_router
 from app.paper import router as paper_router
@@ -33,7 +34,7 @@ class DatabaseHealthResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    await initialize_database()
+    await prepare_database()
     try:
         yield
     finally:
@@ -72,6 +73,7 @@ app.add_middleware(
 from app.events import router as events_router
 app.include_router(events_router)
 app.include_router(plans_router)
+app.include_router(plan_saves_router)
 app.include_router(simulations_router)
 app.include_router(ai_router)
 app.include_router(paper_router)

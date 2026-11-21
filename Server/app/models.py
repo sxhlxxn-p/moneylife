@@ -155,3 +155,13 @@ class RequestQuota(Base):
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     count: Mapped[int] = mapped_column(Integer)
     expires_at: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
+class PlanSave(Base):
+    __tablename__='plan_saves'
+    __table_args__=(UniqueConstraint('owner_id','request_id'),)
+    id: Mapped[str]=mapped_column(String(36),primary_key=True)
+    owner_id: Mapped[str]=mapped_column(String(36),index=True)
+    request_id: Mapped[str]=mapped_column(String(36))
+    plan_id: Mapped[str]=mapped_column(String(36))
+    command: Mapped[dict]=mapped_column(JSON)

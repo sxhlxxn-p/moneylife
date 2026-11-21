@@ -4,14 +4,28 @@ function simulate(
   monthlySaving = JourneyStore.current.baseSaving,
   annualRate = JourneyStore.current.baseRate,
 ) {
-  return GameEngine.simulate({
-    initial: JourneyStore.current.start,
-    changes: changes,
-    rateChanges: rateChanges,
-    monthlySaving: monthlySaving,
-    annualRate: annualRate,
-    months: 120,
-  });
+  const toWon = (value) => Math.round(value * 10000);
+  const state = {
+    ...JourneyStore.snapshot(),
+    changes: changes.map((change) => ({
+      ...change,
+      v: toWon(change.v),
+      end: change.end ?? null,
+    })),
+    rateChanges,
+    monthlySaving: toWon(monthlySaving),
+    annualRate,
+  };
+  return MoneyLifeSnapshot.calculateSnapshot(state, 120).monthlyResults.map(
+    (row) => ({
+      month: row.month,
+      ...Object.fromEntries(
+        Object.entries(row)
+          .filter(([key]) => key !== "month")
+          .map(([key, value]) => [key, value / 10000]),
+      ),
+    }),
+  );
 }
 function financialProfile() {
   return {

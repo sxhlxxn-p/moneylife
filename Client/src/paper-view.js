@@ -83,6 +83,18 @@ function installPaperView(paper) {
           true,
         ),
       );
+      if (paper.queue.isSuspended())
+        box.append(
+          paper.button(
+            "이전 요청 별도 보관",
+            serializedMutation(() => {
+              paper.resetForSession("storage-recovered");
+              paper.message(
+                "이전 요청을 별도 보관했어요. 새 연습을 시작할 수 있어요.",
+              );
+            }, paper.message),
+          ),
+        );
       root.append(box);
     }
     if (!paper.current) {

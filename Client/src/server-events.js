@@ -14,8 +14,10 @@ const eventRequests = createRequestJournal(
 function renderEventRecovery() {
   const button = $("eventrequest-retry");
   if (button) button.hidden = !eventRequests.get();
+  const archive = $("eventrequest-archive");
+  if (archive) archive.hidden = !eventRequests.isSuspended();
 }
-async function saveEventBranch(eventMonth, accepted) {
+async function saveEventBranchTransaction(eventMonth, accepted) {
   if (serverPlanBusy || JourneyStore.current.events.has(eventMonth)) return;
   stop();
   const command = {
@@ -52,9 +54,9 @@ async function saveEventBranch(eventMonth, accepted) {
     }
   }
   renderEventRecovery();
-  return retryPendingEvent();
+  return retryPendingEventTransaction();
 }
-function archivePendingEvent() {
+function archivePendingEventTransaction() {
   try {
     eventRequests.archive("user-archived-unconfirmed");
     renderEventRecovery();
@@ -66,7 +68,13 @@ function archivePendingEvent() {
     toast("요청을 보관하지 못했어요. 브라우저 저장 공간을 확인해주세요.");
   }
 }
-async function retryPendingEvent() {
+async function retryPendingEventTransaction() {
+  if (eventRequests.isSuspended()) {
+    toast(
+      "이전 세션의 요청을 보관하지 못했어요. 저장 공간을 확인한 뒤 별도 보관해주세요.",
+    );
+    return;
+  }
   const pending = eventRequests.get();
   if (serverPlanBusy || !pending) return;
   stop();
@@ -84,7 +92,7 @@ async function retryPendingEvent() {
     const sameState =
       JSON.stringify(JourneyStore.snapshot()) ===
       JSON.stringify(pending.command.base.state);
-    eventRequests.clear();
+    eventRequests.clear(pending.requestId);
     if (!sameState) {
       $("serverstatus").textContent =
         "이전 선택 결과를 서버에서 확인했어요. 현재 수정 중인 여정은 유지하며 저장 목록에서 결과를 볼 수 있어요.";
@@ -110,3 +118,13 @@ async function retryPendingEvent() {
     renderEventRecovery();
   }
 }
+
+const saveEventBranch = serializedMutation(saveEventBranchTransaction);
+
+const archivePendingEvent = serializedMutation(archivePendingEventTransaction);
+
+const retryPendingEvent = serializedMutation(retryPendingEventTransaction);
+
+window.addEventListener("storage", (event) => {
+  if (event.key === "money-life-event-pending") renderEventRecovery();
+});

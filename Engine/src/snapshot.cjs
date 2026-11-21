@@ -1,6 +1,8 @@
+(function(root) {
+const commonJS=typeof module !== 'undefined' && module.exports;
 // Server KRW calculation policy.
-const {createInterestCalculator} = require('./interest.cjs');
-const engine = require('./index');
+const {createInterestCalculator} = (commonJS ? require('./interest.cjs') : root.MoneyLifeInterest);
+const engine = (commonJS ? require('./index') : GameEngine);
 const ENGINE_VERSION = 'cash-savings-krw-v1';
 
 function calculateSnapshot(state, months = 120) {
@@ -29,4 +31,7 @@ function summarizePath(rows, target) {
     unmetTotal: final.unpaid
   };
 }
-module.exports = {calculateSnapshot, summarizePath, ENGINE_VERSION};
+const api={calculateSnapshot,summarizePath,ENGINE_VERSION};
+if(commonJS) module.exports=api; else root.MoneyLifeSnapshot=api;
+
+})(typeof globalThis !== 'undefined' ? globalThis : this);

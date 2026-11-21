@@ -5,7 +5,7 @@ const projectRoot = path.resolve(__dirname, '..');
 const port = Number(process.env.PORT || 5173);
 const apiUrl = new URL(process.env.API_BASE_URL || 'http://127.0.0.1:3000');
 if (apiUrl.protocol !== 'http:') throw new Error('Local API_BASE_URL must use http');
-const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml'};
+const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.cjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml'};
 const prototypeMode = process.argv.includes('--prototype');
 const routes = new Map(prototypeMode ? [
   ['/', 'prototype/index.html'],

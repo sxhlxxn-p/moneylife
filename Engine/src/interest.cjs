@@ -1,5 +1,7 @@
+(function(root) {
+const commonJS=typeof module !== 'undefined' && module.exports;
 // Monthly KRW interest policy.
-const Decimal = require('decimal.js').clone({precision: 40, rounding: 4});
+const Decimal = (commonJS ? require('decimal.js') : root.Decimal).clone({precision: 40, rounding: 4});
 
 function createInterestCalculator() {
   const rates = new Map();
@@ -12,4 +14,7 @@ function createInterestCalculator() {
   };
 }
 
-module.exports = {createInterestCalculator};
+const api = {createInterestCalculator};
+if(commonJS) module.exports=api; else root.MoneyLifeInterest=api;
+
+})(typeof globalThis !== 'undefined' ? globalThis : this);

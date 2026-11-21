@@ -3,6 +3,7 @@ services:
     build:
       context: ..
       dockerfile: Server/Dockerfile
+      target: development
     env_file:
       - path: .env
         required: false

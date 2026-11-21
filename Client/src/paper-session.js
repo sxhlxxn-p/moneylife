@@ -186,7 +186,7 @@ function installPaperSession(paper) {
       setPlanBusy(false);
       paper.render();
     }
-    if (paper.queue.get()) await paper.sendPending();
+    if (paper.queue.get()) await paper.executePending();
   };
   paper.startNews = async function () {
     if (!paper.available() || !paper.current) return;
@@ -295,4 +295,5 @@ function installPaperSession(paper) {
       paper.render();
     }
   };
+  paper.create = serializedMutation(paper.create, paper.message);
 }

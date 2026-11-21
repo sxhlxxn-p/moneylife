@@ -81,3 +81,33 @@ test('별도 보관에 실패하면 처리 여부를 모르는 요청을 잃지 
   assert.throws(()=>requests.archive('session-renewed'));
   assert.equal(requests.get().body.requestId,'old-request');
 });
+
+test('다른 탭의 보관 요청을 덮어쓰지 않고 최신 보관 상태를 읽는다',()=>{
+ const saved=storage(),a=queue(saved),b=queue(saved);
+ a.stage({action:'create',body:{requestId:'A'}});
+ assert.equal(b.get().body.requestId,'A');
+ assert.throws(()=>b.stage({action:'create',body:{requestId:'B'}}));
+ assert.equal(queue(saved).get().body.requestId,'A');
+});
+
+test('늦게 완료된 요청 A가 뒤이어 보관된 요청 B를 삭제하지 않는다',()=>{
+ const saved=storage(),a=queue(saved),b=queue(saved);
+ a.stage({action:'create',body:{requestId:'A'}});a.clear('A');
+ b.stage({action:'create',body:{requestId:'B'}});
+ assert.throws(()=>a.clear('A'));
+ assert.equal(b.get().body.requestId,'B');
+});
+
+test('이벤트 요청 보관 실패가 세션 교체 알림을 중단하지 않는다',async()=>{
+ let events=0,suspended=false;
+ const context=vm.createContext({serverPlanBusy:false,serverPlanId:'old',setPlanBusy(){},
+  planRequest:async()=>({status:'renewed'}),localStorage:{removeItem(){}},
+  eventRequests:{archive(){throw new Error('Storage full');},suspend(){suspended=true;}},
+  renderEventRecovery(){},publishSessionEpoch:()=>false,serializedMutation:fn=>fn,
+  window:{addEventListener(){},dispatchEvent(){events++;}},
+  CustomEvent:class{constructor(name,options){this.detail=options.detail;}},
+  closeModal(){},$:()=>({textContent:''}),toast(){}});
+ vm.runInContext(source('session-recovery.js'),context);
+ await vm.runInContext('recoverGuestSession()',context);
+ assert.equal(events,1);assert.equal(suspended,true);
+});
