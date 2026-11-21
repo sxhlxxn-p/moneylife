@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.request_limits import limited_ai_owner
 from app import llm
 from app import ai_explanation
-from app.ai_changes import build_candidate, model_context
+from app.ai_changes import build_candidate, model_context, describe_changes
 from app.ai_schemas import ApplyChange, ApplyResult, ParseChange, ProposalResponse, ExplainRequest, ExplainResult
 from app.database import get_session
 from app.engine import calculate
@@ -100,6 +100,7 @@ async def parse_change(payload: ParseChange, response: Response,
         return {**common, 'status': extraction.status, 'question': extraction.question}
     try:
         candidate, preview = build_candidate(plan.state, extraction.changes)
+        preview_details = describe_changes(plan.state, extraction.changes)
     except (ValueError, ValidationError):
         return {**common, 'status': 'invalid_change',
                 'question': '변경 후 금액이나 적용 기간이 유효하지 않습니다. 금액과 연월을 확인해주세요.'}
@@ -111,7 +112,8 @@ async def parse_change(payload: ParseChange, response: Response,
     session.add(proposal)
     await session.commit()
     return {**common, 'status': 'ready', 'proposalId': proposal.id, 'changes': proposal.intents,
-            'preview': preview, 'expiresAt': proposal.expires_at}
+            'preview': preview, 'previewDetails': preview_details,
+            'expiresAt': proposal.expires_at}
 
 
 async def applied(proposal, owner, session):

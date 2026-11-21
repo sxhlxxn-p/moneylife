@@ -888,3 +888,30 @@ test('만료 세션 안내에서 새 세션을 시작해도 로컬 여정은 유
   await page.evaluate(() => saveServerPlan());
   await page.waitForFunction(() => !serverPlanBusy && serverPlanId !== null);
 });
+
+test('AI 승인 전 항목별 변경 금액·기간과 요청 수정은 현재 여정을 보존한다', async t => {
+  const page = await pageFor(t);
+  await page.locator('#ml-main-nav [data-page=dashboard]').click();
+  await page.evaluate(() => closeModal());
+  const before = await page.evaluate(() => aiSnapshot());
+  let applyCalls = 0;
+  await page.route('**/api/ai/parse-change', async route => {
+    const input = route.request().postDataJSON();
+    await route.fulfill({status:200, contentType:'application/json', body:JSON.stringify({
+      status:'ready', basePlanId:input.planId, message:input.message, proposalId:crypto.randomUUID(), preview:[],
+      previewDetails:[{field:'expense', label:'월 생활비',operation:'subtract',amount:200000,
+        startMonth:'2027-03',endMonth:'2036-10',segments:[{startMonth:'2027-03',endMonth:'2036-10',before:1600000,after:1400000}]}]
+    })});
+  });
+  await page.route('**/api/ai/proposals/**/apply', route => {applyCalls++; return route.abort();});
+  await page.locator('#ask').fill('내년 3월부터 생활비 20만원 줄여줘');
+  await page.evaluate(() => askServer());
+  const detail = page.locator('.ai-change-detail');
+  await detail.waitFor();
+  assert.match(await detail.innerText(), /1,600,000원 → 1,400,000원/);
+  assert.match(await detail.innerText(), /2027년 3월 ~ 2036년 10월/);
+  await page.getByRole('button', {name:'요청 수정',exact:true}).click();
+  assert.equal(await page.locator('#ask').inputValue(), '내년 3월부터 생활비 20만원 줄여줘');
+  assert.deepEqual(await page.evaluate(() => aiSnapshot()), before);
+  assert.equal(applyCalls, 0);
+});

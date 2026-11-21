@@ -62,3 +62,29 @@ def build_candidate(original, intents):
                        f'{LABELS[intent.field]} {intent.amount:,}원 {verb}')
     # Reuse the existing contract, including limits and all monthly income/expense checks.
     return GameState.model_validate(state).model_dump(mode='json'), preview
+
+
+def describe_changes(original, intents):
+    """Show every effective before/after interval, including existing future changes."""
+    state = deepcopy(original)
+    origin = month_number(state['startMonth'])
+    details = []
+    for intent in intents:
+        candidate, _ = build_candidate(state, [intent])
+        begin = month_number(intent.startMonth) - origin
+        end = month_number(intent.endMonth) - origin if intent.endMonth else 120
+        segments = []
+        for index in range(begin, end + 1):
+            before = effective(state, intent.field, index)
+            after = effective(candidate, intent.field, index)
+            if segments and (segments[-1]['before'], segments[-1]['after']) == (before, after):
+                segments[-1]['endMonth'] = month_name(origin + index)
+            else:
+                segments.append({'startMonth': month_name(origin + index),
+                                 'endMonth': month_name(origin + index), 'before': before, 'after': after})
+        details.append({'field': intent.field, 'label': LABELS[intent.field],
+                        'operation': intent.operation, 'amount': intent.amount,
+                        'startMonth': intent.startMonth, 'endMonth': month_name(origin + end),
+                        'segments': segments})
+        state = candidate
+    return details

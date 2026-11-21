@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import Field, field_validator
 
-from app.schemas import StrictModel, Money, PlanDetail, RunDetail
+from app.schemas import StrictModel, Money, CalculatedMoney, PlanDetail, RunDetail
 
 
 class ChangeIntent(StrictModel):
@@ -66,6 +66,23 @@ class ApplyResult(StrictModel):
     toolsExecuted: list[str]
 
 
+class ChangePreviewSegment(StrictModel):
+    startMonth: str
+    endMonth: str
+    before: CalculatedMoney
+    after: CalculatedMoney
+
+
+class ChangePreview(StrictModel):
+    field: Literal['income', 'expense', 'monthlySaving']
+    label: str
+    operation: Literal['set', 'add', 'subtract']
+    amount: Money
+    startMonth: str
+    endMonth: str
+    segments: list[ChangePreviewSegment] = Field(max_length=120)
+
+
 class ProposalResponse(StrictModel):
     status: Literal['ready', 'needs_clarification', 'unsupported', 'invalid_change']
     proposalId: UUID | None = None
@@ -75,6 +92,7 @@ class ProposalResponse(StrictModel):
     changes: list[ChangeIntent] = Field(default_factory=list)
     question: str | None = None
     preview: list[str] = Field(default_factory=list)
+    previewDetails: list[ChangePreview] = Field(default_factory=list, max_length=10)
     expiresAt: int | None = None
     model: str | None = None
     promptVersion: str

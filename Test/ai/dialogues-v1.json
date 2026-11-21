@@ -1,0 +1,125 @@
+{
+  "version": "clarification-dialogues-v1",
+  "split": "development-only",
+  "kind": "scripted-integration-fixtures",
+  "limitations": "Responses are scripted; passing does not measure model language understanding.",
+  "cases": [
+    {
+      "id": "missing-amount",
+      "purpose": "금액이 없으면 재질문",
+      "turns": [
+        {
+          "message": "생활비 좀 줄여줘",
+          "status": "needs_clarification",
+          "question": "매달 얼마를 줄일까요?",
+          "changes": []
+        },
+        {
+          "message": "20만원",
+          "status": "ready",
+          "question": null,
+          "changes": [
+            {
+              "field": "expense",
+              "operation": "subtract",
+              "amount": 200000,
+              "startMonth": "2026-11",
+              "endMonth": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing-fields-date",
+      "purpose": "항목·금액·연도가 빠진 요청",
+      "turns": [
+        {
+          "message": "3월부터 바꿔줘",
+          "status": "needs_clarification",
+          "question": "몇 년 3월부터 어떤 항목을 얼마로 바꿀까요?",
+          "changes": []
+        },
+        {
+          "message": "2027년 3월부터 생활비를 20만원 줄여줘",
+          "status": "ready",
+          "question": null,
+          "changes": [
+            {
+              "field": "expense",
+              "operation": "subtract",
+              "amount": 200000,
+              "startMonth": "2027-03",
+              "endMonth": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compound-amounts",
+      "purpose": "복합 요청의 각 금액 확인",
+      "turns": [
+        {
+          "message": "생활비 줄이고 저축 늘려줘",
+          "status": "needs_clarification",
+          "question": "생활비는 얼마 줄이고 저축은 얼마 늘릴까요?",
+          "changes": []
+        },
+        {
+          "message": "생활비 20만원 줄이고 저축은 10만원 늘려줘",
+          "status": "ready",
+          "question": null,
+          "changes": [
+            {
+              "field": "expense",
+              "operation": "subtract",
+              "amount": 200000,
+              "startMonth": "2026-11",
+              "endMonth": null
+            },
+            {
+              "field": "monthlySaving",
+              "operation": "add",
+              "amount": 100000,
+              "startMonth": "2026-11",
+              "endMonth": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "correction-during-clarification",
+      "purpose": "확인 중 정정한 금액 사용",
+      "turns": [
+        {
+          "message": "생활비 좀 줄여줘",
+          "status": "needs_clarification",
+          "question": "매달 얼마를 줄일까요?",
+          "changes": []
+        },
+        {
+          "message": "20만원 정도?",
+          "status": "needs_clarification",
+          "question": "생활비를 매달 20만원 줄이는 것으로 확정할까요?",
+          "changes": []
+        },
+        {
+          "message": "아니, 10만원만 줄여줘",
+          "status": "ready",
+          "question": null,
+          "changes": [
+            {
+              "field": "expense",
+              "operation": "subtract",
+              "amount": 100000,
+              "startMonth": "2026-11",
+              "endMonth": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
