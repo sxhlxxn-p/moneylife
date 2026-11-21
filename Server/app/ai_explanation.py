@@ -5,12 +5,13 @@ import re
 
 from fastapi import HTTPException
 from pydantic import Field, ValidationError
+from typing import Literal
 
 from app import llm
 from app.schemas import StrictModel
 
 
-PROMPT_VERSION = 'metric-explanation-v1'
+PROMPT_VERSION = 'metric-facts-v2'
 TOKENS = ('baseGoal', 'candidateGoal', 'assetDifference', 'shortageDifference')
 
 
@@ -35,42 +36,58 @@ def render_verified(text, comparison):
     prose = re.sub(r'\{\{.*?\}\}', '', text)
     if re.search(r'\d|[{}%]|(?:[영공일이삼사오육칠팔구십백천만억조]+|한|두|세|네|다섯|여섯|열|스무|서른)\s*(?:원|개월|년|배|달|퍼센트)', prose):
         raise ValueError('Unbound numeric claim')
+    allowed = ('기존 목표는 {{baseGoal}}, 변경 목표는 {{candidateGoal}}입니다.',
+               '자산 차이는 {{assetDifference}}, 현금 부족 기간 차이는 {{shortageDifference}}입니다.',
+               '가정에 따른 비교입니다.')
+    if text != ' '.join(allowed):
+        raise ValueError('Only server-authored legacy clauses are supported')
     result = text
     for key, value in bindings(comparison).items():
         result = result.replace('{{' + key + '}}', value)
     return result
 
 
+class FactOrder(StrictModel):
+    selectedIds: list[Literal['goal', 'assets', 'liquidity', 'assumptions']] = Field(min_length=4, max_length=4)
+
+
+def facts_for(comparison):
+    values = bindings(comparison)
+    assets = comparison['finalAssetsDifference']
+    shortage = comparison['shortageMonthsDifference']
+    asset_text = '두 계획의 기간 말 순자산이 같습니다.' if assets == 0 else f'변경 계획의 기간 말 순자산이 기존보다 {abs(assets):,}원 ' + ('높습니다.' if assets > 0 else '낮습니다.')
+    shortage_text = '두 계획의 현금 부족 기간이 같습니다.' if shortage == 0 else f'변경 계획의 현금 부족 기간이 기존보다 {abs(shortage)}개월 ' + ('많습니다.' if shortage > 0 else '적습니다.')
+    return {'goal': f"목표 최초 달성은 기존 {values['baseGoal']}, 변경 후 {values['candidateGoal']}입니다.",
+            'assets': asset_text, 'liquidity': shortage_text,
+            'assumptions': '동일한 기간과 입력 가정의 계산 결과이며 실제 미래 수익을 보장하지 않습니다.'}
+
+
 async def generate(comparison, fallback):
     if not os.getenv('OPENAI_API_KEY') or not os.getenv('LLM_MODEL') or os.getenv('LLM_PROVIDER', 'openai') != 'openai':
         return {'text': fallback, 'source': 'template', 'attempts': 0,
                 'fallbackReason': 'LLM_NOT_CONFIGURED', 'verifiedNumbers': True}
-    system = '''개인 재무 시뮬레이션의 두 계획을 짧게 비교한다. 입력된 엔진 지표만 설명한다.
-모든 수치는 다음 네 자리표시자로만 표현하고 각각 한 번 사용한다:
-{{baseGoal}}, {{candidateGoal}}, {{assetDifference}}, {{shortageDifference}}.
-직접 숫자나 한글 금액, 배수, 날짜, 비율을 쓰지 않는다. 기존 목표와 변경 목표를 구분한다.
-자산/부족 기간 차이는 변경 계획에서 기존 계획을 뺀 값이다. 방향을 거꾸로 설명하지 않는다.
-기간 내 미달성과 시작 시점 달성을 임의 개월로 바꾸지 않는다. 원인을 추측하지 않는다.
-실제 미래 예측, 수익 보장, 투자 종목 추천을 하지 않는다. 설정 가정의 비교임을 설명한다.'''
-    user = json.dumps({'metrics': comparison, 'displayBindings': bindings(comparison)}, ensure_ascii=False)
+    facts = facts_for(comparison)
+    user = json.dumps({'facts': facts}, ensure_ascii=False)
     for attempt in range(1, 3):
         try:
             response = await llm.call_response({
-                'model': os.environ['LLM_MODEL'], 'store': False, 'max_output_tokens': 1000,
-                'input': [{'role': 'system', 'content': system}, {'role': 'user', 'content': user}],
-                'text': {'format': {'type': 'json_schema', 'name': 'metric_explanation',
-                                    'strict': True, 'schema': llm.schema(ExplanationText)}}},
+                'model': os.environ['LLM_MODEL'], 'store': False, 'max_output_tokens': 400,
+                'input': [{'role': 'system', 'content': '서버가 작성한 네 사실의 읽기 순서만 정한다. selectedIds에 네 ID를 각각 한 번 넣는다. 문장·숫자·원인은 작성하지 않는다.'},
+                          {'role': 'user', 'content': user}],
+                'text': {'format': {'type': 'json_schema', 'name': 'comparison_fact_order',
+                                    'strict': True, 'schema': llm.schema(FactOrder)}}},
                 timeout=8, prompt_version=PROMPT_VERSION)
-            generated = ExplanationText.model_validate_json(response['text'])
-            text = render_verified(generated.text, comparison)
-            return {'text': text, 'source': 'llm', 'attempts': attempt,
+            order = FactOrder.model_validate_json(response['text']).selectedIds
+            if len(set(order)) != 4:
+                raise ValueError('Duplicate fact')
+            return {'text': '\n'.join(facts[key] for key in order), 'source': 'llm', 'attempts': attempt,
                     'fallbackReason': None, 'verifiedNumbers': True}
         except HTTPException as error:
             if error.detail != 'MODEL_OUTPUT_INVALID':
                 return {'text': fallback, 'source': 'template', 'attempts': attempt,
                         'fallbackReason': error.detail, 'verifiedNumbers': True}
-        except (ValueError, ValidationError):
+        except (ValueError, ValidationError, KeyError, TypeError):
             pass
-        user += '\n이전 응답 검증 실패: 네 자리표시자를 모두 사용하고 직접 수치를 쓰지 말아주세요.'
+        user += '\nID 중복·누락 없이 네 사실을 모두 선택해주세요.'
     return {'text': fallback, 'source': 'template', 'attempts': 2,
             'fallbackReason': 'EXPLANATION_VALIDATION_FAILED', 'verifiedNumbers': True}

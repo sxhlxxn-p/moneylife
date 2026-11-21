@@ -220,6 +220,7 @@ const PaperTrading = (() => {
   }
   async function open() {
     if (serverPlanBusy) return;
+    if (typeof mlShowPage === 'function') mlShowPage('investment');
     stop(); $('paperlab').classList.remove('hidden');
     $('paperlab').scrollIntoView({behavior: 'smooth', block: 'start'});
     setPlanBusy(true); render(); message('투자 연습을 불러오는 중이에요.');
@@ -254,6 +255,7 @@ const PaperTrading = (() => {
       }
       select.addEventListener('change', () => { selectedSeriesId = select.value; setup(); });
       box.append(label, select);
+      if (!sources.some(item => item.dataKind === 'historical-market')) box.append(node('p', '실제 과거 주가 자료는 아직 등록되지 않았어요. 지금은 가상 가격으로 체험할 수 있어요.', 'paper-warning'));
       const source = sources.find(item => item.priceSeriesId === selectedSeriesId) || sources[0];
       if (source.dataKind === 'historical-market') box.append(node('p', `주가 재생 기간 ${source.historicalStartMonth}~${source.historicalEndMonth}. 경과 월 0은 이 기간의 첫 달에 대응해요.`));
       box.append(node('p', `지원 기간은 시작 후 ${source.lastMonth}개월까지예요. 지금 ${month}개월차 여정은 ${month <= source.lastMonth ? '사본으로 시작할 수 있어요.' : '지원 기간을 지났어요. 예시 조건으로 체험해주세요.'}`),

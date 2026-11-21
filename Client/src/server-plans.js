@@ -66,6 +66,10 @@ async function apiRequest(resource, path, options = {}) {
           LLM_UNAVAILABLE: 'AI 서버가 응답하지 않아요. 잠시 후 다시 요청해주세요.',
           LLM_REFUSED: '이 요청을 해석하지 못했어요. 바꿀 조건을 다시 입력해주세요.',
           MODEL_OUTPUT_INVALID: 'AI 응답 형식이 올바르지 않아 적용하지 않았어요.',
+          CLARIFICATION_NOT_FOUND: '이 재질문을 찾지 못했어요. 새 질문으로 시작해주세요.',
+          CLARIFICATION_PLAN_MISMATCH: '재질문의 출발 계획이 달라요. 새 조건에서 다시 질문해주세요.',
+          CLARIFICATION_EXPIRED: '재질문이 만료됐어요. 새 질문으로 시작해주세요.',
+          CLARIFICATION_LIMIT: '보충 답변은 세 번까지 가능해요. 조건을 정리해 새 질문으로 시작해주세요.',
           PROPOSAL_EXPIRED: '변경안이 만료됐어요. 다시 요청해주세요.',
           SIMULATION_FINISHED: '진행이 끝났어요. 새로운 여정에서 요청해주세요.'
         };

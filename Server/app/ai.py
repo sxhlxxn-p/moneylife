@@ -15,7 +15,7 @@ from app.ai_changes import build_candidate, model_context
 from app.ai_schemas import ApplyChange, ApplyResult, ParseChange, ProposalResponse, ExplainRequest, ExplainResult
 from app.database import get_session
 from app.engine import calculate
-from app.models import AIProposal, AIExplanation, Plan, Run
+from app.models import AIProposal, AIExplanation, AIClarification, Plan, Run
 from app.plans import get_owner, owned_plan, summary as plan_summary
 from app.simulations import detail as run_detail
 
@@ -36,13 +36,19 @@ async def explain(payload: ExplainRequest, response: Response,
         return {'text': row.text, 'source': 'llm', 'attempts': row.attempts,
                 'fallbackReason': None, 'verifiedNumbers': True}
     cached = await session.get(AIExplanation, run.id)
-    if cached:
+    if cached and cached.prompt_version == ai_explanation.PROMPT_VERSION and cached.model == os.getenv('LLM_MODEL', ''):
         return stored(cached)
     result = await ai_explanation.generate(run.input_snapshot['aiComparison'], run.input_snapshot['aiExplanation'])
     if result['source'] == 'llm':
-        session.add(AIExplanation(run_id=run.id, owner_id=owner, text=result['text'],
-                    model=os.environ['LLM_MODEL'], prompt_version=ai_explanation.PROMPT_VERSION,
-                    attempts=result['attempts']))
+        if cached:
+            cached.text = result['text']
+            cached.model = os.environ['LLM_MODEL']
+            cached.prompt_version = ai_explanation.PROMPT_VERSION
+            cached.attempts = result['attempts']
+        else:
+            session.add(AIExplanation(run_id=run.id, owner_id=owner, text=result['text'],
+                        model=os.environ['LLM_MODEL'], prompt_version=ai_explanation.PROMPT_VERSION,
+                        attempts=result['attempts']))
         try:
             await session.commit()
         except IntegrityError:
@@ -61,10 +67,35 @@ async def parse_change(payload: ParseChange, response: Response,
     plan = await owned_plan(str(payload.planId), owner, session)
     if plan.state['month'] == 120:
         raise HTTPException(422, detail='SIMULATION_FINISHED')
-    extraction = await llm.extract(payload.message, model_context(plan.state))
-    common = {'basePlanId': plan.id, 'message': payload.message,
+    original_message, turns = payload.message, []
+    if payload.clarificationId is not None:
+        prior = await session.scalar(select(AIClarification).where(
+            AIClarification.id == str(payload.clarificationId), AIClarification.owner_id == owner))
+        if prior is None:
+            raise HTTPException(404, 'CLARIFICATION_NOT_FOUND')
+        if prior.plan_id != plan.id:
+            raise HTTPException(409, 'CLARIFICATION_PLAN_MISMATCH')
+        if prior.expires_at <= int(time.time()):
+            raise HTTPException(410, 'CLARIFICATION_EXPIRED')
+        if len(prior.turns) >= 3:
+            raise HTTPException(422, 'CLARIFICATION_LIMIT')
+        original_message = prior.original_message
+        turns = [*prior.turns, {'question': prior.question, 'answer': payload.message}]
+    context = model_context(plan.state)
+    if turns:
+        context['clarificationTurns'] = turns
+    extraction = await llm.extract(original_message, context)
+    common = {'basePlanId': plan.id, 'message': original_message,
               'model': os.getenv('LLM_MODEL'), 'promptVersion': llm.PROMPT_VERSION}
     if extraction.status != 'ready':
+        if extraction.status == 'needs_clarification':
+            clarification = AIClarification(id=str(uuid4()), owner_id=owner, plan_id=plan.id,
+                expires_at=int(time.time()) + 1800, original_message=original_message,
+                question=extraction.question, turns=turns)
+            session.add(clarification)
+            await session.commit()
+            return {**common, 'status': extraction.status, 'question': extraction.question,
+                    'clarificationId': clarification.id, 'expiresAt': clarification.expires_at}
         return {**common, 'status': extraction.status, 'question': extraction.question}
     try:
         candidate, preview = build_candidate(plan.state, extraction.changes)
@@ -72,7 +103,7 @@ async def parse_change(payload: ParseChange, response: Response,
         return {**common, 'status': 'invalid_change',
                 'question': '변경 후 금액이나 적용 기간이 유효하지 않습니다. 금액과 연월을 확인해주세요.'}
     proposal = AIProposal(id=str(uuid4()), owner_id=owner, base_plan_id=plan.id,
-                          expires_at=int(time.time()) + 1800, message=payload.message,
+                          expires_at=int(time.time()) + 1800, message=original_message,
                           intents=[change.model_dump() for change in extraction.changes],
                           candidate=candidate, model=os.getenv('LLM_MODEL', 'test-double'),
                           prompt_version=llm.PROMPT_VERSION)
