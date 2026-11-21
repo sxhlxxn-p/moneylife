@@ -28,9 +28,9 @@ Python 의존성과 DB 설정은 [서버 안내](../Server/README.md)를 따른�
 - `src/server-plans.js`, `server-events.js`, `session-recovery.js`: 저장 계획·계산 결과·이벤트 분기·세션 복구.
 - `src/ai-client.js`, `ai-preview.js`: 자연어 변경 요청·보충 답변·조건별 변경 전후와 적용 기간 표시·수정·사용자 승인.
 - `src/paper-client.js`: 모의투자 기능 조립. 각 화면은 `paper-view`, `paper-orders`, `paper-conditions`, `paper-comparison`, `paper-explanation`, `paper-charts`로 나뉜다.
-- `src/paper-requests.js`: 미확인 명령의 로컬 보관과 복원. 요청 ID는 재시도 시 새로 만들지 않는다.
+- `src/request-journal.js`, `paper-requests.js`: 미확인 명령의 로컬 보관·복원과 세션 교체 시 별도 보관. 요청 ID는 재시도 시 새로 만들지 않는다.
 - `src/paper-commands.js`, `paper-session.js`, `paper-context.js`: 명령 전송·결과 확인·저장 목록과 모의투자 전용 상태.
-- `src/news-game.js`: 가상 뉴스 게임. 실제 뉴스나 시장 예측이 아니다.
+- `src/news-game.js`: 가상 뉴스 기능 조립. 라운드 화면은 news-view/news-round, 저장·복원은 news-records, 비교·차트는 news-comparison이 담당한다. 실제 뉴스나 시장 예측이 아니다.
 - `src/styles.css`: 스타일 진입점. `styles/`의 공통·대화상자·투자·레이아웃·입력·대시보드·반응형 보정 순서로 불러온다.
 
 ## 변경 기준
@@ -46,3 +46,5 @@ Python 의존성과 DB 설정은 [서버 안내](../Server/README.md)를 따른�
 ## 관련 문서
 
 [화면 명세](../docs/FRONTEND_HANDOFF.md), [계획 계약](../Shared/plan-contract.md), [투자 API](../Shared/paper-api-contract.md), [주문 확인](../Shared/order-preview-contract.md), [AI 변경](../Shared/ai-change-contract.md), [뉴스 게임](../Shared/news-game-contract.md), [백엔드 운영](../docs/backend-operations.md).
+
+생애 이벤트 규칙은 Shared/life-events.json을 사용한다. 프론트는 표시용 단위 변환만 수행하고 서버도 같은 파일에서 원 단위 효과를 읽는다. 비용·기간 변경 시 양쪽 프로세스를 다시 시작하고 규칙 버전을 관리한다.

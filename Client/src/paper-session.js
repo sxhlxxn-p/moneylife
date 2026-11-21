@@ -140,16 +140,7 @@ function installPaperSession(paper) {
       paper.sources.find(
         (item) => item.priceSeriesId === paper.selectedSeriesId,
       ) || paper.sources[0];
-    let state = MoneyLifePlanState.encode({
-      start: JourneyStore.current.start,
-      month: JourneyStore.current.month,
-      baseSaving: JourneyStore.current.baseSaving,
-      baseRate: JourneyStore.current.baseRate,
-      mods: JourneyStore.current.mods,
-      rateMods: JourneyStore.current.rateMods,
-      logs: JourneyStore.current.logs,
-      events: JourneyStore.current.events,
-    });
+    let state = JourneyStore.snapshot();
     if (example)
       state = {
         ...state,

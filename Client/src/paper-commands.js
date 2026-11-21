@@ -69,6 +69,16 @@ function installPaperCommands(paper) {
     } catch (error) {
       // A definite validation failure can be corrected. Uncertain transport/server failures keep the ID.
       if (
+        error.status === 404 &&
+        ["PAPER_PLAN_NOT_FOUND", "PLAN_NOT_FOUND"].includes(error.code)
+      ) {
+        paper.resetForSession("source-unavailable");
+        paper.message(
+          "원본 투자 사본을 확인할 수 없어 미확인 요청을 별도 보관했어요. 취소된 것으로 간주하지 않으며 새 연습을 시작할 수 있어요.",
+        );
+        return;
+      }
+      if (
         [400, 403, 409, 422].includes(error.status) ||
         error.code === "ORDER_NOT_FOUND"
       ) {

@@ -20,16 +20,7 @@ async function saveServerPlan() {
   setPlanBusy(true);
   let planSaved = false;
   try {
-    const state = MoneyLifePlanState.encode({
-      start: JourneyStore.current.start,
-      month: JourneyStore.current.month,
-      baseSaving: JourneyStore.current.baseSaving,
-      baseRate: JourneyStore.current.baseRate,
-      mods: JourneyStore.current.mods,
-      rateMods: JourneyStore.current.rateMods,
-      logs: JourneyStore.current.logs,
-      events: JourneyStore.current.events,
-    });
+    const state = JourneyStore.snapshot();
     const plan = await planRequest("", {
       method: "POST",
       body: JSON.stringify({

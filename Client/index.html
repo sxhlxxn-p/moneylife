@@ -90,6 +90,15 @@
             </div>
             <div class="buttonrow">
               <button
+                id="eventrequest-retry"
+                class="btn"
+                data-plan-action="event-retry"
+                hidden
+                onclick="retryPendingEvent()"
+              >
+                이전 선택 결과 확인
+              </button>
+              <button
                 class="btn primary"
                 data-plan-action="save"
                 onclick="saveServerPlan()"
@@ -931,6 +940,7 @@
     <script src="plan-state.js"></script>
     <script src="journey-defaults.js"></script>
     <script src="journey-store.js"></script>
+    <script src="request-journal.js"></script>
     <script src="ui-common.js"></script>
     <script src="journey-storage.js"></script>
     <script src="journey-simulation.js"></script>
@@ -946,6 +956,10 @@
     <script src="ai-preview.js"></script>
     <script src="ai-client.js"></script>
     <script src="news-scenario.js"></script>
+    <script src="news-view.js"></script>
+    <script src="news-round.js"></script>
+    <script src="news-records.js"></script>
+    <script src="news-comparison.js"></script>
     <script src="news-game.js"></script>
     <script src="paper-requests.js"></script>
     <script src="paper-context.js"></script>

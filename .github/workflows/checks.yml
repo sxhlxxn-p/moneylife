@@ -1,0 +1,45 @@
+name: Project checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OPENAI_API_KEY: ""
+      LLM_MODEL: ""
+      LLM_PROVIDER: openai
+      PYTHONPATH: Server
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          npm ci
+          python -m venv .venv
+          .venv/bin/python -m pip install -r Server/requirements-dev.txt
+          npx playwright install --with-deps chromium
+      - name: Source checks
+        run: |
+          npm run check
+          npm run format:check
+      - name: Unit and server tests
+        run: |
+          npm test
+          .venv/bin/python -m pytest Server/tests -q
+      - name: Browser regression tests
+        run: npm run test:ui

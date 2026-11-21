@@ -19,5 +19,13 @@ function createPaperContext() {
   try {
     paper.reference = localStorage.getItem(paper.referenceKey);
   } catch {}
+  paper.resetForSession = function (reason = "session-renewed") {
+    paper.queue.archive(reason);
+    localStorage.removeItem(paper.referenceKey);
+    paper.current = null;
+    paper.reference = null;
+    paper.explanations.clear();
+    if (paper.render) paper.render();
+  };
   return paper;
 }

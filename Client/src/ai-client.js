@@ -1,14 +1,5 @@
 function aiSnapshot() {
-  return MoneyLifePlanState.encode({
-    start: JourneyStore.current.start,
-    month: JourneyStore.current.month,
-    baseSaving: JourneyStore.current.baseSaving,
-    baseRate: JourneyStore.current.baseRate,
-    mods: JourneyStore.current.mods,
-    rateMods: JourneyStore.current.rateMods,
-    logs: JourneyStore.current.logs,
-    events: JourneyStore.current.events,
-  });
+  return JourneyStore.snapshot();
 }
 async function askServer() {
   const message = $("ask").value.trim();

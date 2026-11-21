@@ -120,7 +120,18 @@ $("ml-reset-all").onclick = () => {
     "재무 입력에서 새 여정을 시작할 수 있어요. 기존 서버 기록은 보존됩니다.",
   );
 };
-render();
-fillFinance();
-mlShowPage("dashboard");
-welcome();
+async function startApplication() {
+  try {
+    await loadLifeEvents();
+    render();
+    fillFinance();
+    mlShowPage("dashboard");
+    welcome();
+  } catch (error) {
+    show(
+      '<h2>화면을 준비하지 못했어요</h2><p id="start-error"></p><button class="btn" onclick="location.reload()">다시 불러오기</button>',
+    );
+    $("start-error").textContent = error.message;
+  }
+}
+startApplication();
