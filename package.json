@@ -26,7 +26,9 @@
     "check:market": "python3 Server/scripts/check_market.py",
     "prepare:market": "python3 Server/scripts/prepare_market_demo.py",
     "demo:monthly-trading": "npm run demo:monthly-trading --workspace Engine",
-    "test:ui": "npm run test:ui --workspace Test"
+    "test:ui": "npm run test:ui --workspace Test",
+    "db:migrate": "python3 Server/scripts/maintain_database.py migrate",
+    "db:cleanup": "python3 Server/scripts/maintain_database.py cleanup"
   },
   "engines": {
     "node": ">=18"

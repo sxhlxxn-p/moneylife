@@ -12,7 +12,7 @@ const PaperTrading = (() => {
   try {
     reference = localStorage.getItem(referenceKey);
     const saved = JSON.parse(localStorage.getItem(pendingKey));
-    // Only replay the three allowed commands, never arbitrary stored URLs.
+    // Replay only the allowed commands, never arbitrary stored URLs.
     if (saved && ['create', 'orders', 'advance', 'cancel', 'conditions'].includes(saved.action) &&
         typeof saved.body?.requestId === 'string' &&
         (saved.action === 'create' || /^[a-f0-9-]{36}$/.test(saved.parentId)) &&

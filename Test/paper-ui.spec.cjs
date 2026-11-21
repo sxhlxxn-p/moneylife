@@ -794,12 +794,11 @@ test('새 재무 화면의 원 단위 입력·공용 계산·서버 저장·복�
 test('낮은 소득의 휴식 이벤트도 음수가 되지 않고 서버에 저장된다', {timeout: 30000}, async t => {
   const page = await pageFor(t);
   await page.evaluate(() => { start.income = 100; start.expense = 60; month = 30; render(); mlShowPage('dashboard'); nextEvent(); });
+  const response = page.waitForResponse(r => r.url().endsWith('/api/event-branches') && r.request().method() === 'POST');
   await page.getByRole('button', {name: '나를 위한 휴식', exact: true}).click();
-  assert.deepEqual(await page.evaluate(() => [simulate()[31].income, simulate()[33].income, simulate()[34].income]), [0, 0, 100]);
-  const response = page.waitForResponse(r => r.url().endsWith('/api/plans') && r.request().method() === 'POST');
-  await page.getByRole('button', {name: '서버 계산·저장', exact: true}).click();
   assert.equal((await response).status(), 201);
-  await page.waitForFunction(() => !serverPlanBusy);
+  await page.waitForFunction(() => !serverPlanBusy && events.has(30));
+  assert.deepEqual(await page.evaluate(() => [simulate()[31].income, simulate()[33].income, simulate()[34].income]), [0, 0, 100]);
 });
 
 test('재질문 답변은 동일 계획·질문 ID에 연결하고 승인 전 상태를 유지한다', {timeout: 30000}, async t => {
@@ -862,4 +861,30 @@ test('새 모바일 메뉴에서 재무 입력·목표·투자 화면을 이동�
   await page.locator('#ml-mobile-toggle').click();
   await page.locator('#ml-main-nav [data-page=investment]').click();
   await page.getByRole('button', {name:'예시 조건으로 체험', exact:true}).waitFor();
+});
+
+test('생애 이벤트는 원본과 새 계획을 함께 저장하고 선택을 한 번만 반영한다', async (t) => {
+  const page = await pageFor(t);
+  await page.evaluate(() => { closeModal(); month = 12; render(); eventPreview(12); });
+  const saved = page.waitForResponse(r => r.url().endsWith('/api/event-branches') && r.status() === 201);
+  await page.getByRole('button', {name: '지금 독립할래요', exact: true}).click();
+  const response = await saved;
+  const result = await response.json();
+  await page.waitForFunction(() => events.has(12));
+  assert.equal(result.plan.parentPlanId, result.basePlan.id);
+  assert.equal(await page.evaluate(() => mods.filter(c => c.type === 'once').length), 1);
+  assert.equal(await page.evaluate(() => serverPlanId), result.plan.id);
+});
+
+test('만료 세션 안내에서 새 세션을 시작해도 로컬 여정은 유지된다', async (t) => {
+  const page = await pageFor(t);
+  await page.evaluate(() => { closeModal(); month = 12; render(); });
+  await page.context().addCookies([{name: 'moneylife_guest', value: 'expired-session', url}]);
+  await page.evaluate(() => saveServerPlan());
+  await page.getByRole('button', {name: '새 세션으로 계속하기', exact: true}).click();
+  await page.waitForFunction(() => !serverPlanBusy && document.getElementById('overlay').classList.contains('hidden'));
+  assert.equal(await page.evaluate(() => month), 12);
+  assert.equal(await page.evaluate(() => serverPlanId), null);
+  await page.evaluate(() => saveServerPlan());
+  await page.waitForFunction(() => !serverPlanBusy && serverPlanId !== null);
 });

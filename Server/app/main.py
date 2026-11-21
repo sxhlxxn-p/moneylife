@@ -1,4 +1,7 @@
 import os
+import logging
+import time
+from uuid import uuid4
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
@@ -66,6 +69,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.events import router as events_router
+app.include_router(events_router)
 app.include_router(plans_router)
 app.include_router(simulations_router)
 app.include_router(ai_router)
@@ -74,6 +79,27 @@ app.include_router(paper_comparison_router)
 app.include_router(paper_explanation_router)
 app.include_router(news_games_router)
 app.include_router(news_comparison_router)
+
+
+logger = logging.getLogger('moneylife.requests')
+logger.setLevel(logging.INFO)
+
+@app.middleware('http')
+async def request_logging(request: Request, call_next):
+    request_id = str(uuid4())
+    started = time.monotonic()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.error('request_id=%s method=%s route=%s status=500', request_id,
+                     request.method, getattr(request.scope.get('route'), 'path', 'unmatched'))
+        return JSONResponse(status_code=500, content={'detail': 'INTERNAL_ERROR'},
+                            headers={'X-Request-ID': request_id})
+    response.headers['X-Request-ID'] = request_id
+    logger.info('request_id=%s method=%s route=%s status=%s duration_ms=%.1f',
+                request_id, request.method, getattr(request.scope.get('route'), 'path', 'unmatched'),
+                response.status_code, (time.monotonic()-started)*1000)
+    return response
 
 
 @app.exception_handler(SQLAlchemyError)

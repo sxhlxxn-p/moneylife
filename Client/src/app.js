@@ -650,16 +650,11 @@ function eventPreview(m) {
       event.b +
       "</strong><small>" +
       event.bd +
-      '</small></button></div><p class="note">선택은 다음 달부터 반영해요. 원본을 보관하려면 선택 전 서버에 저장해주세요.</p>',
+      '</small></button></div><p class="note">선택은 다음 달부터 반영해요. 확정하면 선택 전 원본과 새 계획을 서버에 함께 저장해요. 서버 연결이 필요합니다.</p>',
   );
 }
 function choose(m, accepted) {
-  if (serverPlanBusy || events.has(m)) return;
-  if (accepted) mods.push(...eventMods(m));
-  events.add(m);
-  log(accepted ? EV[m].a : EV[m].b);
-  closeModal();
-  render();
+  return saveEventBranch(m, accepted);
 }
 function step() {
   if (serverPlanBusy) return;

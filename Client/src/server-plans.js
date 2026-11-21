@@ -52,6 +52,7 @@ async function apiRequest(resource, path, options = {}) {
         };
         if (messages[failureCode]) throw new Error(messages[failureCode]);
       }
+      if (resource === 'event-branches' && failureCode === 'EVENT_STATE_INVALID') throw new Error('변경 기록이 저장 한도를 넘었어요. 현재 여정은 유지됩니다.');
       if (resource === 'ai') {
         const messages = {
           LLM_NOT_CONFIGURED: '서버에 LLM API 키와 모델을 설정해야 해요. 현재 여정은 유지됩니다.',
@@ -75,7 +76,11 @@ async function apiRequest(resource, path, options = {}) {
         };
         if (messages[body.detail]) throw new Error(messages[body.detail]);
       }
-      if (response.status === 401) throw new Error('저장 세션이 만료됐어요. 현재 여정은 이 기기에 남아 있어요.');
+      if (response.status === 401) {
+        show('<h2>저장 세션이 만료됐어요</h2><p>현재 여정은 이 기기에 남아 있어요. 새 세션을 시작하면 로컬 여정을 다시 저장할 수 있어요. 이전 세션의 서버 자료는 자동으로 연결되지 않아요.</p><button class="btn primary" onclick="recoverGuestSession()">새 세션으로 계속하기</button>');
+        throw new Error('저장 세션이 만료됐어요. 새 세션으로 계속한 뒤 다시 시도해주세요.');
+      }
+      if (response.status === 429) throw new Error('요청이 많아요. 잠시 후 다시 시도해주세요.');
       if (response.status === 422) throw new Error('입력이나 이벤트 적용 후 금액·기간을 확인해주세요.');
       if (response.status === 404) throw new Error('저장된 계획이나 계산 결과를 찾을 수 없어요.');
       throw new Error('서버에 연결하지 못했어요. 현재 여정은 이 기기에 남아 있어요.');
@@ -244,4 +249,59 @@ async function openServerResult() {
   } finally {
     setPlanBusy(false);
   }
+}
+
+
+async function recoverGuestSession() {
+  if (serverPlanBusy) return;
+  setPlanBusy(true);
+  try {
+    const result = await planRequest('/session/recover', {method: 'POST'});
+    if (result.status === 'renewed') {
+      serverPlanId = null;
+      try { localStorage.removeItem('money-life-server-plan'); } catch {}
+      pendingEventRequest = null;
+    }
+    closeModal();
+    $('serverstatus').textContent = '새 세션을 준비했어요. 로컬 여정을 다시 저장할 수 있어요.';
+    toast('현재 여정은 유지됩니다. 저장 또는 이벤트 선택을 다시 진행해주세요.');
+  } catch (error) { toast(error.message); }
+  finally { setPlanBusy(false); }
+}
+
+let pendingEventRequest = null;
+async function saveEventBranch(eventMonth, accepted) {
+  if (serverPlanBusy || events.has(eventMonth)) return;
+  stop();
+  const state = MoneyLifePlanState.encode({start, month, baseSaving, baseRate, mods, rateMods, logs, events});
+  const command = {base: {schemaVersion: 1, goalBasis: 'net_assets', parentPlanId: serverPlanId, state}, eventMonth, accepted};
+  const snapshot = JSON.stringify(command);
+  if (!pendingEventRequest || pendingEventRequest.snapshot !== snapshot) {
+    pendingEventRequest = {snapshot, requestId: crypto.randomUUID()};
+  }
+  setPlanBusy(true);
+  try {
+    const result = await apiRequest('event-branches', '', {method: 'POST',
+      body: JSON.stringify({...command, requestId: pendingEventRequest.requestId})});
+    // Never overwrite edits made while the server was calculating.
+    const current = MoneyLifePlanState.encode({start, month, baseSaving, baseRate, mods, rateMods, logs, events});
+    if (JSON.stringify(current) !== JSON.stringify(state)) {
+      toast('선택 결과를 서버에 저장했어요. 현재 수정 중인 여정은 유지됩니다.');
+      return;
+    }
+    const decoded = MoneyLifePlanState.decode(result.plan);
+    serverPlanId = result.plan.id;
+    try { localStorage.setItem('money-life-server-plan', serverPlanId); } catch {}
+    mods = decoded.mods;
+    events = new Set(decoded.events);
+    logs = decoded.logs;
+    pendingEventRequest = null;
+    closeModal();
+    render();
+    $('serverstatus').textContent = '선택 전 원본과 선택 후 계획·계산 결과를 저장했어요.';
+    toast('선택을 반영했어요. 이전 계획은 저장한 여정에서 확인할 수 있어요.');
+  } catch (error) {
+    $('serverstatus').textContent = '선택 반영을 확인하지 못했어요. 현재 여정은 유지됩니다.';
+    toast(error.message);
+  } finally { setPlanBusy(false); }
 }

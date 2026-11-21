@@ -9,6 +9,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.request_limits import limited_ai_owner
 from app import llm
 from app import ai_explanation
 from app.ai_changes import build_candidate, model_context
@@ -25,7 +26,7 @@ router = APIRouter(prefix='/ai', tags=['ai'])
 
 @router.post('/explain', response_model=ExplainResult)
 async def explain(payload: ExplainRequest, response: Response,
-                  owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+                  owner: str = Depends(limited_ai_owner), session: AsyncSession = Depends(get_session)):
     response.headers['Cache-Control'] = 'no-store'
     run = await session.scalar(select(Run).where(Run.id == str(payload.runId), Run.owner_id == owner))
     if run is None:
@@ -62,7 +63,7 @@ async def explain(payload: ExplainRequest, response: Response,
 
 @router.post('/parse-change', response_model=ProposalResponse)
 async def parse_change(payload: ParseChange, response: Response,
-                       owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+                       owner: str = Depends(limited_ai_owner), session: AsyncSession = Depends(get_session)):
     response.headers['Cache-Control'] = 'no-store'
     plan = await owned_plan(str(payload.planId), owner, session)
     if plan.state['month'] == 120:
@@ -124,7 +125,7 @@ async def applied(proposal, owner, session):
 
 @router.post('/proposals/{proposal_id}/apply', response_model=ApplyResult)
 async def apply_change(proposal_id: UUID, payload: ApplyChange, response: Response,
-                       owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+                       owner: str = Depends(limited_ai_owner), session: AsyncSession = Depends(get_session)):
     response.headers['Cache-Control'] = 'no-store'
     proposal = await session.scalar(select(AIProposal).where(AIProposal.id == str(proposal_id),
                                                             AIProposal.owner_id == owner))
