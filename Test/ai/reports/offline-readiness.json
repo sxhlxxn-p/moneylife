@@ -5,7 +5,7 @@
   "flow": {
     "kind": "offline-integration-check",
     "externalApiCalls": 0,
-    "scriptedProviderRequests": 11,
+    "scriptedProviderRequests": 13,
     "checks": [
       {
         "id": "approval-calculation-repeat",
@@ -49,6 +49,26 @@
       {
         "id": "verified-explanation-cache",
         "passed": true
+      },
+      {
+        "id": "compound-approved-comparison",
+        "passed": true,
+        "comparison": {
+          "baseGoalMonth": 12,
+          "candidateGoalMonth": 8,
+          "finalAssetsDifference": 60000000,
+          "shortageMonthsDifference": 0
+        }
+      },
+      {
+        "id": "bounded-approved-comparison",
+        "passed": true,
+        "comparison": {
+          "baseGoalMonth": 12,
+          "candidateGoalMonth": 11,
+          "finalAssetsDifference": 800000,
+          "shortageMonthsDifference": 0
+        }
       }
     ],
     "limitations": [
@@ -117,8 +137,8 @@
       "wrongApplicationRateOfApplied": 0.0,
       "clarificationRecall": 1.0,
       "errors": 0,
-      "meanLatencyMs": 0.09617777777777778,
-      "p95LatencyMs": 0.175,
+      "meanLatencyMs": 0.11124444444444445,
+      "p95LatencyMs": 0.256,
       "inputTokens": null,
       "outputTokens": null,
       "costUsd": null
@@ -134,8 +154,8 @@
         "wrongApplicationRateOfApplied": 0.0,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.13883333333333334,
-        "p95LatencyMs": 0.275,
+        "meanLatencyMs": 0.1473888888888889,
+        "p95LatencyMs": 0.245,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -150,8 +170,8 @@
         "wrongApplicationRateOfApplied": 0.0,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.12444444444444445,
-        "p95LatencyMs": 0.152,
+        "meanLatencyMs": 0.1327222222222222,
+        "p95LatencyMs": 0.186,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -166,8 +186,8 @@
         "wrongApplicationRateOfApplied": null,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.035555555555555556,
-        "p95LatencyMs": 0.071,
+        "meanLatencyMs": 0.0415,
+        "p95LatencyMs": 0.145,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -182,8 +202,8 @@
         "wrongApplicationRateOfApplied": null,
         "clarificationRecall": 1.0,
         "errors": 0,
-        "meanLatencyMs": 0.0405,
-        "p95LatencyMs": 0.158,
+        "meanLatencyMs": 0.03227777777777777,
+        "p95LatencyMs": 0.089,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -198,8 +218,8 @@
         "wrongApplicationRateOfApplied": null,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.03961111111111111,
-        "p95LatencyMs": 0.107,
+        "meanLatencyMs": 0.035111111111111114,
+        "p95LatencyMs": 0.083,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -214,8 +234,8 @@
         "wrongApplicationRateOfApplied": null,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.07527777777777778,
-        "p95LatencyMs": 0.136,
+        "meanLatencyMs": 0.09616666666666668,
+        "p95LatencyMs": 0.254,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -230,8 +250,8 @@
         "wrongApplicationRateOfApplied": 0.0,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.128,
-        "p95LatencyMs": 0.267,
+        "meanLatencyMs": 0.19205555555555553,
+        "p95LatencyMs": 0.611,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -246,8 +266,8 @@
         "wrongApplicationRateOfApplied": 0.0,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.14733333333333334,
-        "p95LatencyMs": 0.276,
+        "meanLatencyMs": 0.17333333333333334,
+        "p95LatencyMs": 0.415,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -262,8 +282,8 @@
         "wrongApplicationRateOfApplied": 0.0,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.19727777777777777,
-        "p95LatencyMs": 1.12,
+        "meanLatencyMs": 0.22427777777777777,
+        "p95LatencyMs": 1.435,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -278,8 +298,8 @@
         "wrongApplicationRateOfApplied": null,
         "clarificationRecall": null,
         "errors": 0,
-        "meanLatencyMs": 0.034944444444444445,
-        "p95LatencyMs": 0.103,
+        "meanLatencyMs": 0.037611111111111116,
+        "p95LatencyMs": 0.188,
         "inputTokens": null,
         "outputTokens": null,
         "costUsd": null
@@ -294,6 +314,7 @@
   "reproduce": [
     "npm run check:ai:offline",
     "npm run prepare:ai",
-    "npm run evaluate:ai -- --mode rules --split dev --output .data/ai-evaluation/rules-dev-current.json"
+    "npm run evaluate:ai -- --mode rules --split dev --output .data/ai-evaluation/rules-dev-current.json",
+    "npm run review:ai -- --report .data/ai-evaluation/rules-dev-current.json"
   ]
 }

@@ -147,3 +147,35 @@ button:disabled {
 .server-tools [hidden] {
   display: none;
 }
+
+.ai-comparison-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.ai-comparison-metrics > div {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf9fd;
+  min-width: 0;
+}
+.ai-comparison-metrics dt,
+.ai-comparison-caption {
+  color: var(--sub);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.ai-comparison-metrics dd {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 450px) {
+  .ai-comparison-metrics {
+    grid-template-columns: 1fr;
+  }
+}

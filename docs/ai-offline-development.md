@@ -37,3 +37,15 @@ npm run evaluate:ai -- --mode rules --split dev --output .data/ai-evaluation/rul
 ## 결과 확인
 
 `Test/ai/reports/offline-readiness.json`은 이번 검증의 공유용 요약이다. 전체 개발 시도 기록과 검수표는 위 명령으로 재생성한다. 요약 파일은 최종 평가 동결 설정으로 사용할 수 없다. 규칙 기준선 결과를 실제 LLM 성능이나 실제 사용자 분포의 성능으로 소개하지 않는다.
+
+## 개발 결과 재검토
+
+```bash
+npm run review:ai -- --report .data/ai-evaluation/rules-dev-current.json
+```
+
+현재 코드·데이터 설정과 일치하는 개발 60건×3회 전체 보고서만 읽는다. `.data/ai-evaluation/development-review/summary.json`과 `failures.csv`에 문장 단위의 실패 유형을 저장한다. 반복 실패 42회를 별개 문장 42건으로 세지 않으며, 실제 실패 문장은 14건이다. 공유용 결과는 `Test/ai/reports/rules-dev-review.json`이다. 실패 유형 검토는 정답 데이터의 독립 의미 검수를 대체하지 않는다.
+
+현재 규칙 기준선에서 기간 한정 6건·복합 요청 6건·상대 시점 1건·역전 기간 1건을 재질문으로 처리했다. 기준선을 이 사례에 맞춰 확장하지 않았다. 실제 모델 연결 후 이 범주를 포함한 같은 개발 세트로 plain/structured를 비교한다. 최종 40건은 지금 실행하지 않는다.
+
+통합 검사는 복합 조건과 한정 기간 변경을 실제 엔진으로 승인·계산하고, 저장된 비교 수치를 다시 조회하는 항목까지 포함한다. 브라우저는 비교 카드·실패 후 같은 변경안 재확인·모바일 표시를 모의 응답으로 검사한다. 모의 응답과 규칙 결과는 LLM 정확도나 지연 성능으로 보고하지 않는다.

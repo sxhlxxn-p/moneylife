@@ -163,14 +163,27 @@ async function applyAIProposalTransaction(id, snapshot) {
     }
     restoreServerPlan(result.plan);
     show(
-      '<h2>새 계획을 계산했어요</h2><p id="aiexplanation"></p><p id="aiexplanationsource">계산 결과를 넣은 정형 설명입니다.</p><div class="modalactions"><button id="explainai" class="btn" data-plan-action="explain">AI 설명 보기</button></div><p>원본과 새 계획은 저장한 여정에서 각각 불러올 수 있어요. 상세 수치는 계산 결과에서 확인하세요.</p>',
+      '<h2>새 계획을 계산했어요</h2><div id="aicomparison" aria-label="조건 변경 전후 비교"></div><p id="aiexplanation"></p><p id="aiexplanationsource">계산 결과를 넣은 정형 설명입니다.</p><div class="modalactions"><button id="explainai" class="btn" data-plan-action="explain">AI 설명 보기</button></div><p>원본과 새 계획은 저장한 여정에서 각각 불러올 수 있어요. 상세 수치는 계산 결과에서 확인하세요.</p>',
     );
+    if (result.comparison)
+      renderAIComparison(
+        $("aicomparison"),
+        result.comparison,
+        result.run.months ?? 120,
+      );
     $("aiexplanation").textContent = result.explanation;
     $("explainai").addEventListener("click", () => explainAIRun(result.run.id));
     $("serverstatus").textContent =
       "AI 변경안 적용 · 새 계획과 서버 계산 결과 저장 완료";
   } catch (error) {
-    toast(error.message);
+    const retryable = !error.status || error.status >= 500;
+    const message = retryable
+      ? error.message +
+        " 변경안 화면에서 같은 확인 버튼으로 처리 결과를 다시 확인할 수 있어요."
+      : error.message;
+    $("serverstatus").textContent = message;
+    if ($("aistatus")) $("aistatus").textContent = message;
+    toast(message);
   } finally {
     setPlanBusy(false);
   }

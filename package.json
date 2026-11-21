@@ -33,7 +33,8 @@
     "format:check": "prettier --check \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html",
     "check:ai:offline": "python3 Test/ai/check_offline.py",
     "prepare:ai": "python3 Test/ai/prepare.py",
-    "evaluate:ai": "python3 Test/ai/evaluate.py"
+    "evaluate:ai": "python3 Test/ai/evaluate.py",
+    "review:ai": "python3 Test/ai/review_development.py"
   },
   "engines": {
     "node": ">=18"
