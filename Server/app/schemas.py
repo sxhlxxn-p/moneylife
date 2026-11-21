@@ -3,7 +3,14 @@
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator, model_serializer, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    model_validator,
+    model_serializer,
+    field_validator,
+)
 
 
 Money = Annotated[int, Field(strict=True, ge=0, le=10_000_000_000)]
@@ -56,11 +63,11 @@ class GoalMetadata(StrictModel):
     name: str = Field(min_length=1, max_length=40)
     months: Annotated[int, Field(strict=True, ge=1, le=120)]
 
-    @field_validator('name')
+    @field_validator("name")
     @classmethod
     def nonblank_name(cls, value):
         if not value.strip():
-            raise ValueError('목표 이름을 입력해주세요.')
+            raise ValueError("목표 이름을 입력해주세요.")
         return value
 
 
@@ -77,11 +84,11 @@ class GameState(StrictModel):
     logs: list[LogEntry] = Field(default_factory=list, max_length=80)
     events: list[Literal[12, 30, 48, 72, 96]] = Field(default_factory=list, max_length=5)
 
-    @model_serializer(mode='wrap')
+    @model_serializer(mode="wrap")
     def serialize_state(self, handler):
         result = handler(self)
-        if result.get('goal') is None:
-            result.pop('goal', None)
+        if result.get("goal") is None:
+            result.pop("goal", None)
         return result
 
     @model_validator(mode="after")

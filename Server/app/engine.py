@@ -24,8 +24,11 @@ async def run_engine(payload: dict, max_output: int = 1_000_000) -> bytes:
     async with slots:
         try:
             process = await asyncio.create_subprocess_exec(
-                node, str(RUNNER), stdin=asyncio.subprocess.PIPE,
-                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+                node,
+                str(RUNNER),
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
         except OSError:
             raise HTTPException(status_code=503, detail="ENGINE_UNAVAILABLE") from None
@@ -60,8 +63,10 @@ async def calculate(state: dict, months: int) -> EngineResult:
         goal = next((row.month for row in rows if row.total >= state["initial"]["target"]), None)
         first_shortage = next((row.month for row in rows if row.short > 0), None)
         if result.summary.model_dump() != {
-            "goalMonth": goal, "finalNetAssets": final.total,
-            "finalCash": final.cash, "finalSaved": final.saved,
+            "goalMonth": goal,
+            "finalNetAssets": final.total,
+            "finalCash": final.cash,
+            "finalSaved": final.saved,
             "firstShortageMonth": first_shortage,
             "shortageMonths": sum(row.short > 0 for row in rows),
             "unmetTotal": final.unpaid,

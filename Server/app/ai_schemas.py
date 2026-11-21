@@ -1,4 +1,5 @@
 """AI extraction and approval contracts."""
+
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -8,15 +9,15 @@ from app.schemas import StrictModel, Money, CalculatedMoney, PlanDetail, RunDeta
 
 
 class ChangeIntent(StrictModel):
-    field: Literal['income', 'expense', 'monthlySaving']
-    operation: Literal['set', 'add', 'subtract']
+    field: Literal["income", "expense", "monthlySaving"]
+    operation: Literal["set", "add", "subtract"]
     amount: Money
-    startMonth: str = Field(pattern=r'^\d{4}-(0[1-9]|1[0-2])$')
+    startMonth: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     endMonth: str | None
 
 
 class Extraction(StrictModel):
-    status: Literal['ready', 'needs_clarification', 'unsupported']
+    status: Literal["ready", "needs_clarification", "unsupported"]
     changes: list[ChangeIntent] = Field(max_length=10)
     question: str | None = Field(max_length=1000)
 
@@ -30,11 +31,11 @@ class ParseChange(StrictModel):
 class ApplyChange(StrictModel):
     confirmed: Literal[True]
 
-    @field_validator('confirmed', mode='before')
+    @field_validator("confirmed", mode="before")
     @classmethod
     def explicit_confirmation(cls, value):
         if value is not True:
-            raise ValueError('명시적인 확인이 필요합니다.')
+            raise ValueError("명시적인 확인이 필요합니다.")
         return value
 
 
@@ -44,7 +45,7 @@ class ExplainRequest(StrictModel):
 
 class ExplainResult(StrictModel):
     text: str
-    source: Literal['template', 'llm']
+    source: Literal["template", "llm"]
     attempts: int
     fallbackReason: str | None
     verifiedNumbers: Literal[True]
@@ -62,7 +63,7 @@ class ApplyResult(StrictModel):
     run: RunDetail
     comparison: Comparison
     explanation: str
-    explanationSource: Literal['template']
+    explanationSource: Literal["template"]
     toolsExecuted: list[str]
 
 
@@ -74,9 +75,9 @@ class ChangePreviewSegment(StrictModel):
 
 
 class ChangePreview(StrictModel):
-    field: Literal['income', 'expense', 'monthlySaving']
+    field: Literal["income", "expense", "monthlySaving"]
     label: str
-    operation: Literal['set', 'add', 'subtract']
+    operation: Literal["set", "add", "subtract"]
     amount: Money
     startMonth: str
     endMonth: str
@@ -84,7 +85,7 @@ class ChangePreview(StrictModel):
 
 
 class ProposalResponse(StrictModel):
-    status: Literal['ready', 'needs_clarification', 'unsupported', 'invalid_change']
+    status: Literal["ready", "needs_clarification", "unsupported", "invalid_change"]
     proposalId: UUID | None = None
     clarificationId: UUID | None = None
     basePlanId: UUID

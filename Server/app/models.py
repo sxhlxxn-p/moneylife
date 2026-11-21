@@ -74,7 +74,7 @@ class AIExplanation(Base):
 
 
 class AIClarification(Base):
-    __tablename__ = 'ai_clarifications'
+    __tablename__ = "ai_clarifications"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     owner_id: Mapped[str] = mapped_column(String(36), index=True)
     plan_id: Mapped[str] = mapped_column(String(36))
@@ -111,8 +111,9 @@ class PaperRun(Base):
     input_snapshot: Mapped[dict] = mapped_column(JSON)
     result: Mapped[dict] = mapped_column(JSON)
 
+
 class PaperExplanation(Base):
-    __tablename__ = 'paper_explanations'
+    __tablename__ = "paper_explanations"
 
     run_id: Mapped[str] = mapped_column(String(36), primary_key=True)
     prompt_version: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -124,8 +125,8 @@ class PaperExplanation(Base):
 
 
 class NewsGameRecord(Base):
-    __tablename__ = 'news_game_records'
-    __table_args__ = (UniqueConstraint('owner_id', 'request_id'),)
+    __tablename__ = "news_game_records"
+    __table_args__ = (UniqueConstraint("owner_id", "request_id"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     owner_id: Mapped[str] = mapped_column(String(36), index=True)
@@ -139,8 +140,8 @@ class NewsGameRecord(Base):
 
 
 class EventBranch(Base):
-    __tablename__ = 'event_branches'
-    __table_args__ = (UniqueConstraint('owner_id', 'request_id'),)
+    __tablename__ = "event_branches"
+    __table_args__ = (UniqueConstraint("owner_id", "request_id"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     owner_id: Mapped[str] = mapped_column(String(36), index=True)
     request_id: Mapped[str] = mapped_column(String(36))
@@ -151,17 +152,17 @@ class EventBranch(Base):
 
 
 class RequestQuota(Base):
-    __tablename__ = 'request_quotas'
+    __tablename__ = "request_quotas"
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     count: Mapped[int] = mapped_column(Integer)
     expires_at: Mapped[int] = mapped_column(BigInteger, index=True)
 
 
 class PlanSave(Base):
-    __tablename__='plan_saves'
-    __table_args__=(UniqueConstraint('owner_id','request_id'),)
-    id: Mapped[str]=mapped_column(String(36),primary_key=True)
-    owner_id: Mapped[str]=mapped_column(String(36),index=True)
-    request_id: Mapped[str]=mapped_column(String(36))
-    plan_id: Mapped[str]=mapped_column(String(36))
-    command: Mapped[dict]=mapped_column(JSON)
+    __tablename__ = "plan_saves"
+    __table_args__ = (UniqueConstraint("owner_id", "request_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    plan_id: Mapped[str] = mapped_column(String(36))
+    command: Mapped[dict] = mapped_column(JSON)
