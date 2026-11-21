@@ -222,4 +222,5 @@ function installNewsRecords(news) {
       }
     }
   };
+  news.saveSnapshot = serializedMutation(news.saveSnapshot);
 }

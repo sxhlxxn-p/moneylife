@@ -14,49 +14,35 @@ function planRequest(path, options) {
 function simulationRequest(path, options) {
   return apiRequest("simulations", path, options);
 }
-async function saveServerPlan() {
+async function saveServerPlanTransaction() {
   if (serverPlanBusy) return;
-  stop();
-  setPlanBusy(true);
-  let planSaved = false;
-  try {
-    const state = JourneyStore.snapshot();
-    const plan = await planRequest("", {
-      method: "POST",
-      body: JSON.stringify({
-        schemaVersion: 1,
-        goalBasis: "net_assets",
-        parentPlanId: serverPlanId,
-        state,
-      }),
-    });
-    serverPlanId = plan.id;
-    planSaved = true;
-    try {
-      localStorage.setItem("money-life-server-plan", plan.id);
-    } catch {}
-    $("serverstatus").textContent =
-      "계획을 저장했어요. 서버에서 계산 중이에요.";
-    await simulationRequest("", {
-      method: "POST",
-      body: JSON.stringify({
-        planId: plan.id,
-        requestId: crypto.randomUUID(),
-        months: 120,
-      }),
-    });
-    $("serverstatus").textContent =
-      `${state.month}개월 시점 서버 저장 완료 · 계산 결과 보관`;
-    toast("여정과 서버 계산 결과를 새 사본으로 저장했어요.");
-  } catch (error) {
-    const message = planSaved
-      ? "계획은 저장됐지만 계산을 완료하지 못했어요. 저장한 여정은 유지됩니다."
-      : error.message;
-    $("serverstatus").textContent = message;
-    toast(message);
-  } finally {
-    setPlanBusy(false);
+  const snapshot = JourneyStore.snapshot();
+  const previous = planSaves.get();
+  if (
+    previous &&
+    JSON.stringify(previous.snapshot) !== JSON.stringify(snapshot)
+  ) {
+    show(
+      '<h2>확인하지 못한 저장이 있어요</h2><p>이전 저장 결과를 먼저 확인해주세요. 별도 보관해도 서버에서 처리된 저장을 취소하지는 않아요.</p><button class="btn primary" onclick="retryPlanSave()">이전 저장 결과 확인</button><button class="btn" onclick="archivePlanSave()">이전 요청 별도 보관</button>',
+    );
+    return;
   }
+  if (!previous)
+    planSaves.stage({
+      requestId: crypto.randomUUID(),
+      runRequestId: crypto.randomUUID(),
+      snapshot,
+      command: {
+        kind: "save",
+        plan: {
+          schemaVersion: 1,
+          goalBasis: "net_assets",
+          parentPlanId: serverPlanId,
+          state: snapshot,
+        },
+      },
+    });
+  return retryPlanSaveTransaction();
 }
 async function openServerPlans(offset = 0) {
   if (serverPlanBusy) return;
@@ -142,7 +128,9 @@ async function openServerResult() {
       "?planId=" + encodeURIComponent(serverPlanId) + "&limit=1",
     );
     if (!runs.length) {
-      toast("이 여정에는 계산 결과가 없어요. 서버 계산·저장을 눌러주세요.");
+      show(
+        '<h2>저장된 계획의 계산이 필요해요</h2><p>새 계획을 만들지 않고 저장된 조건으로 다시 계산할 수 있어요.</p><button class="btn primary" onclick="calculateSavedPlan()">저장된 계획 다시 계산</button>',
+      );
       return;
     }
     const run = await simulationRequest("/" + encodeURIComponent(runs[0].id));
@@ -150,7 +138,7 @@ async function openServerResult() {
       '<h2>서버 계산 결과</h2><p id="runstatus"></p><div id="runsummary" class="run-summary"></div><details class="run-details"><summary>월별 자산 상세 보기</summary><div class="run-table-scroll"><table><thead><tr><th>경과 월</th><th>현금</th><th>저축</th><th>누적 미충족액</th><th>총자산</th></tr></thead><tbody id="runmonths"></tbody></table></div></details>',
     );
     $("runstatus").textContent =
-      `저장한 조건으로 ${run.months}개월을 계산한 결과입니다. 이자는 매월 원 단위로 반올림합니다. 현재 화면의 미리보기와 소액 차이가 날 수 있어요.`;
+      `저장한 조건으로 ${run.months}개월을 계산한 결과입니다. 이자는 매월 원 단위로 반올림합니다. 화면 미리보기와 같은 원 단위 반올림 규칙을 사용해요.`;
     const currency = (value) => value.toLocaleString("ko-KR") + "원";
     const goal = run.summary.goalMonth;
     const metrics = [
@@ -196,3 +184,5 @@ async function openServerResult() {
     setPlanBusy(false);
   }
 }
+
+const saveServerPlan = serializedMutation(saveServerPlanTransaction);

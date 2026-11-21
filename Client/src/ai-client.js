@@ -9,7 +9,7 @@ async function askServer() {
   }
   return requestAIChange(message);
 }
-async function requestAIChange(message, followup = null) {
+async function requestAIChangeTransaction(message, followup = null) {
   if (serverPlanBusy) return;
   stop();
   const snapshot = aiSnapshot();
@@ -136,7 +136,7 @@ async function requestAIChange(message, followup = null) {
     setPlanBusy(false);
   }
 }
-async function applyAIProposal(id, snapshot) {
+async function applyAIProposalTransaction(id, snapshot) {
   if (serverPlanBusy) return;
   if (JSON.stringify(snapshot) !== JSON.stringify(aiSnapshot())) {
     toast("현재 조건이 바뀌었어요. 변경안을 다시 요청해주세요.");
@@ -198,3 +198,7 @@ async function explainAIRun(runId) {
     setPlanBusy(false);
   }
 }
+
+const requestAIChange = serializedMutation(requestAIChangeTransaction);
+
+const applyAIProposal = serializedMutation(applyAIProposalTransaction);

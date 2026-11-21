@@ -46,5 +46,10 @@
   "/news-view.js": "Client/src/news-view.js",
   "/news-round.js": "Client/src/news-round.js",
   "/news-records.js": "Client/src/news-records.js",
-  "/news-comparison.js": "Client/src/news-comparison.js"
+  "/news-comparison.js": "Client/src/news-comparison.js",
+  "/decimal.js": "node_modules/decimal.js/decimal.js",
+  "/interest.js": "Engine/src/interest.cjs",
+  "/snapshot.js": "Engine/src/snapshot.cjs",
+  "/mutation-lock.js": "Client/src/mutation-lock.js",
+  "/plan-save.js": "Client/src/plan-save.js"
 }

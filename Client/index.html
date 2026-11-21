@@ -90,6 +90,23 @@
             </div>
             <div class="buttonrow">
               <button
+                id="plansave-retry"
+                class="btn"
+                data-plan-action="save-retry"
+                hidden
+                onclick="retryPlanSave()"
+              >
+                이전 저장 결과 확인
+              </button>
+              <button
+                id="plansave-archive"
+                class="btn"
+                hidden
+                onclick="archivePlanSave()"
+              >
+                이전 저장 요청 별도 보관
+              </button>
+              <button
                 id="eventrequest-retry"
                 class="btn"
                 data-plan-action="event-retry"
@@ -124,6 +141,14 @@
                 모의투자 열기 ↗</button
               ><button class="btn" onclick="NewsGame.demo()">
                 뉴스 게임 체험
+              </button>
+              <button
+                id="eventrequest-archive"
+                class="btn"
+                hidden
+                onclick="archivePendingEvent()"
+              >
+                이전 요청 별도 보관
               </button>
             </div>
           </section>
@@ -937,10 +962,14 @@
     </div>
     <div id="toast" class="toast hidden" role="status"></div>
     <script src="engine.js"></script>
+    <script src="decimal.js"></script>
+    <script src="interest.js"></script>
+    <script src="snapshot.js"></script>
     <script src="plan-state.js"></script>
     <script src="journey-defaults.js"></script>
     <script src="journey-store.js"></script>
     <script src="request-journal.js"></script>
+    <script src="mutation-lock.js"></script>
     <script src="ui-common.js"></script>
     <script src="journey-storage.js"></script>
     <script src="journey-simulation.js"></script>
@@ -950,6 +979,7 @@
     <script src="finance-screen.js"></script>
     <script src="api-errors.js"></script>
     <script src="api-client.js"></script>
+    <script src="plan-save.js"></script>
     <script src="server-plans.js"></script>
     <script src="server-events.js"></script>
     <script src="session-recovery.js"></script>

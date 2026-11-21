@@ -27,13 +27,20 @@ function installPaperCommands(paper) {
       );
       return;
     }
-    await paper.sendPending();
+    await paper.executePending();
   };
   paper.sendPending = async function () {
     if (serverPlanBusy || !paper.queue.get()) return;
     setPlanBusy(true);
     paper.render();
     paper.message("서버에서 처리 결과를 확인하는 중이에요.");
+    if (paper.queue.isSuspended()) {
+      setPlanBusy(false);
+      paper.message(
+        "이전 요청을 보관하지 못했어요. 브라우저 저장 공간을 확인해주세요.",
+      );
+      return;
+    }
     const request = paper.queue.get();
     try {
       const path =
@@ -52,7 +59,7 @@ function installPaperCommands(paper) {
       });
       // Store the returned reference before clearing the recoverable command.
       paper.remember(result);
-      paper.queue.clear();
+      paper.queue.clear(request.body.requestId);
       paper.message(
         request.action === "conditions"
           ? "생활 조건을 변경한 새 사본을 저장했어요. 다음 달부터 반영됩니다."
@@ -82,7 +89,7 @@ function installPaperCommands(paper) {
         [400, 403, 409, 422].includes(error.status) ||
         error.code === "ORDER_NOT_FOUND"
       ) {
-        paper.queue.clear();
+        paper.queue.clear(request.body.requestId);
       }
       paper.message(error.message);
     } finally {
@@ -90,4 +97,7 @@ function installPaperCommands(paper) {
       paper.render();
     }
   };
+  paper.executePending = paper.sendPending;
+  paper.sendPending = serializedMutation(paper.executePending, paper.message);
+  paper.command = serializedMutation(paper.command, paper.message);
 }

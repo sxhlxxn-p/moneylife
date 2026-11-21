@@ -73,13 +73,13 @@ def test_migration_adopts_existing_baseline_and_keeps_data(tmp_path):
         engine = create_async_engine(f'sqlite+aiosqlite:///{tmp_path / "legacy.db"}')
         metadata = MetaData()
         for table in Base.metadata.sorted_tables:
-            if table.name not in ('event_branches', 'request_quotas'):
+            if table.name not in ('event_branches', 'request_quotas', 'plan_saves'):
                 table.to_metadata(metadata)
         async with engine.begin() as connection:
             await connection.run_sync(metadata.create_all)
             await connection.execute(text("INSERT INTO guest_sessions VALUES ('hash','owner',9999999999)"))
             await connection.run_sync(database.migrate_database)
-            assert await connection.scalar(text('SELECT version_num FROM alembic_version')) == '0003'
+            assert await connection.scalar(text('SELECT version_num FROM alembic_version')) == '0004'
             assert await connection.scalar(text('SELECT owner_id FROM guest_sessions')) == 'owner'
             await connection.run_sync(database.migrate_database)
         await engine.dispose()
@@ -125,3 +125,26 @@ def test_legacy_schema_mismatch_stops_migration(tmp_path):
             assert await connection.scalar(text("SELECT count(*) FROM unknown_data")) == 0
         await engine.dispose()
     asyncio.run(exercise())
+
+
+def test_production_schema_check_requires_explicit_migration(tmp_path, monkeypatch):
+    async def exercise():
+        engine = create_async_engine(f'sqlite+aiosqlite:///{tmp_path / "production.db"}')
+        monkeypatch.setattr(database, 'engine', engine)
+        monkeypatch.setenv('AUTO_MIGRATE', 'false')
+        with pytest.raises(RuntimeError, match='schema is not current'):
+            await database.prepare_database()
+        async with engine.connect() as connection:
+            assert await connection.scalar(text("SELECT count(*) FROM sqlite_master WHERE type='table'")) == 0
+        async with engine.begin() as connection:
+            await connection.run_sync(database.migrate_database)
+        await database.prepare_database()
+        await engine.dispose()
+    asyncio.run(exercise())
+
+
+def test_production_start_requires_database_url(monkeypatch):
+    monkeypatch.setattr(database, 'engine', None)
+    monkeypatch.setenv('AUTO_MIGRATE', 'false')
+    with pytest.raises(RuntimeError, match='DATABASE_URL is required'):
+        asyncio.run(database.prepare_database())

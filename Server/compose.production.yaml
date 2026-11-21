@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: moneylife
+      POSTGRES_USER: moneylife
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes: [production_database:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U moneylife -d moneylife]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    networks: [backend]
+  migrate:
+    build:
+      context: ..
+      dockerfile: Server/Dockerfile
+      target: production
+    image: moneylife-api:local
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+      AUTO_MIGRATE: "false"
+    command: [python, scripts/maintain_database.py, migrate]
+    depends_on:
+      db: { condition: service_healthy }
+    networks: [backend]
+  api:
+    image: moneylife-api:local
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:?Set the HTTPS client origin}
+      COOKIE_SECURE: "true"
+      AUTO_MIGRATE: "false"
+      FORWARDED_ALLOW_IPS: "*"
+      OPENAI_API_KEY: ""
+      LLM_MODEL: ""
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    volumes: [../.data/market:/app/.data/market:ro]
+    networks: [backend, frontend]
+  web:
+    build:
+      context: ..
+      dockerfile: Client/Dockerfile
+    ports: ["${HTTPS_PORT:-8443}:443"]
+    volumes: [../.data/tls:/etc/nginx/tls:ro]
+    depends_on: [api]
+    networks: [frontend]
+volumes:
+  production_database:
+networks:
+  backend: { internal: true }
+  frontend: {}

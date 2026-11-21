@@ -160,4 +160,5 @@ function render() {
   mlRenderReport();
   persist();
   renderEventRecovery();
+  renderSaveRecovery();
 }

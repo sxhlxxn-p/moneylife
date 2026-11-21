@@ -139,6 +139,11 @@ button:disabled {
   border-left: 3px solid var(--purple);
 }
 
-#eventrequest-retry[hidden] {
+#eventrequest-retry[hidden],
+#eventrequest-archive[hidden] {
+  display: none;
+}
+
+.server-tools [hidden] {
   display: none;
 }
