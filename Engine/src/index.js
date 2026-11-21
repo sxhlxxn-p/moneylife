@@ -1,4 +1,4 @@
-/* Financial transition rules. Author: sxhlxxn. */
+/* Financial transition rules. */
 const GameEngine = {
   goalMonth(path, target) {
     return path.findIndex(row => row.total >= target);

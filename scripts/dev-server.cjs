@@ -13,19 +13,7 @@ const routes = new Map(prototypeMode ? [
   ['/styles.css', 'prototype/styles.css'],
   ['/app.js', 'prototype/app.js'],
   ['/engine.js', 'prototype/engine.js']
-] : [
-  ['/', 'Client/index.html'],
-  ['/index.html', 'Client/index.html'],
-  ['/styles.css', 'Client/src/styles.css'],
-  ['/app.js', 'Client/src/app.js'],
-  ['/plan-state.js', 'Client/src/plan-state.js'],
-  ['/server-plans.js', 'Client/src/server-plans.js'],
-  ['/ai-client.js', 'Client/src/ai-client.js'],
-  ['/paper-client.js', 'Client/src/paper-client.js'],
-  ['/news-scenario.js', 'Engine/src/news-scenario.js'],
-  ['/news-game.js', 'Client/src/news-game.js'],
-  ['/engine.js', 'Engine/src/index.js']
-]);
+] : Object.entries(require('../Client/assets.json')));
 http.createServer(async (req,res) => {
   try {
     const pathname = decodeURIComponent(new URL(req.url,'http://localhost').pathname);

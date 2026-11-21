@@ -1,4 +1,4 @@
-// Shared cash-flow and investment simulation. Author: sxhlxxn.
+// Shared cash-flow and investment simulation.
 const engine = require('./index.js');
 const {createInterestCalculator} = require('./interest.cjs');
 const {calculateSnapshot, summarizePath} = require('./snapshot.cjs');

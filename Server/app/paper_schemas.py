@@ -1,4 +1,4 @@
-"""Paper trading API contracts. Author: sxhlxxn."""
+"""Paper trading API contracts."""
 from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID

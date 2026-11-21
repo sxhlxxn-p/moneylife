@@ -1,4 +1,4 @@
-"""Owned, optionally ranked result explanations. Author: sxhlxxn."""
+"""Owned, optionally ranked result explanations."""
 import asyncio
 import os
 import time
@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
 from app.models import PaperRun, PaperExplanation
 from app.plans import get_owner
+from app.request_limits import limited_ai_owner
 from app.paper_schemas import PaperExplainCreate, PaperExplainDetail
 from app import paper_explanation as explanation
 
@@ -35,7 +36,7 @@ async def basic_explanation(run_id: UUID, response: Response,
 
 @router.post('/paper-runs/{run_id}/explanation', response_model=PaperExplainDetail)
 async def ranked_explanation(run_id: UUID, payload: PaperExplainCreate, response: Response,
-                             owner: str = Depends(get_owner), session: AsyncSession = Depends(get_session)):
+                             owner: str = Depends(limited_ai_owner), session: AsyncSession = Depends(get_session)):
     response.headers['Cache-Control'] = 'no-store'
     run = await owned_run(run_id, owner, session)
     facts, required, default = explanation.facts_for(run)

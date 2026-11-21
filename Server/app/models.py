@@ -1,4 +1,4 @@
-"""Plan snapshots and guest sessions. Author: sxhlxxn."""
+"""Plan snapshots and guest sessions."""
 
 from sqlalchemy import JSON, BigInteger, Integer, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -136,3 +136,22 @@ class NewsGameRecord(Base):
     source_month: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[int] = mapped_column(BigInteger)
     result: Mapped[dict] = mapped_column(JSON)
+
+
+class EventBranch(Base):
+    __tablename__ = 'event_branches'
+    __table_args__ = (UniqueConstraint('owner_id', 'request_id'),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(String(36), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    command: Mapped[dict] = mapped_column(JSON)
+    base_plan_id: Mapped[str] = mapped_column(String(36))
+    plan_id: Mapped[str] = mapped_column(String(36))
+    run_id: Mapped[str] = mapped_column(String(36))
+
+
+class RequestQuota(Base):
+    __tablename__ = 'request_quotas'
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    count: Mapped[int] = mapped_column(Integer)
+    expires_at: Mapped[int] = mapped_column(BigInteger, index=True)

@@ -1,4 +1,4 @@
-"""Validate model intents against every affected month. Author: sxhlxxn."""
+"""Validate model intents against every affected month."""
 from copy import deepcopy
 
 from app.schemas import GameState

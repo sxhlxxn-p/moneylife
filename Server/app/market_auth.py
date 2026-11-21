@@ -1,4 +1,4 @@
-"""Server-only Toss credentials and token acquisition. Author: sxhlxxn."""
+"""Server-only Toss credentials and token acquisition."""
 import os
 import re
 from pathlib import Path

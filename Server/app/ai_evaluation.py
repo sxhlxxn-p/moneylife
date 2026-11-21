@@ -1,4 +1,4 @@
-"""Offline extraction evaluation, never a production fallback. Author: sxhlxxn."""
+"""Offline extraction evaluation, never a production fallback."""
 import hashlib
 import json
 import re

@@ -1,4 +1,4 @@
-"""AI extraction and approval contracts. Author: sxhlxxn."""
+"""AI extraction and approval contracts."""
 from typing import Annotated, Literal
 from uuid import UUID
 

@@ -1,4 +1,4 @@
-"""Read-only Toss daily candles adapter. Author: sxhlxxn."""
+"""Read-only Toss daily candles adapter."""
 from datetime import datetime, time
 import re
 from zoneinfo import ZoneInfo

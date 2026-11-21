@@ -1,4 +1,4 @@
-// Server KRW calculation policy. Author: sxhlxxn.
+// Server KRW calculation policy.
 const {createInterestCalculator} = require('./interest.cjs');
 const engine = require('./index');
 const ENGINE_VERSION = 'cash-savings-krw-v1';

@@ -1,4 +1,4 @@
-"""Configure local model credentials through hidden input. Author: sxhlxxn."""
+"""Configure local model credentials through hidden input."""
 import getpass
 import os
 from pathlib import Path

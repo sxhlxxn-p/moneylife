@@ -1,4 +1,4 @@
-"""Validate monthly investment engine outputs. Author: sxhlxxn."""
+"""Validate monthly investment engine outputs."""
 from fastapi import HTTPException
 from pydantic import ValidationError
 from app.engine import run_engine

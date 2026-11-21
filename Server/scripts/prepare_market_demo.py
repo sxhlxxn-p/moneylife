@@ -1,4 +1,4 @@
-"""Prepare one reproducible market demo; collection is explicit. Author: sxhlxxn."""
+"""Prepare one reproducible market demo; collection is explicit."""
 import argparse
 import json
 from pathlib import Path

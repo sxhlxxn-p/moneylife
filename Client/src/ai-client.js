@@ -1,17 +1,15 @@
-/* AI change approval flow. Author: sxhlxxn. */
 function aiSnapshot() {
   return MoneyLifePlanState.encode({
-    start,
-    month,
-    baseSaving,
-    baseRate,
-    mods,
-    rateMods,
-    logs,
-    events,
+    start: JourneyStore.current.start,
+    month: JourneyStore.current.month,
+    baseSaving: JourneyStore.current.baseSaving,
+    baseRate: JourneyStore.current.baseRate,
+    mods: JourneyStore.current.mods,
+    rateMods: JourneyStore.current.rateMods,
+    logs: JourneyStore.current.logs,
+    events: JourneyStore.current.events,
   });
 }
-
 async function askServer() {
   const message = $("ask").value.trim();
   if (!message) {
@@ -20,7 +18,6 @@ async function askServer() {
   }
   return requestAIChange(message);
 }
-
 async function requestAIChange(message, followup = null) {
   if (serverPlanBusy) return;
   stop();
@@ -37,7 +34,9 @@ async function requestAIChange(message, followup = null) {
     $("serverstatus").textContent =
       "현재 조건으로 AI 변경안을 확인하고 있어요.";
     const plan = followup
-      ? { id: followup.planId }
+      ? {
+          id: followup.planId,
+        }
       : await planRequest("", {
           method: "POST",
           body: JSON.stringify({
@@ -53,7 +52,11 @@ async function requestAIChange(message, followup = null) {
       body: JSON.stringify({
         planId: plan.id,
         message,
-        ...(followup ? { clarificationId: followup.id } : {}),
+        ...(followup
+          ? {
+              clarificationId: followup.id,
+            }
+          : {}),
       }),
     });
     if (JSON.stringify(snapshot) !== JSON.stringify(aiSnapshot())) {
@@ -111,7 +114,6 @@ async function requestAIChange(message, followup = null) {
     setPlanBusy(false);
   }
 }
-
 async function applyAIProposal(id, snapshot) {
   if (serverPlanBusy) return;
   if (JSON.stringify(snapshot) !== JSON.stringify(aiSnapshot())) {
@@ -126,7 +128,9 @@ async function applyAIProposal(id, snapshot) {
       {
         method: "POST",
         timeoutMs: 35000,
-        body: JSON.stringify({ confirmed: true }),
+        body: JSON.stringify({
+          confirmed: true,
+        }),
       },
     );
     if (JSON.stringify(snapshot) !== JSON.stringify(aiSnapshot())) {
@@ -149,7 +153,6 @@ async function applyAIProposal(id, snapshot) {
     setPlanBusy(false);
   }
 }
-
 async function explainAIRun(runId) {
   if (serverPlanBusy) return;
   setPlanBusy(true);
@@ -157,7 +160,9 @@ async function explainAIRun(runId) {
     const result = await apiRequest("ai", "/explain", {
       method: "POST",
       timeoutMs: 35000,
-      body: JSON.stringify({ runId }),
+      body: JSON.stringify({
+        runId,
+      }),
     });
     if (!$("aiexplanation") || !$("aiexplanationsource")) return;
     $("aiexplanation").textContent = result.text;

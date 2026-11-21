@@ -1,4 +1,4 @@
-"""Server-controlled immutable test market data. Author: sxhlxxn."""
+"""Server-controlled immutable test market data."""
 import hashlib
 import json
 import os

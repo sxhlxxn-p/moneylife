@@ -1,4 +1,4 @@
-// Fixed stdin/stdout bridge. Author: sxhlxxn.
+// Fixed stdin/stdout bridge.
 const {calculateSnapshot} = require('./snapshot.cjs');
 const {compareWithTrading} = require('./monthly-trading.cjs');
 const {previewOrder} = require('./order-preview.cjs');

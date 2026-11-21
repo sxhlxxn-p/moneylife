@@ -1,4 +1,4 @@
-"""Run against a local API using synthetic prices. Author: sxhlxxn."""
+"""Run against a local API using synthetic prices."""
 import argparse
 import json
 from pathlib import Path

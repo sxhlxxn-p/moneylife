@@ -27,6 +27,7 @@ COPY Server/requirements.txt Server/requirements-dev.txt ./
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
 COPY Server/app ./app
+COPY Server/migrations ./migrations
 COPY Server/tests ./tests
 COPY Engine /app/Engine
 COPY fixtures /app/fixtures

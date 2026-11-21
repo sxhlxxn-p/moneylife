@@ -1,4 +1,4 @@
-"""Structured extraction through an external LLM. Author: sxhlxxn."""
+"""Structured extraction through an external LLM."""
 import json
 import os
 import time

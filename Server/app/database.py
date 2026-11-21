@@ -5,7 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 
 from fastapi import HTTPException
 
-from app.models import Base
+from pathlib import Path
+
+from alembic import command
+from alembic.config import Config
 
 
 def create_database_engine() -> AsyncEngine | None:
@@ -29,7 +32,7 @@ def database_kind() -> str:
 async def initialize_database() -> None:
     if engine is not None:
         async with engine.begin() as connection:
-            await connection.run_sync(Base.metadata.create_all)
+            await connection.run_sync(migrate_database)
 
 
 async def get_session():
@@ -50,3 +53,10 @@ async def check_database_connection() -> None:
 async def close_database_connection() -> None:
     if engine is not None:
         await engine.dispose()
+
+
+def migrate_database(connection):
+    config = Config()
+    config.set_main_option('script_location', str(Path(__file__).resolve().parents[1] / 'migrations'))
+    config.attributes['connection'] = connection
+    command.upgrade(config, 'head')
