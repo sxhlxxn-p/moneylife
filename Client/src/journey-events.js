@@ -44,7 +44,11 @@ function eventPreview(m) {
       event.title +
       "</h2><p>" +
       event.body +
-      '</p><div class="eventoptions"><button class="choice" aria-label="' +
+      '</p><div class="game-event-forecast"><span>선택 전 목표 <strong>' +
+      gameGoalLabel(reference) +
+      "</strong></span><span>선택 후 목표 <strong>" +
+      gameGoalLabel(candidate) +
+      '</strong></span></div><div class="eventoptions"><button class="choice" aria-label="' +
       event.a +
       '" onclick="choose(' +
       m +

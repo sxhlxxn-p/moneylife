@@ -90,8 +90,5 @@ function journal() {
   );
 }
 function welcome() {
-  show(
-    '<div class="eyebrow">WELCOME TO MONEY LIFE</div><h2>돈을 모으는 시간도,<br>당신의 인생이니까요.</h2><p>개인의 조건으로 선택 전후의 계획을 비교해요. 저장한 진행은 같은 기기에서 이어집니다.</p><div class="modalactions"><button class="btn" onclick="closeModal();settings()">재무 정보 입력</button><button class="btn primary" onclick="closeModal()">마을로 시작하기 →</button></div>',
-  );
+  showJourneyStart();
 }
-// Restore the established version-1 game snapshot; do not reinterpret legacy stock inputs as deposits.

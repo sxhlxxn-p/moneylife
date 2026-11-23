@@ -29,6 +29,11 @@ $("ml-mobile-toggle").onclick = () => {
     String(button.getAttribute("aria-expanded") !== "true"),
   );
 };
+document
+  .querySelectorAll("[data-game-place]")
+  .forEach((node) =>
+    node.addEventListener("click", () => openLifePlace(node.dataset.gamePlace)),
+  );
 $("ml-play").onclick = toggle;
 $("ml-one-month").onclick = step;
 $("ml-next-event").onclick = nextEvent;

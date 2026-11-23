@@ -1,0 +1,519 @@
+/* Game stage and journey feedback. */
+body.ml-game-edition {
+  background: #f6f5ef;
+}
+.ml-game-edition #money-life-app {
+  background: #f6f5ef;
+  color: #243d38;
+}
+.ml-game-edition .ml-topbar {
+  height: 62px;
+  background: #fdfcf8;
+  border-color: #e3e6dc;
+}
+.ml-game-edition .ml-brand-mark {
+  background: #256554;
+}
+.ml-game-edition .ml-layout {
+  grid-template-columns: 160px minmax(0, 1fr);
+}
+.ml-game-edition .ml-sidebar {
+  top: 62px;
+  height: calc(100vh - 62px);
+  background: #fdfcf8;
+  border-color: #e3e6dc;
+  padding: 24px 10px;
+}
+.ml-game-edition .ml-nav button {
+  padding: 12px 10px;
+  gap: 7px;
+  color: #63756d;
+}
+.ml-game-edition .ml-nav button.active {
+  background: #e4eee5;
+  color: #245b49;
+}
+.ml-game-edition .ml-side-bottom {
+  background: #ecf0e5;
+}
+.ml-game-edition .ml-main {
+  padding: 26px 32px;
+}
+.ml-game-edition .ml-page {
+  max-width: 1250px;
+}
+.ml-game-edition .ml-page-head {
+  margin-bottom: 18px;
+}
+.ml-game-edition .ml-page-head h1 {
+  font-size: 26px;
+}
+.ml-game-edition .ml-page-head p {
+  color: #6c7b70;
+}
+.ml-game-edition .ml-eyebrow {
+  color: #657f6d;
+}
+.ml-game-edition .ml-card {
+  border-color: #e2e6db;
+  box-shadow: none;
+}
+.ml-game-edition .ml-btn.primary {
+  background: #256554;
+  border-color: #256554;
+}
+.game-goal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 24px;
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  background: #e9efdf;
+}
+.game-goal h3 {
+  font-size: 10px;
+  color: #5f7659;
+  text-transform: uppercase;
+}
+.game-goal .ml-desc {
+  margin: 0;
+  color: #264b39;
+  font-size: 17px;
+  font-weight: 800;
+}
+.game-goal .ml-goal-money {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  margin: 0;
+  font-size: 23px;
+}
+.game-goal .ml-bar {
+  grid-column: 1 / -1;
+  margin: 12px 0 8px;
+  height: 6px;
+  background: #d1ddc8;
+}
+.game-goal .ml-bar span {
+  background: #4c8059;
+}
+.game-goal .ml-hint,
+.game-goal .ml-goal-deadline {
+  margin: 0;
+  color: #4c6751;
+  font-size: 11px;
+}
+.game-goal .ml-goal-deadline {
+  text-align: right;
+}
+.ml-game-edition .ml-hud {
+  margin-bottom: 14px;
+  gap: 10px;
+}
+.ml-game-edition .ml-metric {
+  padding: 11px 14px;
+  border-color: #e2e6db;
+  background: #fdfcf8;
+}
+.ml-game-edition .ml-metric-icon {
+  background: #edf1e8;
+  color: #5f7d5c;
+  width: 30px;
+  height: 30px;
+}
+.ml-game-edition .ml-metric strong {
+  font-size: 16px;
+}
+.ml-game-edition .ml-town-layout {
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 16px;
+}
+.game-story {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #fffdf6;
+  border-top: 1px solid #e9ecdf;
+}
+.game-story-marker {
+  font-size: 24px;
+  color: #c08b35;
+}
+.game-story strong {
+  font-size: 14px;
+}
+.game-story p {
+  margin: 5px 0 0;
+  color: #687668;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.game-turn {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #81927a;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.ml-game-edition .ml-world {
+  min-height: 330px;
+  background: linear-gradient(
+    #e1eee5 0%,
+    #eef2d8 68%,
+    #cfdfac 68%,
+    #bbcf98 100%
+  );
+}
+.ml-game-edition .ml-world::after {
+  content: "";
+  position: absolute;
+  width: 120%;
+  height: 38px;
+  background: #f6e9cc;
+  bottom: 30px;
+  left: -10%;
+  transform: rotate(-5deg);
+  border: 2px solid #fff7e3;
+}
+.ml-game-edition .ml-world-copy {
+  max-width: 290px;
+  pointer-events: none;
+}
+.ml-game-edition .ml-world-copy h2 {
+  max-width: 280px;
+  font-size: 23px;
+  color: #35593d;
+}
+.ml-game-edition .ml-world-copy p {
+  max-width: 235px;
+  color: #657c59;
+  font-size: 11px;
+}
+.ml-game-edition .ml-town {
+  z-index: 2;
+  right: 5%;
+  width: 67%;
+  bottom: 65px;
+}
+.ml-game-edition .ml-building {
+  padding: 0;
+  transition: transform 0.2s;
+  border: 3px solid #fff8e8;
+  box-shadow: 5px 7px 0 #64855630;
+}
+.ml-game-edition .ml-building:hover {
+  transform: translateY(-7px);
+}
+.ml-game-edition .ml-building:focus-visible {
+  outline: 3px solid #285d47;
+  outline-offset: 6px;
+}
+.ml-game-edition .ml-building strong {
+  bottom: -28px;
+  background: #fffdf1;
+  color: #3b5845;
+  padding: 7px 9px;
+  border-radius: 6px;
+  box-shadow: 0 2px 0 #46674b24;
+}
+.ml-game-edition .ml-building.bank {
+  background: #c9d9ca;
+}
+.ml-game-edition .ml-building.office {
+  background: #b1c9d0;
+}
+.ml-game-edition .ml-building.home {
+  background: #eacfaa;
+}
+.ml-game-edition .ml-building.home:before {
+  background: #b97059;
+}
+.ml-game-edition .ml-building.office:before {
+  background: #6a9295;
+}
+.ml-game-edition .ml-building.bank:before {
+  background: #819b71;
+}
+.ml-game-edition .ml-person {
+  right: 28%;
+  bottom: 5px;
+  font-size: 42px;
+}
+.ml-game-edition .ml-world-location {
+  z-index: 2;
+  bottom: 12px;
+  color: #496740;
+}
+.ml-game-edition .ml-event-card {
+  border: 0;
+  border-radius: 0;
+  padding: 17px 20px;
+  background: #faf4e6;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 18px;
+  align-items: center;
+}
+.ml-game-edition .ml-event-card .ml-eyebrow {
+  grid-column: 1;
+  color: #a47a3b;
+}
+.ml-game-edition .ml-event-card h3 {
+  font-size: 15px;
+  margin: 5px 0;
+}
+.ml-game-edition .ml-event-card p {
+  margin: 0;
+  font-size: 11px;
+  color: #7b705b;
+}
+.ml-game-edition .ml-event-options {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  min-width: 145px;
+}
+.ml-game-edition .ml-event-options button:first-child {
+  background: #315c43;
+  color: white;
+  border-color: #315c43;
+}
+.ml-game-edition .ml-event-options button {
+  font-size: 11px;
+  padding: 10px;
+}
+.game-month-receipt {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-top: 1px dashed #dedfd3;
+  color: #78816c;
+  font-size: 11px;
+}
+.game-month-receipt > div {
+  flex: 1;
+  min-width: 100px;
+}
+.game-month-receipt strong {
+  display: block;
+  margin-top: 5px;
+  color: #365442;
+  font-size: 14px;
+}
+.game-warning {
+  flex-basis: 100%;
+  color: #b04c35;
+  margin: 0;
+}
+.game-choice-result {
+  padding: 18px 20px;
+  background: #e9efdf;
+  border-bottom: 1px solid #d5dfc8;
+}
+.game-choice-result p {
+  line-height: 1.8;
+  font-size: 12px;
+}
+.game-choice-result[hidden] {
+  display: none;
+}
+.ml-game-edition .ml-bottom-grid {
+  grid-template-columns: 1fr;
+}
+.journey-drawer {
+  margin-top: 22px;
+  border-top: 1px solid #dddeda;
+  padding: 14px 0;
+}
+.journey-drawer summary {
+  cursor: pointer;
+  color: #647367;
+  font-size: 12px;
+}
+.journey-drawer .server-tools {
+  margin-top: 14px;
+}
+.game-kicker {
+  color: #5c7d62;
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+.game-starts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 24px 0 14px;
+}
+.game-start-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  align-items: start;
+  gap: 9px;
+  padding: 19px;
+  border: 1px solid #dce3d4;
+  border-radius: 14px;
+  background: #f3f5eb;
+  color: #31533e;
+}
+.game-start-card:hover {
+  background: #e9efdf;
+  border-color: #7f9b75;
+}
+.game-start-card > span {
+  font-size: 32px;
+}
+.game-start-card small {
+  color: #78816c;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.game-start-card em {
+  margin-top: auto;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+@media (max-width: 1100px) {
+  .ml-game-edition .ml-town-layout {
+    grid-template-columns: 1fr;
+  }
+  .ml-game-edition .ml-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .ml-game-edition .ml-main {
+    padding: 20px;
+  }
+}
+@media (max-width: 760px) {
+  .ml-game-edition .ml-layout {
+    grid-template-columns: 1fr;
+  }
+  .ml-game-edition .ml-sidebar {
+    position: relative;
+    top: auto;
+    height: auto;
+    padding: 9px 16px;
+  }
+  .ml-game-edition .ml-main {
+    padding: 17px 12px;
+  }
+  .ml-game-edition .ml-page-head {
+    align-items: start;
+  }
+  .ml-game-edition .ml-page-head h1 {
+    font-size: 22px;
+  }
+  .ml-game-edition .ml-page-head > .ml-btn {
+    padding: 8px;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .game-goal {
+    padding: 15px;
+    column-gap: 10px;
+  }
+  .game-goal .ml-desc {
+    font-size: 14px;
+  }
+  .game-goal .ml-goal-money {
+    font-size: 17px;
+  }
+  .ml-game-edition .ml-hud {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ml-game-edition .ml-metric {
+    padding: 10px;
+  }
+  .ml-game-edition .ml-metric strong {
+    font-size: 14px;
+  }
+  .game-story {
+    padding: 14px;
+  }
+  .game-turn {
+    display: none;
+  }
+  .ml-game-edition .ml-world {
+    min-height: 370px;
+    padding: 18px;
+  }
+  .ml-game-edition .ml-world-copy h2 {
+    font-size: 21px;
+  }
+  .ml-game-edition .ml-world-copy p {
+    max-width: 245px;
+  }
+  .ml-game-edition .ml-town {
+    width: 90%;
+    right: 5%;
+    height: 165px;
+  }
+  .ml-game-edition .ml-building.office {
+    height: 114px;
+  }
+  .ml-game-edition .ml-building.bank {
+    height: 92px;
+  }
+  .ml-game-edition .ml-building.home {
+    height: 74px;
+  }
+  .ml-game-edition .ml-building strong {
+    font-size: 9px;
+    padding: 6px;
+  }
+  .ml-game-edition .ml-event-card {
+    display: block;
+    padding: 16px;
+  }
+  .ml-game-edition .ml-event-options {
+    display: flex;
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .ml-game-edition .ml-event-options button {
+    flex: 1;
+  }
+  .ml-game-edition .ml-aside {
+    grid-template-columns: 1fr;
+  }
+  .game-starts {
+    grid-template-columns: 1fr;
+  }
+  .game-start-card {
+    gap: 7px;
+    padding: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-game-edition *,
+  .ml-game-edition *::before {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.game-event-forecast {
+  display: flex;
+  gap: 14px;
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: #edf2e4;
+}
+.game-event-forecast > span {
+  flex: 1;
+  font-size: 11px;
+  color: #718364;
+}
+.game-event-forecast strong {
+  display: block;
+  color: #33573e;
+  font-size: 19px;
+  margin-top: 6px;
+}

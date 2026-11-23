@@ -51,5 +51,7 @@
   "/interest.js": "Engine/src/interest.cjs",
   "/snapshot.js": "Engine/src/snapshot.cjs",
   "/mutation-lock.js": "Client/src/mutation-lock.js",
-  "/plan-save.js": "Client/src/plan-save.js"
+  "/plan-save.js": "Client/src/plan-save.js",
+  "/gameplay.js": "Client/src/gameplay.js",
+  "/gameplay.css": "Client/src/styles/gameplay.css"
 }

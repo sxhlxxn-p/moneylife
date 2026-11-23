@@ -34,11 +34,10 @@ function mlShowGoalDeadline(id, hit, prefix = "") {
         ? delay + "개월 초과"
         : "기한 내 도달");
 }
-function mlRenderGoal() {
+function mlRenderGoal(path = simulate()) {
   $("ml-goal-name").value = financialProfile().goalName;
   $("ml-goal-amount").value = mlFormatAmount(financialProfile().goalAmount);
   $("ml-goal-months").value = financialProfile().goalMonths;
-  const path = simulate();
   const state = path[JourneyStore.current.month];
   $("ml-goal-current-page").textContent = mlFormatMan(state.total);
   $("ml-goal-target-page").textContent = mlFormatKoreanWon(
@@ -109,7 +108,8 @@ function render() {
         ? "비상금 확인 필요"
         : "차근차근 안정적으로";
   $("ml-game-chart-current").textContent = "현재 " + money(row.total);
-  mlDrawChart("ml-game-chart", [path, simulate([], [])]);
+  const base = simulate([], []);
+  mlDrawChart("ml-game-chart", [path, base]);
   $("ml-game-log").replaceChildren();
   for (const item of JourneyStore.current.logs.slice(0, 5)) {
     const line = document.createElement("p");
@@ -134,9 +134,9 @@ function render() {
   for (const [i, node] of [...$("ml-milestones").children].entries())
     node.textContent = [
       JourneyStore.current.start.age + "세 출발",
-      JourneyStore.current.start.age + 1 + "세 독립",
-      JourneyStore.current.start.age + 4 + "세 이직",
-      JourneyStore.current.start.age + 6 + "세 여행",
+      JourneyStore.current.start.age + 1 + "세 독립 선택",
+      JourneyStore.current.start.age + 4 + "세 이직 선택",
+      JourneyStore.current.start.age + 6 + "세 여행 선택",
       JourneyStore.current.start.age + 10 + "세 다음 장",
     ][i];
   const assets = $("ml-live-assets");
@@ -156,8 +156,13 @@ function render() {
     item.append(title, amount);
     assets.append(item);
   }
-  mlRenderGoal();
-  mlRenderReport();
+  mlRenderGoal(path);
+  mlRenderReport({
+    base,
+    current: path,
+    stress: simulate(stressChanges(path)),
+  });
+  renderGameplay(path);
   persist();
   renderEventRecovery();
   renderSaveRecovery();

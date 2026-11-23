@@ -47,8 +47,7 @@ function log(text) {
   });
   if (JourneyStore.current.logs.length > 80) JourneyStore.mutate("logs", "pop");
 }
-function stressChanges() {
-  const path = simulate();
+function stressChanges(path = simulate()) {
   return [
     ...JourneyStore.current.mods,
     ...Array.from(
