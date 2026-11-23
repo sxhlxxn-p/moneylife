@@ -1,13 +1,13 @@
 # MoneyLife API 엔드포인트 명세서
 
-이 문서는 실행 중인 FastAPI `/openapi.json`을 기준으로 작성했다. 경로·HTTP 메서드·매개변수·요청/응답 자료형·선언된 상태 코드와 77개 구성 스키마를 포함한다. 쿠키·동작·추가 검증·런타임 오류는 서버 코드에서 확인한 보충 사항이다.
+이 문서는 FastAPI `/openapi.json`을 기준으로 작성했다. 경로·HTTP 메서드·매개변수·요청/응답 자료형·선언된 상태 코드와 79개 구성 스키마를 포함한다. 쿠키·동작·추가 검증·런타임 오류는 서버 코드에서 확인한 보충 사항이다.
 
 | 항목                        | 값                                                                       |
 | --------------------------- | ------------------------------------------------------------------------ |
 | 작성 기준일                 | 2026-11-23 (KST)                                                         |
-| 기준 커밋                   | `12775c29e70a888b41c57b40258d6e421ed7ab77`                               |
+| 기준                        | `12775c2` 기반 명세 + 토스 읽기 전용 연동 상태 API 추가                  |
 | API / OpenAPI 버전          | `0.1.0` / `3.1.0`                                                        |
-| 문서 범위                   | 27개 경로, 33개 HTTP 작업, 77개 구성 스키마                              |
+| 문서 범위                   | 28개 경로, 34개 HTTP 작업, 79개 구성 스키마                              |
 | 로컬 API Base URL           | `http://localhost:3000`                                                  |
 | 로컬 화면의 프록시 Base URL | `http://localhost:5173/api`                                              |
 | Swagger UI                  | [http://localhost:3000/docs](http://localhost:3000/docs)                 |
@@ -46,7 +46,7 @@
 - 쿠키 유효기간은 30일이며 `HttpOnly`, `SameSite=Lax`, `Path=/`이다. `COOKIE_SECURE=true` 환경에서는 `Secure`를 사용한다.
 - 브라우저에서 다른 Origin으로 직접 호출할 때는 `credentials: "include"`와 서버 CORS 설정이 필요하다. 로컬 화면은 `/api` 프록시를 사용한다.
 - 다른 게스트의 자원은 일반적으로 없는 자원과 같은 404로 응답한다. 세션 갱신은 계정 복구가 아니므로 이전 소유자의 자료를 새 게스트에게 연결하지 않는다.
-- 공개 조회는 `/health`, `/health/db`, `/market/series`다. 세션 갱신은 별도 경로다. OpenAPI에 인증 `securitySchemes`와 쿠키 매개변수는 선언되어 있지 않지만 실제 서버는 위 소유권 검사를 수행한다.
+- 공개 조회는 `/health`, `/health/db`, `/market/series`다. 세션 갱신은 별도 경로다. 게스트 쿠키 매개변수는 OpenAPI에 선언되어 있지 않지만 실제 서버는 위 소유권 검사를 수행한다. `/integrations/toss/status`는 별도 운영자 키가 필요하며 OpenAPI `securitySchemes`에 APIKeyHeader로 선언된다.
 
 ### 1.3 Origin·요청 제한·헤더 (코드 보충)
 
@@ -110,6 +110,7 @@
 | 31   | `GET`  | [`/paper-plans/{plan_id}/news-games`](#operation-31)               | 모의투자의 뉴스 기록 목록     |
 | 32   | `GET`  | [`/news-games/{record_id}`](#operation-32)                         | 뉴스 기록 상세                |
 | 33   | `POST` | [`/news-game-comparisons`](#operation-33)                          | 저장된 뉴스 기록 비교         |
+| 34   | `GET`  | [`/integrations/toss/status`](#operation-34)                       | 운영자용 토스 읽기 전용 상태   |
 
 <a id="endpoint-details"></a>
 
@@ -1386,9 +1387,60 @@ OpenAPI의 200 schema는 빈 객체(`{}`)라 필드가 정의되어 있지 않�
 
 **코드에 직접 선언된 오류:** `404 NEWS_GAME_NOT_FOUND`, `409 NEWS_COMPARISON_FUTURE_ROUND`, `409 NEWS_COMPARISON_INCOMPATIBLE`.
 
+<a id="operation-34"></a>
+
+### 3.34 운영자용 토스 읽기 전용 상태
+
+`GET /integrations/toss/status`
+
+- 구현: [app/toss_status.py](app/toss_status.py), operationId: `status_integrations_toss_status_get`
+- 인증: `X-Moneylife-Operator-Key` 헤더. 서버 `TOSS_OPERATOR_KEY`(32자 이상)와 비교한다. 게스트 쿠키 인증과 별개이며 Swagger Authorize의 APIKeyHeader로 입력한다.
+- 요청 본문 없음. 외부 토스 호출·토큰 재발급·주문을 수행하지 않는다. `Cache-Control: no-store`.
+- `200`: [TossStatus](#schema-tossstatus). 등록 자료 수는 project 공개 과거 자료만 집계한다. `lastCheck`는 `check_market.py --live`가 저장한 과거 기록이며 현재 연결 보장이 아니다.
+- `401`: `TOSS_OPERATOR_UNAUTHORIZED`(키 누락·불일치).
+- `503`: `TOSS_OPERATOR_NOT_CONFIGURED`, `TOSS_STATUS_UNAVAILABLE` 또는 기존 가격 목록 오류. 비밀정보·공급자 원문 오류는 반환하지 않는다.
+
+```json
+{
+  "configured": true,
+  "mode": "client-credentials",
+  "readOnly": true,
+  "realTradingEnabled": false,
+  "registeredHistoricalSeries": 0,
+  "lastCheck": null
+}
+```
+
+실제 검사는 운영 CLI, 자료 수집·등록도 기존 운영 스크립트로 수행한다. 공개 토큰 발급·자료 수집·실주문 엔드포인트는 제공하지 않는다. [설정과 운영 절차](../docs/market-demo.md#실거래-차단과-상태-api).
+
 <a id="schemas"></a>
 
 ## 4. 요청·응답 스키마
+
+<a id="schema-tossstatus"></a>
+
+### TossStatus
+
+| 필드 | 자료형 | 설명 |
+| --- | --- | --- |
+| configured | boolean | 서버의 토스 자격증명 설정 여부. 연결 성공 여부와 별개 |
+| mode | string | access-token / client-credentials / not-configured |
+| readOnly | boolean | 항상 true |
+| realTradingEnabled | boolean | 항상 false |
+| registeredHistoricalSeries | integer | 0 이상의 공개 과거 가격 묶음 수 |
+| lastCheck | TossCheck 또는 null | 마지막 명시적 연결 검사. 미검사 시 null |
+
+<a id="schema-tosscheck"></a>
+
+### TossCheck
+
+| 필드 | 자료형 | 설명 |
+| --- | --- | --- |
+| checkedAt | string(date-time) | 시간대 포함 검사 시각 |
+| succeeded | boolean | 명시적 검사 성공 여부 |
+| error | string 또는 null | 성공 시 null, 실패 시 고정 MARKET_* 코드 |
+
+고정 오류 코드의 전체 enum은 Swagger의 TossCheck 및 [서버 정의](app/toss_status.py)를 따른다. 두 스키마 모두 추가 필드를 거부한다.
 
 아래 이름은 OpenAPI `components.schemas`의 키와 정확히 일치한다. `Create`·`Detail`·`State`·`Result`·`Round`·`Path`·`Selection`은 뉴스 도메인의 모델이다. `app__...__Comparison`은 서로 다른 모듈의 동명 모델을 구분하기 위한 OpenAPI 이름이다.
 

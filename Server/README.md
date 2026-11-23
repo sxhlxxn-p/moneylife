@@ -47,3 +47,5 @@ Python 구문·미정의 이름·포맷 검사, Node 단위 검사와 Server/tes
 - DB 변경은 `models.py`와 Alembic migration에 반영한다. 배포 API 시작 시 임의로 테이블을 생성하지 않는다.
 
 외부 LLM과 토스의 실제 연결은 별도 설정·검증 대상이다. 미설정 모델을 가짜 모델로 자동 대체하지 않는다. [LLM 안내](../docs/llm-evaluation.md), [시장 데이터 안내](../docs/market-demo.md), [공통 계약](../Shared/README.md)을 참고한다.
+
+토스 연동은 인증·일봉 조회만 허용하며 실주문 API를 제공하지 않는다. 운영자 전용 `GET /integrations/toss/status`는 `TOSS_OPERATOR_KEY`(32자 이상)와 `X-Moneylife-Operator-Key` 헤더로 보호한다. 상태 조회는 토스 호출 없이 마지막 검사 결과만 반환한다. 로컬 실연동 확인과 가격 자료 등록·이용 조건 검증을 구분한다.

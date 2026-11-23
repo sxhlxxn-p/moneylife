@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 import httpx
 from dotenv import dotenv_values
-from app.market_provider import MarketProviderError
+from app.toss_client import BASE_URL, MarketProviderError, request_toss
 
 
 def settings():
@@ -40,15 +40,15 @@ async def access_token(client: httpx.AsyncClient):
     if not values["TOSS_CLIENT_ID"] or not values["TOSS_CLIENT_SECRET"]:
         raise MarketProviderError("MARKET_NOT_CONFIGURED")
     try:
-        response = await client.post(
-            "https://openapi.tossinvest.com/oauth2/token",
+        response = await request_toss(
+            client,
+            "POST",
+            BASE_URL + "/oauth2/token",
             data={
                 "grant_type": "client_credentials",
                 "client_id": values["TOSS_CLIENT_ID"],
                 "client_secret": values["TOSS_CLIENT_SECRET"],
             },
-            timeout=15,
-            follow_redirects=False,
         )
     except httpx.HTTPError:
         raise MarketProviderError("MARKET_CONNECTION_FAILED") from None

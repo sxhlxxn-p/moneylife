@@ -5,13 +5,9 @@ import re
 from zoneinfo import ZoneInfo
 import httpx
 from app.market_import import DailyClose, decimal_integer
+from app.toss_client import BASE_URL, MarketProviderError, request_toss
 
-BASE_URL = "https://openapi.tossinvest.com"
 KST = ZoneInfo("Asia/Seoul")
-
-
-class MarketProviderError(ValueError):
-    pass
 
 
 async def fetch_toss_daily(
@@ -29,7 +25,9 @@ async def fetch_toss_daily(
             raise MarketProviderError("MARKET_CURSOR_REPEATED")
         cursors.add(cursor)
         try:
-            response = await client.get(
+            response = await request_toss(
+                client,
+                "GET",
                 BASE_URL + "/api/v1/candles",
                 params={
                     "symbol": symbol,
@@ -39,8 +37,6 @@ async def fetch_toss_daily(
                     "adjusted": "false",
                 },
                 headers={"Authorization": "Bearer " + access_token},
-                timeout=15,
-                follow_redirects=False,
             )
         except httpx.HTTPError:
             raise MarketProviderError("MARKET_CONNECTION_FAILED") from None

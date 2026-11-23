@@ -11,10 +11,10 @@ import sys
 import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import httpx
 from app.market_import import DailyClose, build_series, decimal_integer, parse_month, end_of_month, month_number
 from app.market_provider import fetch_toss_daily, MarketProviderError
 from app.market_auth import access_token
+from app.toss_client import read_only_client
 
 
 def arguments():
@@ -39,7 +39,7 @@ async def collect(args):
     if not 1 <= month_number(end) - month_number(start) <= 120 or end_of_month(end) >= datetime.now(ZoneInfo('Asia/Seoul')).date():
         raise ValueError('Only 2~121 completed months are supported')
     if args.toss:
-        async with httpx.AsyncClient(trust_env=False) as client:
+        async with read_only_client() as client:
             token = await access_token(client)
             daily = await fetch_toss_daily(client=client, access_token=token, symbol=args.symbol,
                 start=parse_month(args.start_month), end=end_of_month(parse_month(args.end_month)))

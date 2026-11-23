@@ -35,7 +35,7 @@ def load_series(series_id: str) -> dict:
     if series_id != "synthetic-monthly-v1":
         return load_historical(series_id)
     try:
-        fixture = json.loads(FIXTURE.read_text())
+        fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
         investment = fixture["investment"]
         snapshot = {key: investment[key] for key in ("priceSeriesId", "symbol", "prices", "costs")}
         snapshot.update(

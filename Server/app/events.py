@@ -22,7 +22,9 @@ from app.schemas import PlanCreate, PlanDetail, RunDetail, StrictModel, GameStat
 from app.simulations import detail
 
 router = APIRouter(prefix="/event-branches", tags=["plans"])
-CATALOG = json.loads((Path(__file__).resolve().parents[2] / "Shared/life-events.json").read_text())
+CATALOG = json.loads(
+    (Path(__file__).resolve().parents[2] / "Shared/life-events.json").read_text(encoding="utf-8")
+)
 if CATALOG["version"] != "life-events-v1" or CATALOG["unit"] != "KRW":
     raise RuntimeError("Unsupported life event catalog")
 EVENTS = {event["month"]: event for event in CATALOG["events"]}
