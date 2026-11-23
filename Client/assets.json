@@ -54,5 +54,7 @@
   "/plan-save.js": "Client/src/plan-save.js",
   "/gameplay.js": "Client/src/gameplay.js",
   "/gameplay.css": "Client/src/styles/gameplay.css",
-  "/life-town.svg": "Client/public/life-town.svg"
+  "/life-town.svg": "Client/public/life-town.svg",
+  "/paper-market-chart.js": "Client/src/paper-market-chart.js",
+  "/trading.css": "Client/src/styles/trading.css"
 }

@@ -7,6 +7,7 @@ const PaperTrading = (() => {
   installPaperSession(paper);
   installPaperCommands(paper);
   installPaperCharts(paper);
+  installPaperMarketChart(paper);
   installPaperExplanation(paper);
   window.addEventListener("moneylife:session-renewed", (event) => {
     try {

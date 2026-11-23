@@ -170,10 +170,60 @@ function installPaperView(paper) {
       card.append(paper.node("small", label), paper.node("strong", value));
       metrics.append(card);
     }
-    root.append(metrics);
+    const desk = paper.node("div", undefined, "stock-desk");
+    const watch = paper.node("aside", undefined, "stock-watch");
+    watch.append(
+      paper.node("span", "MONTHLY TRADING", "stock-kicker"),
+      paper.node("h3", "나의 투자 여정"),
+      paper.node(
+        "strong",
+        `${plan.month} / ${plan.source.lastMonth}`,
+        "stock-turn",
+      ),
+      paper.node("p", "개월 진행", "paper-caption"),
+    );
+    const progress = paper.node("progress");
+    progress.max = Math.max(1, plan.source.lastMonth);
+    progress.value = plan.month;
+    progress.setAttribute("aria-label", "모의투자 기간 진행률");
+    const selected = paper.node("div", undefined, "stock-selected");
+    selected.append(
+      paper.node("small", "선택한 종목"),
+      paper.node("strong", plan.source.symbol),
+      paper.node("span", paper.dataLabel(plan.source)),
+      paper.button(
+        "다른 종목·조건 선택",
+        () => paper.setup(),
+        Boolean(paper.queue.get()),
+      ),
+    );
+    watch.append(
+      progress,
+      selected,
+      paper.node("h4", "주문 가능 현금"),
+      paper.node("strong", paper.won(final.cash), "stock-cash"),
+      paper.node(
+        "p",
+        "생활비와 투자금은 같은 현금에서 사용합니다. 다음 달 생활비도 확인하세요.",
+        "paper-caption",
+      ),
+    );
+    const ticket = paper.node("section", undefined, "stock-ticket");
+    ticket.append(
+      paper.node("h3", "주문하기"),
+      paper.node(
+        "p",
+        "다음 달 가격으로 체결되는 예약 주문",
+        "stock-ticket-note",
+      ),
+    );
+    desk.append(watch, paper.marketChart(plan, invested), ticket);
+    root.append(desk);
+    const account = paper.node("section", undefined, "stock-account");
+    account.append(paper.node("h3", "내 계좌 현황"), metrics);
     const quote =
       position.price === null ? "가격 없음" : paper.won(position.price);
-    root.append(
+    ticket.append(
       paper.node(
         "p",
         `현재 평가 가격 ${quote}${position.stale ? " · 이전 유효 가격으로 평가 중" : ""}${position.priceMonth === null ? "" : " · " + paper.marketDate(plan.source, position.priceMonth)}. 주문은 다음 달 가격으로 체결 여부가 결정됩니다.`,
@@ -214,7 +264,7 @@ function installPaperView(paper) {
       event.preventDefault();
       paper.submitOrder("buy");
     });
-    root.append(form);
+    ticket.append(form);
     const time = paper.node("div", undefined, "paper-toolbar");
     time.append(
       paper.button(
@@ -234,7 +284,7 @@ function installPaperView(paper) {
         "paper-caption",
       ),
     );
-    root.append(time);
+    ticket.append(time);
     const pendingList = paper.node("div", undefined, "paper-orders");
     pendingList.append(paper.node("h4", "다음 달 체결 대기"));
     if (!invested.pendingOrders.length)
@@ -262,10 +312,45 @@ function installPaperView(paper) {
           "paper-caption",
         ),
       );
-    root.append(
-      pendingList,
+    ticket.append(pendingList);
+    const holdings = paper.node("div", undefined, "stock-holdings");
+    const holdingTitle = paper.node("h4", "보유 종목");
+    holdings.append(holdingTitle);
+    if (position.quantity > 0) {
+      const row = paper.node("div", undefined, "stock-holding-row");
+      for (const [caption, amount] of [
+        ["종목", plan.source.symbol],
+        ["보유 수량", `${position.quantity.toLocaleString("ko-KR")}주`],
+        [
+          "평균 매입가",
+          position.averageCost === null
+            ? "없음"
+            : paper.won(Math.round(Number(position.averageCost))),
+        ],
+        ["평가 금액", paper.won(position.marketValue)],
+        ["평가 손익", paper.signed(position.unrealizedPnl)],
+      ]) {
+        const item = paper.node("div");
+        item.append(paper.node("small", caption), paper.node("strong", amount));
+        row.append(item);
+      }
+      holdings.append(row);
+    } else
+      holdings.append(
+        paper.node(
+          "p",
+          "아직 보유한 주식이 없어요. 주문 후 다음 달로 진행하면 체결 결과를 확인할 수 있어요.",
+          "paper-caption",
+        ),
+      );
+    account.append(holdings);
+    root.append(account);
+    const assets = paper.node("details", undefined, "stock-assets-chart");
+    assets.append(
+      paper.node("summary", "투자와 비투자 순자산 경로 비교"),
       paper.chart(invested.monthlyResults, baseline.monthlyResults),
     );
+    root.append(assets);
     const compare = paper.node("div", undefined, "paper-comparison");
     compare.append(
       paper.node("h4", "같은 조건에서 투자하지 않았다면?"),

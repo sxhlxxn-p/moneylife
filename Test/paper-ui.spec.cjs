@@ -1119,3 +1119,30 @@ for (const width of [1440, 390]) {
     assert.deepEqual(errors, []);
   });
 }
+
+for (const width of [1440,390]) {
+  test(`증권 화면의 종가 차트·주문·월 진행 · ${width}px`, {timeout:30000}, async t => {
+    const page=await pageFor(t,{width,height:1000});
+    await demo(page);
+    await page.locator('.stock-market').waitFor();
+    assert.equal(await page.locator('.stock-ticket').getByRole('heading',{name:'주문하기',exact:true}).isVisible(),true);
+    assert.equal(await page.locator('.stock-market svg').count(),1);
+    assert.equal(await page.locator('.stock-price-dot').count(),1);
+    assert.equal(await page.getByRole('slider',{name:'주가 시점 탐색'}).isEnabled(),false);
+    const first=await page.locator('.stock-readout').innerText();
+    await page.getByLabel('주문 수량 · 주').fill('5');
+    await clickCommand(page,'매수 예약','orders');
+    await clickCommand(page,'다음 달로 +1개월','advance');
+    assert.equal(await page.locator('.stock-buy-mark').count(),1);
+    assert.equal(await page.locator('.stock-holding-row').count(),1);
+    const current=await page.locator('.stock-readout').innerText();
+    assert.notEqual(first,current);
+    await page.getByRole('slider',{name:'주가 시점 탐색'}).press('Home');
+    assert.equal(await page.locator('.stock-readout').innerText(),first);
+    await page.getByRole('slider',{name:'주가 시점 탐색'}).press('End');
+    assert.equal(await page.locator('.stock-readout').innerText(),current);
+    await page.locator('.stock-ranges').getByRole('button',{name:'6개월',exact:true}).click();
+    assert.equal(await page.locator('.stock-ranges').getByRole('button',{name:'6개월',exact:true}).getAttribute('aria-pressed'),'true');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  });
+}
