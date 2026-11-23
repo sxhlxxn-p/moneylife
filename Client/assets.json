@@ -53,5 +53,6 @@
   "/mutation-lock.js": "Client/src/mutation-lock.js",
   "/plan-save.js": "Client/src/plan-save.js",
   "/gameplay.js": "Client/src/gameplay.js",
-  "/gameplay.css": "Client/src/styles/gameplay.css"
+  "/gameplay.css": "Client/src/styles/gameplay.css",
+  "/life-town.svg": "Client/public/life-town.svg"
 }

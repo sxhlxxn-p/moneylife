@@ -16,8 +16,25 @@
   <body class="ml-game-edition">
     <div id="money-life-app">
       <header class="ml-topbar">
-        <div class="ml-brand">
+        <div
+          class="ml-brand"
+          role="button"
+          tabindex="0"
+          aria-label="내 인생 화면"
+          onclick="mlShowPage('dashboard')"
+          onkeydown="
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              mlShowPage('dashboard');
+            }
+          "
+        >
           <span class="ml-brand-mark">↗</span><span>Money Life</span>
+        </div>
+        <div class="play-header-tools">
+          <button data-page="dashboard">나의 인생</button
+          ><button data-page="report">결과 비교</button
+          ><button data-page="finance">시작 조건</button>
         </div>
         <div class="ml-top-user">
           <span id="ml-user-name">나의 첫 번째 인생</span
@@ -235,230 +252,292 @@
             </form>
           </section>
 
-          <!-- 화면 2: 마을형 10년 금융 시뮬레이션 -->
           <section class="ml-page" id="ml-page-dashboard">
-            <div class="ml-page-head">
+            <div class="play-heading">
               <div>
-                <div class="ml-eyebrow">PLAY YOUR NEXT CHAPTER</div>
-                <h1>오늘의 선택, 달라지는 내일</h1>
-                <p>
-                  내 조건으로 한 달씩 살아보고, 선택이 목표에 만드는 차이를
-                  확인하세요.
-                </p>
+                <span class="play-label">나의 선택으로 살아보는 10년</span>
+                <h1>
+                  나의 머니 라이프<span>작은 선택이 만드는 다른 미래</span>
+                </h1>
               </div>
-              <button class="ml-btn" data-page="finance">
-                ⚙ 나의 시작 조건
+              <button class="ml-btn" onclick="showJourneyStart()">
+                출발 선택
               </button>
             </div>
-            <section class="ml-card game-goal">
-              <h3>이번 여정의 목표</h3>
-              <p class="ml-desc" id="ml-game-goal-name">나만의 공간 마련하기</p>
-              <div class="ml-goal-money">
-                <span id="ml-game-goal-current">3,300만 원</span
-                ><small>
-                  /
-                  <span id="ml-game-goal-target">5,000만 원</span></small
+            <div class="play-objective">
+              <section class="ml-card game-goal">
+                <h3>이번 여정의 목표</h3>
+                <p class="ml-desc" id="ml-game-goal-name">
+                  나만의 공간 마련하기
+                </p>
+                <div class="ml-goal-money">
+                  <span id="ml-game-goal-current">3,300만 원</span
+                  ><small>
+                    /
+                    <span id="ml-game-goal-target">5,000만 원</span></small
+                  >
+                </div>
+                <div class="ml-bar">
+                  <span
+                    id="ml-game-goal-bar"
+                    data-ported-style="ported-style-2"
+                  ></span>
+                </div>
+                <p class="ml-hint" id="ml-game-goal-eta">목표까지 계산 중</p>
+                <p class="ml-goal-deadline" id="ml-game-goal-deadline"></p>
+              </section>
+              <button class="play-objective-edit" data-page="goal">
+                목표 바꾸기 ↗
+              </button>
+            </div>
+            <section class="ml-world-card play-stage">
+              <div class="ml-world-top">
+                <div>
+                  <span class="play-live-dot"></span
+                  ><strong id="ml-game-date"></strong
+                  ><small id="ml-game-month-label"></small>
+                </div>
+                <div class="play-age">
+                  <span id="ml-game-age"></span
+                  ><span class="game-turn" id="game-turn"></span>
+                </div>
+              </div>
+              <div class="ml-world">
+                <img class="play-scenery" src="/life-town.svg" alt="" />
+                <div class="ml-world-copy">
+                  <span class="ml-chapter" id="ml-game-chapter"></span>
+                  <h2 id="ml-world-title"></h2>
+                  <p id="ml-world-desc"></p>
+                </div>
+                <section class="ml-event-card">
+                  <div class="ml-eyebrow" id="ml-event-status"></div>
+                  <h3 id="ml-event-title"></h3>
+                  <p id="ml-event-desc"></p>
+                  <button type="button" id="ml-event-yes">
+                    다음 선택까지 가기 →</button
+                  ><button type="button" id="ml-event-later">자동 진행</button>
+                </section>
+                <div class="ml-town">
+                  <button
+                    type="button"
+                    class="ml-building bank"
+                    data-page="investment"
+                    aria-label="은행에서 모의투자 열기"
+                  >
+                    <span aria-hidden="true">↗</span
+                    ><strong>은행<small>주식 투자 연습</small></strong>
+                  </button>
+                  <button
+                    type="button"
+                    class="ml-building office"
+                    data-game-place="work"
+                    aria-label="직장에서 인생 선택 살펴보기"
+                  >
+                    <span aria-hidden="true">✦</span
+                    ><strong>직장<small>일과 새로운 기회</small></strong>
+                  </button>
+                  <button
+                    type="button"
+                    class="ml-building home"
+                    data-game-place="home"
+                    aria-label="집에서 독립 선택 살펴보기"
+                  >
+                    <span aria-hidden="true">⌂</span
+                    ><strong>우리 집<small>독립 준비하기</small></strong>
+                  </button>
+                </div>
+                <div class="play-avatar">
+                  <div class="play-avatar-marker">
+                    나<span id="game-character"></span>
+                  </div>
+                  <svg viewBox="0 0 100 155" aria-hidden="true">
+                    <ellipse
+                      cx="50"
+                      cy="145"
+                      rx="29"
+                      ry="7"
+                      fill="#344e4a"
+                      opacity=".17"
+                    />
+                    <path
+                      d="M35 98 L34 133 Q34 140 24 139 M65 98 L66 133 Q66 140 76 139"
+                      fill="none"
+                      stroke="#344653"
+                      stroke-width="12"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M31 65 Q50 53 69 65 L74 103 H26 Z"
+                      fill="#688eaa"
+                    />
+                    <path
+                      d="M28 72 L18 99 M72 72 L82 99"
+                      stroke="#f4c7a5"
+                      stroke-width="10"
+                      stroke-linecap="round"
+                    />
+                    <rect
+                      x="42"
+                      y="49"
+                      width="16"
+                      height="17"
+                      rx="7"
+                      fill="#efbb98"
+                    />
+                    <circle cx="50" cy="34" r="25" fill="#f4c7a5" />
+                    <path
+                      d="M25 34 Q19 2 48 4 Q78 0 77 33 L64 18 Q47 30 28 23Z"
+                      fill="#3a4140"
+                    />
+                    <circle cx="41" cy="36" r="2" fill="#394440" />
+                    <circle cx="59" cy="36" r="2" fill="#394440" />
+                    <path
+                      d="M45 46 Q50 50 55 46"
+                      fill="none"
+                      stroke="#c3866a"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <path d="M48 69 V101" stroke="#a4becb" stroke-width="2" />
+                  </svg>
+                </div>
+                <span class="ml-world-location"
+                  >건물을 눌러 다음 이야기를 만나보세요</span
                 >
               </div>
-              <div class="ml-bar">
-                <span
-                  id="ml-game-goal-bar"
-                  data-ported-style="ported-style-2"
-                ></span>
+              <div
+                id="game-choice-result"
+                class="game-choice-result"
+                role="status"
+                hidden
+              ></div>
+              <div class="play-dialogue" id="play-dialogue">
+                <div class="game-story">
+                  <span class="game-story-marker" aria-hidden="true">✦</span>
+                  <div>
+                    <span class="play-label">나의 이야기</span
+                    ><strong id="game-story-title"></strong>
+                    <p id="game-story-body"></p>
+                  </div>
+                </div>
+                <div class="play-actions">
+                  <button
+                    type="button"
+                    class="ml-btn primary"
+                    id="ml-one-month"
+                  >
+                    한 달 살아보기 <span>→</span></button
+                  ><button type="button" class="play-skip" id="ml-next-event">
+                    다음 선택까지 건너뛰기
+                  </button>
+                </div>
               </div>
-              <p class="ml-hint" id="ml-game-goal-eta">목표까지 계산 중</p>
-              <p class="ml-goal-deadline" id="ml-game-goal-deadline"></p>
+              <div
+                id="game-month-receipt"
+                class="game-month-receipt"
+                aria-label="이번 달 돈의 흐름"
+              ></div>
+              <div class="play-timeline">
+                <span>지금</span>
+                <div class="ml-progress">
+                  <span id="ml-time-progress"></span>
+                </div>
+                <span>10년 뒤</span>
+                <details class="play-speed">
+                  <summary>시간 설정</summary>
+                  <div role="group" aria-label="시간 진행">
+                    <button class="ml-btn" type="button" id="ml-play">
+                      ▶ 자동 진행</button
+                    ><button
+                      type="button"
+                      class="ml-speed active"
+                      data-speed="1"
+                      aria-pressed="true"
+                    >
+                      1×</button
+                    ><button
+                      type="button"
+                      class="ml-speed"
+                      data-speed="4"
+                      aria-pressed="false"
+                    >
+                      4×</button
+                    ><button
+                      type="button"
+                      class="ml-speed"
+                      data-speed="12"
+                      aria-pressed="false"
+                    >
+                      12×
+                    </button>
+                  </div>
+                </details>
+              </div>
+              <div class="ml-milestones" id="ml-milestones">
+                <span></span><span></span><span></span><span></span
+                ><span></span>
+              </div>
             </section>
-            <div class="ml-hud">
-              <div class="ml-metric">
-                <div class="ml-metric-icon">◈</div>
-                <div>
-                  <label>나의 순자산</label
-                  ><strong id="ml-game-net">3,300<small>만 원</small></strong>
+            <nav class="play-toolbelt" aria-label="게임 도구">
+              <button type="button" data-page="report">
+                <span>↝</span><strong>다른 미래와 비교</strong
+                ><small>선택 전후, 얼마나 달라졌을까?</small></button
+              ><button type="button" data-page="investment">
+                <span>↗</span><strong>주식 투자 연습</strong
+                ><small>내 생활과 투자를 함께 계산</small></button
+              ><button
+                type="button"
+                onclick="
+                  document.getElementById('play-details').open = true;
+                  document
+                    .getElementById('ask')
+                    .scrollIntoView({ block: 'center', behavior: 'smooth' });
+                  document.getElementById('ask').focus();
+                "
+              >
+                <span>✧</span><strong>조건을 말로 바꾸기</strong
+                ><small>다음 달 생활비를 줄인다면?</small>
+              </button>
+            </nav>
+            <details class="play-details" id="play-details">
+              <summary>내 지갑과 선택 기록 자세히 보기 <span>＋</span></summary>
+              <div class="ml-hud">
+                <div class="ml-metric">
+                  <div class="ml-metric-icon">◈</div>
+                  <div>
+                    <label>나의 순자산</label
+                    ><strong id="ml-game-net">3,300<small>만 원</small></strong>
+                  </div>
                 </div>
-              </div>
-              <div class="ml-metric">
-                <div class="ml-metric-icon">↗</div>
-                <div>
-                  <label>이번 달 소득</label
-                  ><strong id="ml-game-income">400<small>만 원</small></strong>
-                </div>
-              </div>
-              <div class="ml-metric">
-                <div class="ml-metric-icon">↘</div>
-                <div>
-                  <label>이번 달 생활비</label
-                  ><strong id="ml-game-expense">250<small>만 원</small></strong>
-                </div>
-              </div>
-              <div class="ml-metric">
-                <div class="ml-metric-icon">▱</div>
-                <div>
-                  <label>지금 쓸 수 있는 현금</label
-                  ><strong id="ml-game-cash">1,200<small>만 원</small></strong>
-                </div>
-              </div>
-            </div>
-            <div class="ml-town-layout">
-              <div class="ml-stack">
-                <section class="ml-card ml-world-card">
-                  <div class="ml-world-top">
-                    <div>
-                      <strong id="ml-game-date">2026년 10월</strong
-                      ><small id="ml-game-month-label">나의 첫 번째 달</small>
-                    </div>
-                    <span class="ml-eyebrow" id="ml-game-age"
-                      >☀ 맑음 · 25세</span
+                <div class="ml-metric">
+                  <div class="ml-metric-icon">↗</div>
+                  <div>
+                    <label>이번 달 소득</label
+                    ><strong id="ml-game-income"
+                      >400<small>만 원</small></strong
                     >
                   </div>
-                  <div
-                    id="game-choice-result"
-                    class="game-choice-result"
-                    role="status"
-                    hidden
-                  ></div>
-                  <div class="game-story">
-                    <span class="game-story-marker" aria-hidden="true">✦</span>
-                    <div>
-                      <strong id="game-story-title"
-                        >나의 첫 달을 시작해볼까요?</strong
-                      >
-                      <p id="game-story-body">
-                        시간을 보내고 중요한 선택에서 잠시 멈춰보세요.
-                      </p>
-                    </div>
-                    <span class="game-turn" id="game-turn">TURN 01</span>
-                  </div>
-                  <div class="ml-world">
-                    <div class="ml-sun"></div>
-                    <div class="ml-cloud"></div>
-                    <div class="ml-world-copy">
-                      <span class="ml-chapter" id="ml-game-chapter"
-                        >CHAPTER 01 · 새로운 출발</span
-                      >
-                      <h2 id="ml-world-title">
-                        나만의 속도로,<br />한 달씩 앞으로.
-                      </h2>
-                      <p id="ml-world-desc">
-                        새로운 일상을 시작한 당신.<br />오늘은 어떤 미래를
-                        만들어볼까요?
-                      </p>
-                    </div>
-                    <div class="ml-town">
-                      <button
-                        type="button"
-                        class="ml-building bank"
-                        data-page="investment"
-                        aria-label="은행에서 모의투자 열기"
-                      >
-                        <span></span><strong>은행 · 투자 연습</strong>
-                      </button>
-                      <button
-                        type="button"
-                        class="ml-building office"
-                        data-game-place="work"
-                        aria-label="직장에서 인생 선택 살펴보기"
-                      >
-                        <span></span><strong>직장 · 새로운 기회</strong>
-                      </button>
-                      <button
-                        type="button"
-                        class="ml-building home"
-                        data-game-place="home"
-                        aria-label="집에서 독립 선택 살펴보기"
-                      >
-                        <span></span><strong>집 · 독립 준비</strong>
-                      </button>
-                    </div>
-                    <div class="ml-person">
-                      <span id="game-character">🧑‍💼</span
-                      ><span class="game-character-shadow"></span>
-                    </div>
-                    <span class="ml-world-location"
-                      >⌖ 가능성이 자라는 나의 마을</span
+                </div>
+                <div class="ml-metric">
+                  <div class="ml-metric-icon">↘</div>
+                  <div>
+                    <label>이번 달 생활비</label
+                    ><strong id="ml-game-expense"
+                      >250<small>만 원</small></strong
                     >
                   </div>
-                  <section class="ml-event-card">
-                    <div class="ml-eyebrow" id="ml-event-status">
-                      다음 인생 이벤트
-                    </div>
-                    <h3 id="ml-event-title">나만의 공간을 꿈꿔본 적 있나요?</h3>
-                    <p id="ml-event-desc">
-                      26세, 독립의 기회가 찾아옵니다. 지금의 선택은 어떤 미래를
-                      만들까요?
-                    </p>
-                    <div class="ml-event-options">
-                      <button type="button" id="ml-event-yes">
-                        지금 선택하기</button
-                      ><button type="button" id="ml-event-later">
-                        조금 더 준비하기
-                      </button>
-                    </div>
-                  </section>
-                  <div class="ml-game-controls">
-                    <div
-                      class="ml-button-row"
-                      role="group"
-                      aria-label="시간 진행"
+                </div>
+                <div class="ml-metric">
+                  <div class="ml-metric-icon">▱</div>
+                  <div>
+                    <label>지금 쓸 수 있는 현금</label
+                    ><strong id="ml-game-cash"
+                      >1,200<small>만 원</small></strong
                     >
-                      <button type="button" class="ml-btn primary" id="ml-play">
-                        ▶ 시간 시작
-                      </button>
-                      <button type="button" class="ml-btn" id="ml-next-event">
-                        다음 이벤트로 이동
-                      </button>
-                      <button type="button" class="ml-btn" id="ml-one-month">
-                        한 달 보내기
-                      </button>
-                    </div>
-                    <div
-                      class="ml-button-row"
-                      role="group"
-                      aria-label="재생 속도"
-                    >
-                      <button
-                        type="button"
-                        class="ml-speed active"
-                        data-speed="1"
-                        aria-pressed="true"
-                      >
-                        1×
-                      </button>
-                      <button
-                        type="button"
-                        class="ml-speed"
-                        data-speed="4"
-                        aria-pressed="false"
-                      >
-                        4×
-                      </button>
-                      <button
-                        type="button"
-                        class="ml-speed"
-                        data-speed="12"
-                        aria-pressed="false"
-                      >
-                        12×
-                      </button>
-                    </div>
                   </div>
-                  <div
-                    id="game-month-receipt"
-                    class="game-month-receipt"
-                    aria-label="이번 달 돈의 흐름"
-                  ></div>
-                  <div class="ml-progress">
-                    <span
-                      id="ml-time-progress"
-                      data-ported-style="ported-style-1"
-                    ></span>
-                  </div>
-                  <div class="ml-milestones" id="ml-milestones">
-                    <span>25세 출발</span><span>26세 독립</span
-                    ><span>29세 이직</span><span>31세 여행</span
-                    ><span>35세 다음 장</span>
-                  </div>
-                </section>
+                </div>
+              </div>
+              <div class="play-details-grid">
                 <div class="ml-bottom-grid">
                   <section class="ml-card">
                     <h3>자산이 자라는 과정</h3>
@@ -476,66 +555,66 @@
                     </div>
                   </section>
                 </div>
-              </div>
-              <aside class="ml-aside">
-                <section class="ml-card">
-                  <div class="ml-profile">
-                    <div class="ml-profile-avatar" id="ml-profile-avatar">
-                      🌱
+                <aside class="ml-aside">
+                  <section class="ml-card">
+                    <div class="ml-profile">
+                      <div class="ml-profile-avatar" id="ml-profile-avatar">
+                        🌱
+                      </div>
+                      <div>
+                        <strong id="ml-profile-name">나의 첫 번째 인생</strong>
+                        <p>
+                          <span id="ml-profile-age">25</span>세 · 미래를
+                          준비하는 중
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <strong id="ml-profile-name">나의 첫 번째 인생</strong>
-                      <p>
-                        <span id="ml-profile-age">25</span>세 · 미래를 준비하는
-                        중
-                      </p>
+                    <div
+                      class="ml-summary-row"
+                      data-ported-style="ported-style-3"
+                    >
+                      <span>생활비 충당 상태</span
+                      ><strong id="ml-game-health">차근차근 안정적으로</strong>
                     </div>
-                  </div>
-                  <div
-                    class="ml-summary-row"
-                    data-ported-style="ported-style-3"
-                  >
-                    <span>생활비 충당 상태</span
-                    ><strong id="ml-game-health">차근차근 안정적으로</strong>
-                  </div>
-                </section>
+                  </section>
 
-                <section class="ml-card">
-                  <h3>나의 선택 기록</h3>
-                  <div class="ml-log" id="ml-game-log">
-                    <div class="ml-log-entry">
-                      <small>시작</small>
-                      <p>새로운 일상을 준비하고 있어요.</p>
+                  <section class="ml-card">
+                    <h3>나의 선택 기록</h3>
+                    <div class="ml-log" id="ml-game-log">
+                      <div class="ml-log-entry">
+                        <small>시작</small>
+                        <p>새로운 일상을 준비하고 있어요.</p>
+                      </div>
                     </div>
-                  </div>
-                </section>
-                <section class="ml-card">
-                  <h3>다른 조건으로 비교하기</h3>
-                  <p class="ml-desc">
-                    요청을 해석하고 변경안을 확인한 뒤 새 계획을 만들어요.
-                  </p>
-                  <div class="ml-input-wrap">
-                    <input
-                      id="ask"
-                      aria-label="조건 변경 요청"
-                      maxlength="2000"
-                      placeholder="다음 달부터 생활비 20만 원 줄여줘"
-                    />
-                  </div>
-                  <button
-                    class="ml-btn primary"
-                    onclick="askServer()"
-                    data-plan-action="ai-ask"
-                  >
-                    변경안 확인
-                  </button>
-                  <p class="ml-note">
-                    요청은 외부 AI로 전송됩니다. 개인정보는 입력하지 마세요. 키
-                    설정 전에는 변경을 실행하지 않아요.
-                  </p>
-                </section>
-              </aside>
-            </div>
+                  </section>
+                  <section class="ml-card">
+                    <h3>다른 조건으로 비교하기</h3>
+                    <p class="ml-desc">
+                      요청을 해석하고 변경안을 확인한 뒤 새 계획을 만들어요.
+                    </p>
+                    <div class="ml-input-wrap">
+                      <input
+                        id="ask"
+                        aria-label="조건 변경 요청"
+                        maxlength="2000"
+                        placeholder="다음 달부터 생활비 20만 원 줄여줘"
+                      />
+                    </div>
+                    <button
+                      class="ml-btn primary"
+                      onclick="askServer()"
+                      data-plan-action="ai-ask"
+                    >
+                      변경안 확인
+                    </button>
+                    <p class="ml-note">
+                      요청은 외부 AI로 전송됩니다. 개인정보는 입력하지 마세요.
+                      키 설정 전에는 변경을 실행하지 않아요.
+                    </p>
+                  </section>
+                </aside>
+              </div>
+            </details>
           </section>
 
           <!-- 화면 3: 자산관리 -->
@@ -917,7 +996,7 @@
             조건에 따른 계산이며 미래를 확정적으로 예측하지 않아요. 주식·펀드를
             예금 잔액으로 합산하지 않습니다.
           </p>
-          <details class="journey-drawer" open>
+          <details class="journey-drawer">
             <summary>여정 보관 · 투자와 뉴스 더 살펴보기</summary>
             <section class="server-tools" aria-label="계획 저장">
               <div>

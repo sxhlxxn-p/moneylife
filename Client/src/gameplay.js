@@ -91,6 +91,12 @@ function confirmJourneyStart(id) {
 }
 function renderGameplay(path) {
   $("game-choice-result").hidden = true;
+  $("play-dialogue").hidden = false;
+  $("ml-one-month").disabled = false;
+  $("ml-one-month").textContent =
+    JourneyStore.current.month >= 120
+      ? "나의 10년 돌아보기 →"
+      : "한 달 살아보기 →";
   const state = JourneyStore.current,
     row = path[state.month],
     previous = path[Math.max(0, state.month - 1)];
@@ -124,9 +130,17 @@ function renderGameplay(path) {
     ? EV[state.month].title
     : reached
       ? "작은 선택이 만든, 나의 목표."
-      : "오늘은 어떤 미래를 만들어볼까요?";
+      : state.month === 0
+        ? "이곳에서, 나의 미래가 시작돼요."
+        : row.short > 0
+          ? "잠깐, 내 지갑을 살펴볼 시간."
+          : state.month < 12
+            ? "나의 일상에 조금씩 쌓이는 미래."
+            : "선택이 쌓여, 나만의 삶이 됩니다.";
   $("ml-world-desc").textContent =
-    "집에서 독립을 준비하고, 직장에서 기회를 살피고, 은행에서 투자를 연습해보세요.";
+    state.month === 0
+      ? "월급을 받고, 생활비를 쓰고, 저축하는 매달. 그 사이 찾아올 선택들을 직접 경험해보세요."
+      : "같은 출발이어도 선택은 다른 미래로 이어집니다. 이번에는 어떤 길을 걸어볼까요?";
   $("game-character").textContent = state.start.avatar;
   $("ml-event-status").textContent = due
     ? "지금, 당신의 선택"
@@ -199,14 +213,42 @@ function showChoiceResult(reference, candidate, eventMonth, accepted) {
     next = JourneyStore.current.month + 1;
   panel.hidden = false;
   panel.replaceChildren();
+  $("play-dialogue").hidden = true;
   const title = document.createElement("strong"),
-    body = document.createElement("p"),
-    button = document.createElement("button");
-  title.textContent = `${EV[eventMonth].emoji} ${accepted ? EV[eventMonth].a : EV[eventMonth].b} · 선택 저장 완료`;
-  body.textContent = `목표 도달 ${gameGoalLabel(reference)} → ${gameGoalLabel(candidate)}. 다음 달 순자산 차이 ${money(candidate[next].total - reference[next].total)}. 비용과 조건은 다음 달부터 반영됩니다.`;
-  button.className = "ml-btn";
-  button.textContent = "두 미래 비교하기";
-  button.onclick = compare;
-  panel.append(title, body, button);
+    body = document.createElement("p");
+  title.textContent = `${EV[eventMonth].emoji} ${accepted ? EV[eventMonth].a : EV[eventMonth].b}`;
+  body.textContent = `선택 전후 계획을 보관했어요. 비용과 조건은 다음 달부터 반영됩니다. 다음 달 순자산 차이 ${money(candidate[next].total - reference[next].total)}.`;
+  const metrics = document.createElement("div");
+  metrics.className = "game-result-metrics";
+  for (const [label, value] of [
+    [
+      "목표 도달 시점",
+      `${gameGoalLabel(reference)} → ${gameGoalLabel(candidate)}`,
+    ],
+    [
+      "다음 달 순자산 차이",
+      money(candidate[next].total - reference[next].total),
+    ],
+  ]) {
+    const card = document.createElement("div"),
+      caption = document.createElement("span"),
+      amount = document.createElement("strong");
+    caption.textContent = label;
+    amount.textContent = value;
+    card.append(caption, amount);
+    metrics.append(card);
+  }
+  const actions = document.createElement("div"),
+    nextButton = document.createElement("button"),
+    compareButton = document.createElement("button");
+  actions.className = "game-result-actions";
+  nextButton.className = "ml-btn primary";
+  nextButton.textContent = "선택한 삶으로 한 달 살아보기 →";
+  nextButton.onclick = step;
+  compareButton.className = "ml-btn";
+  compareButton.textContent = "두 미래 비교하기";
+  compareButton.onclick = compare;
+  actions.append(nextButton, compareButton);
+  panel.append(title, body, metrics, actions);
   panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }

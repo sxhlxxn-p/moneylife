@@ -24,7 +24,7 @@ function stop() {
   JourneyStore.set("timer", null);
   if ($("ml-play"))
     $("ml-play").textContent =
-      JourneyStore.current.month >= 120 ? "여정 완료" : "▶ 시간 시작";
+      JourneyStore.current.month >= 120 ? "여정 완료" : "▶ 자동 진행";
 }
 function toast(message) {
   $("toast").textContent = message;
@@ -32,7 +32,8 @@ function toast(message) {
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => $("toast").classList.add("hidden"), 3500);
 }
-function show(html) {
+function show(html, scene = "default") {
+  $("overlay").dataset.scene = scene;
   stop();
   JourneyStore.set("focusBefore", document.activeElement);
   $("modal").innerHTML =
@@ -47,6 +48,7 @@ function closeModal() {
     JourneyStore.current.focusBefore.focus();
 }
 function mlShowPage(page) {
+  document.body.classList.toggle("is-playing", page === "dashboard");
   if (page !== "dashboard") stop();
   JourneyStore.set("activePage", page);
   document

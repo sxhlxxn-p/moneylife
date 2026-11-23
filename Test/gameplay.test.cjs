@@ -21,20 +21,20 @@ function game() {
     serverPlanBusy: false, serverPlanId: null,
     eventRequests: {get: () => null, isSuspended: () => false},
     localStorage: {removeItem() {}},
-    show: html => { context.modal = html; }, closeModal() {},
+    show: (html, scene) => { context.modal = html; context.scene = scene; }, closeModal() {},
     toast: text => { context.notice = text; },
     render() {}, mlShowPage: page => { context.page = page; },
     mlFormatAmount: value => Math.round(value).toLocaleString("ko-KR"),
     mlFormatMan: value => Math.round(value * 10000).toLocaleString("ko-KR") + "원",
     money: value => Math.round(value * 10000).toLocaleString('ko-KR') + '원',
     dates: month => `${month}개월차`, escapeHtml: String,
-    nextEvent: () => { context.nextCalled = true; }, compare() {},
+    nextEvent: () => { context.nextCalled = true; }, step: () => { context.stepped = true; }, compare() {},
   });
   const load = file => vm.runInContext(readFileSync(path.join(__dirname, '../Client/src', file), 'utf8'), context);
   for (const file of ['plan-state.js', 'journey-defaults.js', 'journey-store.js', 'journey-simulation.js', 'dashboard-screen.js', 'finance-screen.js', 'gameplay.js', 'report-screen.js']) load(file);
   context.render = () => {};
   vm.runInContext(`EV = {12: {emoji:'🏡', title:'독립',body:'독립 준비',a:'독립하기',b:'더 준비하기'}};`, context);
-  return {context, nodes, run: code => vm.runInContext(code, context)};
+  return {context, nodes, load, run: code => vm.runInContext(code, context)};
 }
 
 test('출발 화면과 새 조건 확인 단계는 진행 중인 여정을 변경하지 않는다', () => {
@@ -113,4 +113,28 @@ test('리포트는 1만원 미만의 차이도 원 단위로 표시한다', () =
   run('mlDrawChart = () => true; const base = simulate(); const current = base.map(row => ({...row,total:row.total + 0.01})); mlRenderReport({base,current,stress:current})');
   assert.equal(nodes.get('ml-report-net-difference').textContent, '100원 증가');
   assert.match(run('mlCompareNetWorth(0.01,"처음 계획")'), /100원/);
+});
+
+
+test('선택 결과에서 다음 달로 진행하고 재렌더링하면 이야기 장면으로 복귀한다', () => {
+  const {context, nodes, run} = game();
+  run('JourneyStore.set("month",12); showChoiceResult(simulate(),simulate(),12,false)');
+  assert.equal(nodes.get('play-dialogue').hidden, true);
+  nodes.get('game-choice-result').children[3].children[0].onclick();
+  assert.equal(context.stepped, true);
+  run('renderGameplay(simulate())');
+  assert.equal(nodes.get('play-dialogue').hidden, false);
+  assert.equal(nodes.get('game-choice-result').hidden, true);
+});
+
+test('이벤트 장면은 승인 전에 미래를 비교하며 현재 조건을 보존한다', () => {
+  const {context, load, run} = game();
+  load('journey-events.js');
+  run('EV = {12:{emoji:"🏡",title:"독립",body:"독립 준비",a:"독립하기",b:"더 준비하기",ad:"이사비 300만 원",bd:"유지",rule:{kind:"effects",effects:[{type:"once",value:3000000}]}}}; JourneyStore.set("month",12)');
+  const before = run('JSON.stringify(JourneyStore.snapshot())');
+  run('eventPreview(12)');
+  assert.equal(context.scene, 'event');
+  assert.match(context.modal, /다음 달 순자산 차이 -3,000,000원/);
+  assert.match(context.modal, /aria-label="독립하기"/);
+  assert.equal(run('JSON.stringify(JourneyStore.snapshot())'), before);
 });
