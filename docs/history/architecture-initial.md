@@ -1,0 +1,77 @@
+> 초기 개발 기록입니다. 현재 상태는 [현재 상태](../project-status.md), 현재 구조는 [개발 구조](../architecture.md)를 따릅니다.
+
+# 개발 구조와 모듈 경계
+
+이 구조는 Notion의 `개발 환경과 패키지 구조`, `DB와 API 계약`, `금융 계산 명세와 검증`, `LLM 설계와 성능 실험`을 로컬 작업 경로에 반영한다.
+
+```text
+Client             게임 화면·스타일·프론트 상태·API 호출
+Server             API·DB·LLM·토스증권 연동
+Engine             독립 금융 계산 로직
+Shared             공통 타입·검증 스키마
+Test               통합 테스트·엔진 회귀·AI 평가
+fixtures           공통 비식별 입력·기대 결과
+docs               개발·API·계산 명세
+prototype          기존 정적 초안 원본
+```
+
+## 초기 폴더 분리 기록
+
+- 기존 정적 초안은 `prototype`에 동일본으로 보관했다.
+- 현재 실행본은 `Client`와 `Engine`으로 분리했다.
+- 실행 가능한 상태를 유지하기 위해 루트 개발 서버가 웹 파일과 엔진 파일만 명시적으로 제공한다.
+- Server와 Shared는 기술 스택 합의 전이므로 README와 명세만 준비했다. Test에는 Node 내장 러너 기반 엔진 회귀 테스트 4개가 구현되어 있다.
+- `dist`는 향후 빌드 산출물 전용이며 Git에 포함하지 않는다.
+- Notion과 동일한 `Client`, `Server`, `Engine`, `Shared`, `Test` 경로명을 사용한다.
+- npm workspaces로 역할 경계를 선언하고 루트 lockfile 하나를 사용한다.
+- 각 workspace의 실제 의존성은 해당 구현을 시작할 때 추가한다.
+
+## 현재 의존 방향
+
+```text
+Client ──> Engine
+Test ───> Engine
+scripts ─> Client + Engine 또는 prototype 제공
+```
+
+현재 Client는 정적 스크립트로 Engine을 직접 불러온다. `Engine`은 Client, Server, DB에 의존하지 않는다.
+
+## 서버 연동 후 목표 방향
+
+```text
+Client ──> Shared <── Server ──> Engine
+                         ├─────> DB
+                         ├─────> LLM
+                         └─────> 토스증권 어댑터
+Test ───> Client + Server + Engine
+```
+
+LLM은 `Server` 내부에서 계산 결과를 설명하되 금융 수치를 직접 산출하지 않는다. 외부 API와 비밀정보는 Server 경계를 넘겨 브라우저에 전달하지 않는다.
+
+## 예시 구조에서 적용하지 않은 항목
+
+- `Client/public`, `Client/src/assets`: 실제 정적 자산이 추가될 때 생성한다.
+- React·TypeScript 세부 폴더: 이전 작업을 시작할 때 실제 코드와 함께 생성한다.
+- Cypress 기본 예제: 테스트 도구 선정 후 프로젝트 시나리오만 추가한다.
+- React·Vite 파일: 기술 전환 결정 전에는 현재 HTML·CSS·JavaScript 실행을 유지한다.
+
+## 초기 검토 항목 (후속 결정은 아래 통합 이후 상태 참고)
+
+1. 현재 정적 JavaScript client를 유지한 상태에서 Node.js 서버 프레임워크 확정
+2. Plan·Event·Run 계약 및 원 단위·반올림 규칙 확정
+3. 패키지 관리자·런타임 버전 고정
+4. PostgreSQL 초기화와 테스트 명령 확정
+5. 배포 방식과 환경변수 이름 검토
+
+
+## 첫 통합 이후 상태
+
+Client는 `/api/plans` 프록시로 FastAPI에 현재 여정의 스냅샷을 저장·조회한다. Server는 SQLAlchemy로 Plan과 GuestSession을 저장한다. Compose는 PostgreSQL이며, `dev:server:local`은 명시적인 SQLite 개발 경로다. Engine은 JS로 브라우저 미리보기와 서버 Node 실행에 함께 사용한다. 서버는 원 단위 반올림을 적용해 입력 스냅샷·월별 결과·요약을 Run으로 저장한다. Shared의 계획·서버 계산 계약을 사용한다. 위의 프레임워크 미정·Server 문서만 존재한다는 설명은 초기 상태 기록이며, 현재 구현 상태는 이 항목을 기준으로 한다.
+
+## 투자 통합 이후 상태 (2026-11-09)
+
+FastAPI·SQLAlchemy·고정 Node 계산 엔진과 Client의 투자 연습실을 연결했다. 투자 계획·Run은 불변 사본으로 저장하며 주문/취소/생활 조건 변경마다 새 사본을 만든다. 저장 투자 사본 최대 3개 비교는 공통 진행 시점의 저장 결과만 읽는다. 과거 주가 등록/읽기 전용 어댑터·해설 선택 연결부는 있으나 외부 실제 호출은 미검증이다. SQLite·Node·Chromium으로 검증하며 운영 PostgreSQL/Docker·배포는 남아 있다. 초기의 Server 문서만 존재한다는 기록을 현재 구현으로 해석하지 않는다. 계획서와의 차이는 progress-2026-11-09.md를 따른다.
+
+## 새 화면 통합 (2026-11-22)
+
+예빈 브랜치 레이아웃을 Client로 이식했다. 활성 게임 상태와 기존 원 단위 변환·Engine·Plan/Run API를 공유한다. prototype은 참고본이며 별도 엔진을 이식하지 않는다. 일반 LLM 설명은 서버 사실 문장 순서 선택으로 변경했고 재질문 문맥은 소유한 Plan에 연결한다. 자세한 범위는 frontend-integration.md를 따른다.

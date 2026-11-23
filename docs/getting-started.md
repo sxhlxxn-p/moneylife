@@ -1,40 +1,57 @@
 # 처음 시작하기
 
-## 저장소 복제와 실행
+현재 실행 구조와 검증 범위는 [현재 상태](project-status.md), 변경 위치는 [개발 구조](architecture.md)를 기준으로 한다. 과거 진행 보고서는 현재 상태 안내를 대체하지 않는다.
 
-Git과 Node.js 18 이상, npm이 필요하다. 팀 공통 런타임 버전 고정은 아직 합의 전이다.
+## 설치와 로컬 실행
+
+팀 공통 검증 환경은 Node.js 22와 Python 3.12다. 저장소 루트에서 npm 의존성과 Python 가상환경을 준비한다.
 
 ```bash
 git clone https://github.com/sxhlxxn-p/moneylife.git
 cd moneylife
 npm ci
-npm run dev:client
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r Server/requirements-dev.txt
+npm run dev:server:local
 ```
 
-브라우저에서 <http://localhost:5173>을 연다. 종료는 `Ctrl+C`다. 현재 화면과 엔진은 실제 API 키, DB, `.env` 없이 실행할 수 있다. `.env.example`은 향후 연동에 필요한 변수 안내이며 Node 개발 서버는 `.env`를 자동으로 읽지 않는다.
+Windows에서는 가상환경 활성화에 `.venv\Scripts\Activate.ps1`을 사용한다. 화면 개발 서버는 별도 터미널에서 실행한다.
 
-## 개인 브랜치에서 작업
+```bash
+npm run dev
+```
+
+화면은 http://localhost:5173, API는 http://localhost:3000/docs다. 로컬 서버 명령은 DATABASE_URL이 없으면 `.data/dev.db` SQLite를 사용한다. 이미 실행 중인 서버는 코드 변경 후 재시작한다. Docker 개발 환경은 [Server 안내](../Server/README.md), PostgreSQL·HTTPS 배포는 [배포 안내](deployment.md)를 따른다.
+
+LLM·시세 실 API 설정 없이 수동 입력·계산·저장·가상 투자 기능을 사용할 수 있다. LLM 미설정 상태에서는 자연어 해석 요청이 설정 오류로 끝나며 가짜 모델로 대체되지 않는다.
+
+## 작업과 검사
 
 ```bash
 git switch main
 git pull --ff-only
-git switch -c <본인-브랜치명>
+git switch -c <작업-브랜치명>
 ```
 
-이미 작업 중인 변경이 있다면 브랜치를 바꾸거나 main을 반영하기 전에 커밋 또는 백업한다. 충돌 해결 기준과 리뷰 예외는 [협업 규칙](../CONTRIBUTING.md)을 따른다.
-
-## 담당 영역 확인
-
-현재 화면은 `Client`, 금융 계산은 `Engine`, 회귀 검증은 `Test`에 있다. `Server`와 `Shared`는 계획과 패키지 경계가 준비된 상태다. [문서 목차](README.md)에서 담당 영역의 README와 Guideline을 확인한다.
-
-의존성은 루트에서 설치하고 루트 `package-lock.json` 하나를 공유한다. 특정 영역에 의존성을 추가할 때는 `npm install <패키지명> --workspace <영역>`을 사용하고 설치 이유와 실행 방법을 문서에 남긴다.
-
-## PR 전 확인
+현재 작업을 커밋하거나 백업한 뒤 브랜치를 바꾼다. API·계산 변경의 기본 검사는 다음 명령이다.
 
 ```bash
-npm run check
-npm test
-npm run tree
+npm run verify:backend
 ```
 
-변경 내용을 커밋해 본인 브랜치로 push하고 `main` 대상 PR을 만든다. 자동으로 표시되는 PR 양식에 변경 내용과 검증 결과를 적고, Assignee는 본인으로 지정한다. 일반 변경은 관련 영역 팀원 또는 팀장 `@sxhlxxn-p`에게 리뷰를 요청하고, PR 링크를 팀 채팅에 공유한다.
+이 명령은 Python 구문·미정의 이름·포맷 검사, Node 단위 검사, 서버 회귀 검사를 수행한다. Python 실행기는 저장소의 `.venv`를 우선 사용하며 `PYTHON_BINARY`로 명시할 수 있다. `.venv`가 없으면 python3를 사용하므로 해당 Python에도 서버 의존성이 있어야 한다.
+
+- `npm test`: Node 단위 검사만 실행한다. 서버·브라우저 검사까지 완료했다는 뜻이 아니다.
+- `npm run test:server`: 임시 SQLite를 사용하는 서버 검사. 실제 제공자 응답은 대역으로 처리한다.
+- `npm run check`: JavaScript와 공개 파일 연결 검사.
+- `npm run format:check`: Client 포맷 검사.
+- `npm run test:ui`: 기존 전체 브라우저 회귀 검사. 최초 실행 전 `npx playwright install chromium`이 필요하다.
+
+GitHub에서는 위 검사와 별도로 실제 PostgreSQL·배포 이미지·HTTPS·백업 복원을 검사한다. 외부 LLM·토스 인증은 별도 실연동 검증 대상이다.
+
+## 협업 기준
+
+패키지는 루트에서 설치하고 `package-lock.json` 하나를 공유한다. Python 의존성은 Server requirements 파일로 관리하며 현재 범위 지정이므로 완전한 버전 고정은 아니다. 계약 변경 시 Shared 명세와 관련 테스트를 함께 수정한다. PR 검토와 병합 규칙은 [협업 규칙](../CONTRIBUTING.md)을 따른다.
+
+백엔드 포맷은 `npm run format:server`, 확인은 `npm run format:server:check`를 사용한다. Ruff 버전은 개발 의존성에서 고정하며 미정의 이름 검사도 수행한다.

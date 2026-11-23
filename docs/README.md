@@ -1,29 +1,24 @@
 # 개발 문서
 
-처음 참여한 팀원은 [처음 시작하기](getting-started.md)와 [협업 규칙](../CONTRIBUTING.md)을 먼저 읽는다.
+처음 참여한 팀원은 [처음 시작하기](getting-started.md)와 [협업 규칙](../CONTRIBUTING.md)을 읽는다.
 
-## 계획과 명세
+## 기준 문서
 
-| 문서 | 확인할 내용 |
-|---|---|
-| [개발 구조](architecture.md) | 역할별 폴더, 의존 방향, 현재 구현과 목표 구조 |
-| [결정 기록](decisions.md) | 확정한 선택과 미확정 기술 스택 |
-| [API 계약](api-contract.md) | API와 공통 데이터 계약 초안 |
-| [계산 규칙](simulation-rules.md) | 계산 단위, 월별 순서와 검증 기준 |
-| [프론트엔드 연동](FRONTEND_HANDOFF.md) | 화면, 상호작용과 서버 연결 지점 |
-| [LLM 설계와 평가](llm-evaluation.md) | 조건 추출, 설명 생성과 평가 기준 |
-| [배포](deployment.md) | 배포 계획과 환경 설정 |
+- [현재 상태](project-status.md): 실제 스택·구현·검증·미완료 범위의 기준.
+- [처음 시작하기](getting-started.md): 설치·서버와 화면 실행·영역별 검사 명령.
+- [개발 구조](architecture.md): 백엔드 공통 모듈과 기능별 수정 위치.
+- [현재 결정](decisions.md): 스택·데이터·트랜잭션·외부 연결 정책.
+- [배포](deployment.md): 개발·배포 이미지, PostgreSQL·HTTPS와 백업 복원.
 
-## 영역별 시작점
+## 기능별 명세
 
-| 영역 | 안내 | 작업 기준 |
-|---|---|---|
-| 화면 | [Client](../Client/README.md) | [FE Guideline](../Client/FE-Guideline.md) |
-| API·DB·LLM | [Server](../Server/README.md) | [BE Guideline](../Server/BE-Guideline.md) |
-| 금융 계산 | [Engine](../Engine/README.md) | [Engine Guideline](../Engine/ENGINE-Guideline.md) |
-| 공통 계약 | [Shared](../Shared/README.md) | 계약 변경은 관련 영역과 함께 검토 |
-| 검증 | [Test](../Test/README.md) | [QA Guideline](../Test/QA-Guideline.md) |
-| 공통 예시 | [fixtures](../fixtures/README.md) | 비식별 입력과 기대 결과 |
-| 초기 초안 | [prototype](../prototype/README.md) | 보관용, 새 작업은 역할별 영역에서 진행 |
+- [API 계약](api-contract.md), [계산 규칙](simulation-rules.md), [저장 복구](write-recovery.md).
+- [LLM 구현·평가](llm-evaluation.md), [오프라인 검증](ai-offline-development.md), [평가 실행](../Test/ai/README.md).
+- [모의투자](paper-trading-plan.md), [과거 가격 시연](market-demo.md), [가상 뉴스 게임](news-game.md).
+- [화면 연결](FRONTEND_HANDOFF.md), [프론트 구조](frontend-structure.md), [백엔드 운영](backend-operations.md).
 
-계획은 구현 완료를 뜻하지 않는다. 현재 실행되는 범위는 Client·Engine과 엔진 회귀 테스트이며, Server API·DB·인증·실제 LLM·증권 연동은 미구현이다. 미확정 항목은 구현 전에 합의하고 결정 기록에 남긴다.
+영역별 안내: [Client](../Client/README.md), [Server](../Server/README.md), [Engine](../Engine/README.md), [Shared](../Shared/README.md), [Test](../Test/README.md).
+
+## 과거 기록
+
+[초기 구조](history/architecture-initial.md), [초기 결정](history/decisions-initial.md), [11월 9일 진행 기록](progress-2026-11-09.md)은 당시 상태다. 현재 구현 여부를 판단할 때는 현재 상태 문서를 우선한다. 기능별 이전 검증 수량도 해당 변경 당시의 결과이며 최신 CI 수량과 다를 수 있다.

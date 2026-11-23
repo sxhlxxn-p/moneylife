@@ -1,6 +1,6 @@
 # API 명세 초안
 
-현재 Server API는 미구현이며 아래 계약은 Client·Server 통합을 위한 기준 초안이다.
+계획 스냅샷 생성·목록·조회 API는 구현했다. 서버 계산·Run 저장·조회도 구현했다. LLM 변경안 해석·사용자 승인·계산·비교 저장 흐름도 구현했다. 지표 연결 설명 API도 구현했다. 독립 비교·자율 탐색은 후속 구현 대상이다. 이번 통합 계약은 `../Shared/plan-contract.md`, 실행 안내는 `first-integration.md`를 참고한다.
 
 ## 데이터 경계
 
@@ -13,16 +13,27 @@
 
 ## 엔드포인트 초안
 
-- `POST /plans`, `GET /plans/{id}`
+- 구현: `POST /plans`, `GET /plans?limit=20&offset=0`, `GET /plans/{id}`
 - `POST /plans/{id}/branches`
-- `POST /simulations`, `GET /simulations/{id}`
+- 구현: `POST /simulations`, `GET /simulations?planId={id}&limit=20`, `GET /simulations/{id}`
 - `POST /comparisons`
-- `POST /ai/parse-change`, `POST /ai/explain`
+- 구현: `POST /ai/parse-change`, `POST /ai/proposals/{id}/apply`
+- 구현: `POST /ai/explain` (비교 결과가 있는 본인 Run, 수치 연결·실패 시 정형 설명)
 - `POST /ai/compare-plans`
 
 오류는 `VALIDATION_ERROR`, `NEEDS_CLARIFICATION`, `EXTERNAL_API_ERROR`, `MODEL_OUTPUT_INVALID`, `RUN_NOT_FOUND`를 구분한다. 인증정보와 계좌 식별자는 응답이나 LLM 입력에 포함하지 않는다.
 
 ## 첫 통합 범위
 
-첫 연결은 계획 생성·조회와 12개월 계산이다. 동일 입력 스냅샷과 기대 결과로 Client·Server·Engine을 검증한 뒤 120개월·이벤트·AI로 확장한다. AI 후보는 사용자 확인 전 확정 계획에 반영하지 않는다.
+현재 연결은 계획 생성·조회와 서버 1~120개월 계산이다. 화면의 저장 버튼은 120개월을 실행한다. 상세 입력·결과·중복 요청·이자 정책은 `Shared/simulation-contract.md`를 따른다. AI 후보는 사용자 확인 전 확정 계획에 반영하지 않는다.
 
+
+자연어 변경·기간·승인·오류 계약은 [AI 변경 계약](../Shared/ai-change-contract.md)을 따른다. 외부 모델 실제 호출은 키와 모델 설정 후 확인해야 한다.
+
+## 모의투자 연결
+
+월별 모의투자 저장 API와 Client 투자 연습실은 [모의투자 계약](../Shared/paper-api-contract.md)을 따른다. 기존 `/plans`와 `/simulations` 흐름은 유지하며, 투자 화면은 `/paper-plans` 명령과 `/paper-runs` 저장 결과를 사용한다. 가격 원본은 서버 내부에 고정하고 현재 시점 이후의 가격/계산 경로는 화면에 제공하지 않는다.
+
+## 재시도 가능한 계획 저장
+
+`POST /plan-saves`는 `{requestId: UUID, plan: PlanCreate}`를 받고 201 PlanDetail을 반환한다. 동일 소유자·동일 ID·동일 내용은 같은 계획으로 복원한다. 내용이 다르면 409 REQUEST_ID_CONFLICT, 타인 또는 없는 부모 계획은 404를 반환한다. 이후 `/simulations`에 별도 고정 requestId를 전달한다. 상세 동작은 [write-recovery.md](write-recovery.md)를 참고한다.

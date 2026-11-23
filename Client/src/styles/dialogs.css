@@ -1,0 +1,181 @@
+/* Money Life client styles. */
+
+/* Snapshot controls. */
+.server-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1px solid #e8e3ee;
+  border-radius: 16px;
+}
+.server-tools strong {
+  font-size: 13px;
+  color: #544866;
+}
+.server-tools p {
+  font-size: 11px;
+  color: #83798e;
+  margin: 5px 0 0;
+}
+.saved-plans {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+.saved-plan {
+  text-align: left;
+  white-space: normal;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+@media (max-width: 700px) {
+  .server-tools {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .server-tools .buttonrow {
+    flex-wrap: wrap;
+  }
+}
+
+/* Saved calculation results. */
+.run-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.run-summary > div {
+  padding: 16px;
+  border-radius: 12px;
+  background: #f5f2fb;
+  overflow-wrap: anywhere;
+}
+.run-summary small,
+.run-summary strong {
+  display: block;
+}
+.run-summary small {
+  font-size: 11px;
+  color: #81718f;
+  margin-bottom: 8px;
+}
+.run-summary strong {
+  font-size: 17px;
+  color: #514264;
+}
+.run-details summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+.run-table-scroll {
+  max-height: 320px;
+  overflow: auto;
+  margin-top: 12px;
+}
+.run-table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.run-table-scroll th,
+.run-table-scroll td {
+  padding: 8px;
+  text-align: right;
+  border-bottom: 1px solid #e8e3ee;
+}
+.run-table-scroll th {
+  background: #f6f3fa;
+  position: sticky;
+  top: 0;
+}
+@media (max-width: 450px) {
+  .run-summary {
+    grid-template-columns: 1fr;
+  }
+  .server-tools .buttonrow {
+    gap: 6px;
+  }
+}
+
+.ai-change-detail {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf9fd;
+}
+.ai-change-detail h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.ai-change-detail p {
+  margin: 4px 0;
+}
+.ai-change-detail dl {
+  margin: 12px 0 0;
+}
+.ai-change-detail dt {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--sub);
+}
+.ai-change-detail dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.ai-followup-answer {
+  padding: 8px 12px;
+  border-left: 3px solid var(--purple);
+}
+
+#eventrequest-retry[hidden],
+#eventrequest-archive[hidden] {
+  display: none;
+}
+
+.server-tools [hidden] {
+  display: none;
+}
+
+.ai-comparison-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.ai-comparison-metrics > div {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf9fd;
+  min-width: 0;
+}
+.ai-comparison-metrics dt,
+.ai-comparison-caption {
+  color: var(--sub);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.ai-comparison-metrics dd {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 450px) {
+  .ai-comparison-metrics {
+    grid-template-columns: 1fr;
+  }
+}

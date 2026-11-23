@@ -1,0 +1,23 @@
+{
+  "dataKind": "synthetic-test-only",
+  "description": "계산 검증용 가상 종목·가격. 실제 시세가 아니다.",
+  "symbol": "TEST-KRW",
+  "initialCash": 1000000,
+  "steps": [
+    {"order": {"id": "buy-1", "symbol": "TEST-KRW", "side": "buy", "quantity": 40}, "quote": {"symbol": "TEST-KRW", "price": 10000, "tradable": true}},
+    {"order": {"id": "sell-1", "symbol": "TEST-KRW", "side": "sell", "quantity": 10}, "quote": {"symbol": "TEST-KRW", "price": 12500, "tradable": true}}
+  ],
+  "expected": {
+    "cash": 725000,
+    "quantity": 30,
+    "costBasis": 300000,
+    "averageCost": "10000.000000",
+    "marketValue": 375000,
+    "realizedPnl": 25000,
+    "unrealizedPnl": 75000,
+    "totalPnl": 100000,
+    "totalAssets": 1100000,
+    "feesPaid": 0,
+    "taxesPaid": 0
+  }
+}

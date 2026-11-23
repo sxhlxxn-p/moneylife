@@ -1,0 +1,29 @@
+// Fixed stdin/stdout bridge.
+const {calculateSnapshot} = require('./snapshot.cjs');
+const {compareWithTrading} = require('./monthly-trading.cjs');
+const {previewOrder} = require('./order-preview.cjs');
+const news = require('./news-scenario.js');
+let input = '';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', chunk => {
+  input += chunk;
+  if (input.length > 500000) process.exit(1);
+});
+process.stdin.on('end', () => {
+  try {
+    const {state, months, investment, mode, order, choices} = JSON.parse(input);
+    if (mode === 'news-game') {
+      process.stdout.write(JSON.stringify(news.replay(state, choices)));
+      return;
+    }
+    const minimum = ['monthly-investment', 'order-preview'].includes(mode) ? 0 : 1;
+    if (!Number.isInteger(months) || months < minimum || months > 120) throw new Error('Invalid period');
+    if (mode === 'monthly-investment') process.stdout.write(JSON.stringify(compareWithTrading(state, investment, months)));
+    else if (mode === 'order-preview') process.stdout.write(JSON.stringify(previewOrder(state, investment, months, order)));
+    else if (mode === undefined) process.stdout.write(JSON.stringify(calculateSnapshot(state, months)));
+    else throw new Error('Unknown mode');
+  } catch {
+    process.stderr.write('Calculation failed');
+    process.exitCode = 1;
+  }
+});

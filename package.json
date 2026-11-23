@@ -13,11 +13,38 @@
   "scripts": {
     "dev": "npm run dev:client",
     "dev:client": "npm run dev --workspace Client",
+    "dev:server": "npm run dev --workspace Server",
+    "dev:server:local": "python3 Server/run_local.py",
     "start": "npm run dev:client",
     "prototype": "node scripts/dev-server.cjs --prototype",
     "tree": "node scripts/print-tree.cjs",
     "test": "npm run test --workspace Test",
-    "check": "npm run check --workspaces --if-present && node --check prototype/app.js && node --check prototype/engine.js && node --check scripts/dev-server.cjs && node --check scripts/print-tree.cjs"
+    "check": "npm run check --workspaces --if-present && node --check prototype/app.js && node --check prototype/engine.js && node --check scripts/dev-server.cjs && node --check scripts/print-tree.cjs",
+    "demo:trading": "npm run demo:trading --workspace Engine",
+    "setup:llm": "python3 Server/scripts/setup_llm.py",
+    "check:llm": "python3 Server/scripts/check_llm.py",
+    "check:market": "python3 Server/scripts/check_market.py",
+    "prepare:market": "python3 Server/scripts/prepare_market_demo.py",
+    "demo:monthly-trading": "npm run demo:monthly-trading --workspace Engine",
+    "test:ui": "npm run test:ui --workspace Test",
+    "db:migrate": "python3 Server/scripts/maintain_database.py migrate",
+    "db:cleanup": "python3 Server/scripts/maintain_database.py cleanup",
+    "format:client": "prettier --write \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html",
+    "format:check": "prettier --check \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html",
+    "check:ai:offline": "python3 Test/ai/check_offline.py",
+    "prepare:ai": "python3 Test/ai/prepare.py",
+    "evaluate:ai": "python3 Test/ai/evaluate.py",
+    "review:ai": "python3 Test/ai/review_development.py",
+    "check:server": "node scripts/run-python.cjs Server/scripts/check_source.py && node scripts/run-python.cjs -m ruff check Server",
+    "test:server": "node scripts/run-python.cjs -m pytest Server/tests -q",
+    "verify:backend": "npm run check:server && npm run format:server:check && npm test && npm run test:server",
+    "format:server": "node scripts/run-python.cjs -m ruff format Server/app",
+    "format:server:check": "node scripts/run-python.cjs -m ruff format --check Server/app"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "prettier": "3.10.1"
+  }
 }
