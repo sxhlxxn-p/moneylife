@@ -1105,7 +1105,7 @@ for (const width of [1440, 390]) {
     await page.getByRole('button',{name:'한 달 살아보기 →',exact:true}).click();
     assert.equal(await page.evaluate(() => JourneyStore.current.month), 1);
     assert.match(await page.locator('#game-month-receipt').innerText(), /들어온 소득/);
-    await page.getByRole('button',{name:/조건을 말로 바꾸기/}).click();
+    await page.getByRole('button',{name:/AI로 계획 바꾸기/}).click();
     assert.equal(await page.locator('#ask').isVisible(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.getByRole('button',{name:/다른 미래와 비교/}).click();
