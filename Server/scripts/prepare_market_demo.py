@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--collect', action='store_true', help='인증정보를 사용해 실제 일봉 수집')
     parser.add_argument('--project-usage-confirmed', action='store_true', help='프로젝트 표시 가능 범위를 확인한 자료를 등록')
     args = parser.parse_args()
-    spec = json.loads((ROOT / 'fixtures/market-demo-spec.json').read_text())
+    spec = json.loads((ROOT / 'fixtures/market-demo-spec.json').read_text(encoding='utf-8'))
     report = {'specId': spec['priceSeriesId'], 'symbol': spec['symbol'], 'period': [spec['startMonth'], spec['endMonth']], **readiness()}
     try:
         stored = load_historical(spec['priceSeriesId'])

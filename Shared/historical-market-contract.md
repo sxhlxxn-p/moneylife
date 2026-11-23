@@ -4,6 +4,10 @@
 
 ## 입력과 표본화
 
+- 토스 외부 호출은 `POST https://openapi.tossinvest.com/oauth2/token`과 `GET https://openapi.tossinvest.com/api/v1/candles`만 허용한다. 리다이렉트·계좌 헤더·실주문/정정/취소 경로는 차단한다. 모의 주문·취소·월 진행은 외부 HTTP 없이 내부 엔진과 DB에서 처리한다.
+- 운영 조회 `GET /integrations/toss/status`는 `X-Moneylife-Operator-Key` 인증이 필요하다. 서버의 `TOSS_OPERATOR_KEY`(32자 이상)가 없으면 503, 인증 불일치는 401이다. 응답은 configured, mode, readOnly=true, realTradingEnabled=false, registeredHistoricalSeries와 lastCheck(checkedAt, succeeded, error)다. 토큰·키·계좌·전체 가격을 반환하지 않는다.
+- 상태 GET은 외부 호출이나 토큰 재발급을 수행하지 않는다. `check_market.py --live`만 마지막 검사 결과를 원자적으로 기록한다. 미검사 시 lastCheck=null이며 과거 성공이 현재 연결 성공을 보장하지 않는다. 기본 기록 파일은 `.data/toss-status.json`, `TOSS_STATUS_FILE` 환경변수로 공유 영속 경로를 지정할 수 있다. 자료 수는 현재 project 공개 목록 기준이다.
+
 - 국내 원화 종목, 6자리 영문·숫자 코드, 원 단위 양의 정수 종가와 0 이상 거래량.
 - CSV 열은 `date,close,volume`, 날짜는 YYYY-MM-DD다. 토스 조회는 고정 호스트의 `GET /api/v1/candles`, `interval=1d`, `adjusted=false`만 사용한다. 계좌·주문 API는 호출하지 않는다.
 - 월 0을 포함해 2~121개의 이미 끝난 달을 지정한다. 월 0은 유효 가격이 필요하다. 같은 날짜의 값이 다르면 거부한다.
