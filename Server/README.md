@@ -2,6 +2,8 @@
 
 FastAPI·SQLAlchemy·Pydantic 서버다. 현재 상태는 [현재 상태](../docs/project-status.md), 모듈별 수정 위치는 [개발 구조](../docs/architecture.md)를 따른다.
 
+Swagger 기준 전체 엔드포인트·요청/응답·스키마·호출 예시는 [API 엔드포인트 명세서](API_ENDPOINTS.md)를 참고한다.
+
 ## 로컬 실행
 
 저장소 루트에서 Node.js 22·Python 3.12와 의존성을 준비한다.
