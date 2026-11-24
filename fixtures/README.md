@@ -8,4 +8,6 @@ Client·Server·Engine·Test가 함께 사용하는 비식별 입력과 기대 �
 - 실제 계좌 정보, 인증정보와 개인 식별 데이터는 저장하지 않는다.
 - 데이터 구조가 바뀌면 관련 명세와 테스트를 같은 PR에서 수정한다.
 
+- `news-game/four-rounds.json`: 가상 뉴스 게임(`news-game-v1`) 4라운드의 대응·주가 충격·해당 라운드 생활비/소득 충격·HALF_UP 0.5원 경계·미충족 누적을 `docs/news-game.md` 규칙으로 독립 계산한 기대값. `Test/news-ledger.test.cjs`가 대조한다.
+
 - `paper-trading/monthly-run.json`: 공유 현금·월별 저축·매수/부분 매도/전량 매도의 가상 가격과 수기 정산 기대값. 실제 종목·시세가 아니다.

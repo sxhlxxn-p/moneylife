@@ -1,0 +1,676 @@
+{
+  "description": "가상 경제 뉴스 게임(news-game-v1) 4라운드 재생을 엔진 출력이 아닌 docs/news-game.md 규칙으로 독립 계산한 기대값이다. 실제 기사·시세가 아닌 교육용 가정이며 notes는 라운드별 검산 근거다.",
+  "units": "KRW",
+  "version": "news-game-v1",
+  "sources": [
+    "docs/news-game.md",
+    "Shared/news-game-contract.md"
+  ],
+  "cases": [
+    {
+      "id": "mixed-responses-four-rounds",
+      "rules": [
+        "충격 전 가격으로 매도",
+        "홀수 보유 절반 매도는 정수 주 내림(51주 → 25주)",
+        "생활비·소득 충격은 해당 라운드만",
+        "주가 8,844.5원 → 8,845원(HALF_UP)",
+        "계속 보유 경로와 비교"
+      ],
+      "seed": {
+        "cash": 500000,
+        "saved": 0,
+        "quantity": 51,
+        "price": 10000,
+        "income": 200000,
+        "expense": 100000,
+        "unpaid": 0
+      },
+      "choices": [
+        "half",
+        "hold",
+        "sell",
+        "hold"
+      ],
+      "notes": [
+        "1라운드 rates/half: 25주×10,000=250,000 매도, 가격 10,000×88%=8800→8,800, 소득 200,000, 생활비 100,000; 가용 500,000+250,000+200,000=950,000, 부족 0; 순자산 850,000+0+26×8,800−0=1,078,800",
+        "2라운드 energy/hold: 0주×8,800=0 매도, 가격 8,800×92%=8096→8,096, 소득 200,000, 생활비 110,000; 가용 850,000+0+200,000=1,050,000, 부족 0; 순자산 940,000+0+26×8,096−0=1,150,496",
+        "3라운드 recovery/sell: 26주×8,096=210,496 매도, 가격 8,096×115%=9310.4→9,310, 소득 200,000, 생활비 100,000; 가용 940,000+210,496+200,000=1,350,496, 부족 0; 순자산 1,250,496+0+0×9,310−0=1,250,496",
+        "4라운드 employment/hold: 0주×9,310=0 매도, 가격 9,310×95%=8844.5→8,845, 소득 160,000, 생활비 100,000; 가용 1,250,496+0+160,000=1,410,496, 부족 0; 순자산 1,310,496+0+0×8,845−0=1,310,496"
+      ],
+      "expected": {
+        "history": [
+          {
+            "state": {
+              "cash": 850000,
+              "saved": 0,
+              "quantity": 26,
+              "price": 8800,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "rates",
+            "action": "half",
+            "sold": 25,
+            "proceeds": 250000,
+            "income": 200000,
+            "expense": 100000,
+            "shortfall": 0,
+            "stockChange": -31200,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1078800,
+            "difference": 68800
+          },
+          {
+            "state": {
+              "cash": 940000,
+              "saved": 0,
+              "quantity": 26,
+              "price": 8096,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "energy",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 200000,
+            "expense": 110000,
+            "shortfall": 0,
+            "stockChange": -18304,
+            "incomeChange": 0,
+            "expenseChange": 10000,
+            "total": 1150496,
+            "difference": 71696
+          },
+          {
+            "state": {
+              "cash": 1250496,
+              "saved": 0,
+              "quantity": 0,
+              "price": 9310,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "recovery",
+            "action": "sell",
+            "sold": 26,
+            "proceeds": 210496,
+            "income": 200000,
+            "expense": 100000,
+            "shortfall": 0,
+            "stockChange": 0,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1250496,
+            "difference": 100000
+          },
+          {
+            "state": {
+              "cash": 1310496,
+              "saved": 0,
+              "quantity": 0,
+              "price": 8845,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "employment",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 160000,
+            "expense": 100000,
+            "shortfall": 0,
+            "stockChange": 0,
+            "incomeChange": -40000,
+            "expenseChange": 0,
+            "total": 1310496,
+            "difference": 60000
+          }
+        ],
+        "heldHistory": [
+          {
+            "state": {
+              "cash": 600000,
+              "saved": 0,
+              "quantity": 51,
+              "price": 8800,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "rates",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 200000,
+            "expense": 100000,
+            "shortfall": 0,
+            "stockChange": -61200,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1048800,
+            "difference": 38800
+          },
+          {
+            "state": {
+              "cash": 690000,
+              "saved": 0,
+              "quantity": 51,
+              "price": 8096,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "energy",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 200000,
+            "expense": 110000,
+            "shortfall": 0,
+            "stockChange": -35904,
+            "incomeChange": 0,
+            "expenseChange": 10000,
+            "total": 1102896,
+            "difference": 54096
+          },
+          {
+            "state": {
+              "cash": 790000,
+              "saved": 0,
+              "quantity": 51,
+              "price": 9310,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "recovery",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 200000,
+            "expense": 100000,
+            "shortfall": 0,
+            "stockChange": 61914,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1264810,
+            "difference": 161914
+          },
+          {
+            "state": {
+              "cash": 850000,
+              "saved": 0,
+              "quantity": 51,
+              "price": 8845,
+              "income": 200000,
+              "expense": 100000,
+              "unpaid": 0
+            },
+            "eventId": "employment",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 160000,
+            "expense": 100000,
+            "shortfall": 0,
+            "stockChange": -23715,
+            "incomeChange": -40000,
+            "expenseChange": 0,
+            "total": 1301095,
+            "difference": 36285
+          }
+        ],
+        "finalAssets": 1310496,
+        "heldAssets": 1301095
+      }
+    },
+    {
+      "id": "half-up-boundaries",
+      "rules": [
+        "생활비 110,005.5원 → 110,006원(HALF_UP)",
+        "충격 생활비는 다음 라운드에 원래 100,005원으로 복귀",
+        "저축 잔액 고정"
+      ],
+      "seed": {
+        "cash": 1000000,
+        "saved": 200000,
+        "quantity": 3,
+        "price": 10010,
+        "income": 300000,
+        "expense": 100005,
+        "unpaid": 0
+      },
+      "choices": [
+        "hold",
+        "hold",
+        "hold",
+        "sell"
+      ],
+      "notes": [
+        "1라운드 rates/hold: 0주×10,010=0 매도, 가격 10,010×88%=8808.8→8,809, 소득 300,000, 생활비 100,005; 가용 1,000,000+0+300,000=1,300,000, 부족 0; 순자산 1,199,995+200,000+3×8,809−0=1,426,422",
+        "2라운드 energy/hold: 0주×8,809=0 매도, 가격 8,809×92%=8104.28→8,104, 소득 300,000, 생활비 110,006; 가용 1,199,995+0+300,000=1,499,995, 부족 0; 순자산 1,389,989+200,000+3×8,104−0=1,614,301",
+        "3라운드 recovery/hold: 0주×8,104=0 매도, 가격 8,104×115%=9319.6→9,320, 소득 300,000, 생활비 100,005; 가용 1,389,989+0+300,000=1,689,989, 부족 0; 순자산 1,589,984+200,000+3×9,320−0=1,817,944",
+        "4라운드 employment/sell: 3주×9,320=27,960 매도, 가격 9,320×95%=8854→8,854, 소득 240,000, 생활비 100,005; 가용 1,589,984+27,960+240,000=1,857,944, 부족 0; 순자산 1,757,939+200,000+0×8,854−0=1,957,939"
+      ],
+      "expected": {
+        "history": [
+          {
+            "state": {
+              "cash": 1199995,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 8809,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "rates",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 300000,
+            "expense": 100005,
+            "shortfall": 0,
+            "stockChange": -3603,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1426422,
+            "difference": 196392
+          },
+          {
+            "state": {
+              "cash": 1389989,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 8104,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "energy",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 300000,
+            "expense": 110006,
+            "shortfall": 0,
+            "stockChange": -2115,
+            "incomeChange": 0,
+            "expenseChange": 10001,
+            "total": 1614301,
+            "difference": 187879
+          },
+          {
+            "state": {
+              "cash": 1589984,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 9320,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "recovery",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 300000,
+            "expense": 100005,
+            "shortfall": 0,
+            "stockChange": 3648,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1817944,
+            "difference": 203643
+          },
+          {
+            "state": {
+              "cash": 1757939,
+              "saved": 200000,
+              "quantity": 0,
+              "price": 8854,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "employment",
+            "action": "sell",
+            "sold": 3,
+            "proceeds": 27960,
+            "income": 240000,
+            "expense": 100005,
+            "shortfall": 0,
+            "stockChange": 0,
+            "incomeChange": -60000,
+            "expenseChange": 0,
+            "total": 1957939,
+            "difference": 139995
+          }
+        ],
+        "heldHistory": [
+          {
+            "state": {
+              "cash": 1199995,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 8809,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "rates",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 300000,
+            "expense": 100005,
+            "shortfall": 0,
+            "stockChange": -3603,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1426422,
+            "difference": 196392
+          },
+          {
+            "state": {
+              "cash": 1389989,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 8104,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "energy",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 300000,
+            "expense": 110006,
+            "shortfall": 0,
+            "stockChange": -2115,
+            "incomeChange": 0,
+            "expenseChange": 10001,
+            "total": 1614301,
+            "difference": 187879
+          },
+          {
+            "state": {
+              "cash": 1589984,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 9320,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "recovery",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 300000,
+            "expense": 100005,
+            "shortfall": 0,
+            "stockChange": 3648,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 1817944,
+            "difference": 203643
+          },
+          {
+            "state": {
+              "cash": 1729979,
+              "saved": 200000,
+              "quantity": 3,
+              "price": 8854,
+              "income": 300000,
+              "expense": 100005,
+              "unpaid": 0
+            },
+            "eventId": "employment",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 240000,
+            "expense": 100005,
+            "shortfall": 0,
+            "stockChange": -1398,
+            "incomeChange": -60000,
+            "expenseChange": 0,
+            "total": 1956541,
+            "difference": 138597
+          }
+        ],
+        "finalAssets": 1957939,
+        "heldAssets": 1956541
+      }
+    },
+    {
+      "id": "shortfall-without-liquidation",
+      "rules": [
+        "미충족 생활비 누적",
+        "저축·주식 자동 청산 없음",
+        "이후 여유가 생겨도 미충족액 자동 상환 없음"
+      ],
+      "seed": {
+        "cash": 0,
+        "saved": 300000,
+        "quantity": 10,
+        "price": 20000,
+        "income": 50000,
+        "expense": 150000,
+        "unpaid": 0
+      },
+      "choices": [
+        "hold",
+        "hold",
+        "half",
+        "hold"
+      ],
+      "notes": [
+        "1라운드 rates/hold: 0주×20,000=0 매도, 가격 20,000×88%=17600→17,600, 소득 50,000, 생활비 150,000; 가용 0+0+50,000=50,000, 부족 100,000; 순자산 0+300,000+10×17,600−100,000=376,000",
+        "2라운드 energy/hold: 0주×17,600=0 매도, 가격 17,600×92%=16192→16,192, 소득 50,000, 생활비 165,000; 가용 0+0+50,000=50,000, 부족 115,000; 순자산 0+300,000+10×16,192−215,000=246,920",
+        "3라운드 recovery/half: 5주×16,192=80,960 매도, 가격 16,192×115%=18620.8→18,621, 소득 50,000, 생활비 150,000; 가용 0+80,960+50,000=130,960, 부족 19,040; 순자산 0+300,000+5×18,621−234,040=159,065",
+        "4라운드 employment/hold: 0주×18,621=0 매도, 가격 18,621×95%=17689.95→17,690, 소득 40,000, 생활비 150,000; 가용 0+0+40,000=40,000, 부족 110,000; 순자산 0+300,000+5×17,690−344,040=44,410"
+      ],
+      "expected": {
+        "history": [
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 10,
+              "price": 17600,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 100000
+            },
+            "eventId": "rates",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 50000,
+            "expense": 150000,
+            "shortfall": 100000,
+            "stockChange": -24000,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 376000,
+            "difference": -124000
+          },
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 10,
+              "price": 16192,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 215000
+            },
+            "eventId": "energy",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 50000,
+            "expense": 165000,
+            "shortfall": 115000,
+            "stockChange": -14080,
+            "incomeChange": 0,
+            "expenseChange": 15000,
+            "total": 246920,
+            "difference": -129080
+          },
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 5,
+              "price": 18621,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 234040
+            },
+            "eventId": "recovery",
+            "action": "half",
+            "sold": 5,
+            "proceeds": 80960,
+            "income": 50000,
+            "expense": 150000,
+            "shortfall": 19040,
+            "stockChange": 12145,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 159065,
+            "difference": -87855
+          },
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 5,
+              "price": 17690,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 344040
+            },
+            "eventId": "employment",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 40000,
+            "expense": 150000,
+            "shortfall": 110000,
+            "stockChange": -4655,
+            "incomeChange": -10000,
+            "expenseChange": 0,
+            "total": 44410,
+            "difference": -114655
+          }
+        ],
+        "heldHistory": [
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 10,
+              "price": 17600,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 100000
+            },
+            "eventId": "rates",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 50000,
+            "expense": 150000,
+            "shortfall": 100000,
+            "stockChange": -24000,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 376000,
+            "difference": -124000
+          },
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 10,
+              "price": 16192,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 215000
+            },
+            "eventId": "energy",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 50000,
+            "expense": 165000,
+            "shortfall": 115000,
+            "stockChange": -14080,
+            "incomeChange": 0,
+            "expenseChange": 15000,
+            "total": 246920,
+            "difference": -129080
+          },
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 10,
+              "price": 18621,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 315000
+            },
+            "eventId": "recovery",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 50000,
+            "expense": 150000,
+            "shortfall": 100000,
+            "stockChange": 24290,
+            "incomeChange": 0,
+            "expenseChange": 0,
+            "total": 171210,
+            "difference": -75710
+          },
+          {
+            "state": {
+              "cash": 0,
+              "saved": 300000,
+              "quantity": 10,
+              "price": 17690,
+              "income": 50000,
+              "expense": 150000,
+              "unpaid": 425000
+            },
+            "eventId": "employment",
+            "action": "hold",
+            "sold": 0,
+            "proceeds": 0,
+            "income": 40000,
+            "expense": 150000,
+            "shortfall": 110000,
+            "stockChange": -9310,
+            "incomeChange": -10000,
+            "expenseChange": 0,
+            "total": 51900,
+            "difference": -119310
+          }
+        ],
+        "finalAssets": 44410,
+        "heldAssets": 51900
+      }
+    }
+  ]
+}
