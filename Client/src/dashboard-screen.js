@@ -71,9 +71,9 @@ function render() {
   }))
     $(id).textContent = money(value);
   $("ml-user-name").textContent = JourneyStore.current.start.name;
-  $("ml-user-avatar").textContent = JourneyStore.current.start.avatar;
+  LifeArt.mountAvatar($("ml-user-avatar"));
   $("ml-profile-name").textContent = JourneyStore.current.start.name;
-  $("ml-profile-avatar").textContent = JourneyStore.current.start.avatar;
+  LifeArt.mountAvatar($("ml-profile-avatar"));
   $("ml-profile-age").textContent =
     JourneyStore.current.start.age +
     Math.floor(JourneyStore.current.month / 12);
@@ -98,9 +98,11 @@ function render() {
   $("ml-game-goal-eta").textContent =
     goal < 0
       ? "기간 내 목표 미도달"
-      : goal <= JourneyStore.current.month
+      : row.total >= JourneyStore.current.start.target
         ? "첫 번째 목표에 도달했어요!"
-        : "목표까지 " + (goal - JourneyStore.current.month) + "개월";
+        : goal <= JourneyStore.current.month
+          ? "목표를 다시 향해 가고 있어요."
+          : "목표까지 " + (goal - JourneyStore.current.month) + "개월";
   mlShowGoalDeadline("ml-game-goal-deadline", goal);
   $("ml-game-health").textContent =
     row.short > 0
@@ -122,23 +124,7 @@ function render() {
       (m) =>
         m >= JourneyStore.current.month && !JourneyStore.current.events.has(m),
     );
-  $("ml-event-title").textContent = next
-    ? EV[next].title
-    : "당신의 10년이 쌓였어요";
-  $("ml-event-desc").textContent = next
-    ? dates(next) + "에 만나는 선택이에요."
-    : "다른 선택과 비교해보세요.";
-  $("ml-event-yes").textContent = next ? "이벤트 만나보기" : "분석 리포트 보기";
-  $("ml-event-later").textContent = "시간 계속 진행";
   $("ml-one-month").disabled = JourneyStore.current.month >= 120;
-  for (const [i, node] of [...$("ml-milestones").children].entries())
-    node.textContent = [
-      JourneyStore.current.start.age + "세 출발",
-      JourneyStore.current.start.age + 1 + "세 독립",
-      JourneyStore.current.start.age + 4 + "세 이직",
-      JourneyStore.current.start.age + 6 + "세 여행",
-      JourneyStore.current.start.age + 10 + "세 다음 장",
-    ][i];
   const assets = $("ml-live-assets");
   assets.replaceChildren();
   for (const [label, value] of [
@@ -157,6 +143,7 @@ function render() {
     assets.append(item);
   }
   mlRenderGoal();
+  renderLifeGame(path, next);
   mlRenderReport();
   persist();
   renderEventRecovery();

@@ -51,6 +51,23 @@ after(async () => {
   })));
   if (temporary) await rm(temporary, {recursive: true, force: true});
 });
+// Open the same tools through the game's collapsed controls.
+async function openLifeDetails(page) {
+  if(await page.locator('#life-details').getAttribute('open')===null)await page.locator('#life-details > summary').click();
+}
+async function goPage(page,name) {
+  const button=page.locator('#ml-main-nav [data-page='+name+']');
+  if(!await button.isVisible())await page.locator('#ml-mobile-toggle').click();
+  await button.click();
+  if(name==='dashboard')await openLifeDetails(page);
+}
+async function openArchive(page) {
+  if(await page.locator('#life-archive').getAttribute('open')!==null)return;
+  if(await page.locator('body').getAttribute('data-life-page')==='dashboard'){
+    await openLifeDetails(page);await page.locator('#life-open-archive').click();
+  }else await page.locator('#life-archive > summary').click();
+}
+
 async function pageFor(t, viewport = {width: 1440, height: 1000}) {
   const context = await browser.newContext({viewport, baseURL: url});
   t.after(() => context.close());
@@ -59,7 +76,7 @@ async function pageFor(t, viewport = {width: 1440, height: 1000}) {
   t.after(() => assert.deepEqual(errors, [], 'No browser script errors'));
   await page.goto(url);
   await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.getByRole('button', {name: '예시 조건으로 체험', exact: true}).waitFor();
   return page;
 }
@@ -103,7 +120,7 @@ test('주문·월 진행·손익 비교·새로고침·저장 목록과 본편 �
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), true);
   assert.equal(await page.evaluate(() => localStorage.getItem('money-life-v1')), before);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.getByText('1,410,000원', {exact: true}).waitFor();
   await page.getByRole('button', {name: '저장한 투자 연습', exact: true}).click();
   const saved = page.locator('#papercontent .saved-plans');
@@ -132,7 +149,7 @@ test('응답 유실 후 새로고침·동일 요청 재확인으로 주문 중�
   const pendingId = await page.evaluate(() => JSON.parse(localStorage.getItem('money-life-paper-pending')).body.requestId);
   await page.unroute('**/api/paper-plans/*/orders');
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).click();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), accepted.plan.id);
   assert.equal(accepted.plan.orders[0].id, pendingId);
@@ -191,6 +208,7 @@ test('지원 기간이 지난 본편은 유지하고 예시 연습을 제공', {
 test('모의투자 이후 기존 여정 저장·계산 결과·AI 오류 안내 유지', {timeout: 30000}, async t => {
   const page = await pageFor(t);
   await demo(page);
+  await openArchive(page);
   await page.getByRole('button', {name: '서버 계산·저장', exact: true}).click();
   await page.waitForFunction(() => document.getElementById('serverstatus').textContent.includes('계획과 계산 결과를 저장'));
   await page.getByRole('button', {name: '계산 결과', exact: true}).click();
@@ -198,11 +216,11 @@ test('모의투자 이후 기존 여정 저장·계산 결과·AI 오류 안내 
   assert.equal(await page.locator('#runmonths tr').count(), 121);
   await page.getByRole('button', {name: '닫기', exact: true}).click();
   await page.route('**/api/ai/parse-change', route => route.fulfill({status: 503, contentType: 'application/json', body: JSON.stringify({detail: 'LLM_NOT_CONFIGURED'})}));
-  await page.locator('#ml-main-nav [data-page=dashboard]').click();
+  await goPage(page,'dashboard');
   await page.getByLabel('조건 변경 요청').fill('저축을 100만 원으로 변경');
   await page.getByRole('button', {name: '변경안 확인', exact: true}).click();
   await page.waitForFunction(() => document.getElementById('serverstatus').textContent.includes('LLM API 키'));
-  await page.locator('#ml-main-nav [data-page=investment]').click();
+  await goPage(page,'investment');
   await page.waitForFunction(() => !document.querySelector('[data-plan-action=paper-open]').disabled);
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), false);
 });
@@ -225,7 +243,7 @@ test('등록 가격 선택·과거 월 표시·출처와 이전 시점 복원', 
   await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), true);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.locator('.paper-provenance').waitFor();
   assert.match(await page.locator('.paper-date').innerText(), /2024년 3월/);
 });
@@ -234,7 +252,7 @@ test('가격 목록 오류에도 저장된 원본으로 복원·월 진행', {ti
   await demo(page);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await page.route('**/api/market/series', route => route.fulfill({status: 503, contentType: 'application/json', body: JSON.stringify({detail: 'MARKET_CATALOG_INVALID'})}));
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.waitForFunction(() => document.getElementById('paperstatus').textContent.includes('저장된 가격으로 진행'));
   const result = await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(result.plan.month, 1);
@@ -388,7 +406,7 @@ test('대기 매수 취소 확인·주문 유지·취소 사본 저장과 재접
   const original = await page.request.get('/api/paper-plans/' + pending.plan.id);
   assert.equal((await original.json()).orders.length, 1);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.getByText('주문 취소를 반영한 사본이에요.', {exact: false}).waitFor();
   const advanced = await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(advanced.run.result.invested.account.quantity, 0);
@@ -414,7 +432,7 @@ test('취소 응답 유실 뒤 동일 요청 복원·중복 취소 방지', {tim
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), true);
   await page.unroute('**/orders/*/cancel');
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).click();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), accepted.plan.id);
   assert.equal(await page.locator('.paper-pending-row').count(), 0);
@@ -503,7 +521,7 @@ test('조건 변경 응답 유실 뒤 동일 요청으로 복원한다', {timeou
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), true);
   await page.unroute('**/conditions');
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await goPage(page,'investment');
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).click();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), saved.plan.id);
   assert.equal((await (await page.request.get('/api/paper-plans')).json()).length, 2);
@@ -766,7 +784,7 @@ test('뉴스 비교 실패 시 선택을 유지하고 다시 시도한다', {tim
 
 test('새 재무 화면의 원 단위 입력·공용 계산·서버 저장·복원', {timeout: 30000}, async t => {
   const page = await pageFor(t);
-  await page.locator('#ml-main-nav [data-page=finance]').click();
+  await goPage(page,'finance');
   await page.locator('#ml-cash').fill('100000');
   await page.locator('#ml-saved').fill('0');
   await page.locator('#ml-income').fill('1000000');
@@ -774,9 +792,11 @@ test('새 재무 화면의 원 단위 입력·공용 계산·서버 저장·복�
   await page.locator('#ml-saving').fill('100000');
   await page.locator('#ml-start-rate').fill('0');
   await page.getByRole('button', {name: '이 조건으로 시뮬레이션 시작'}).click();
+  await page.locator('#life-time-options > summary').click();
   await page.locator('#ml-one-month').click();
   assert.equal(await page.locator('#ml-game-net').innerText(), '500,000원');
   const response = page.waitForResponse(r => r.url().endsWith('/api/plan-saves') && r.request().method() === 'POST');
+  await openArchive(page);
   await page.getByRole('button', {name: '서버 계산·저장', exact: true}).click();
   const plan = await (await response).json();
   assert.equal(plan.state.initial.income, 1000000);
@@ -786,6 +806,7 @@ test('새 재무 화면의 원 단위 입력·공용 계산·서버 저장·복�
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   assert.match(await page.locator('#ml-game-month-label').innerText(), /1 \/ 120/);
   assert.equal(await page.locator('#ml-game-net').innerText(), '500,000원');
+  await openArchive(page);
   await page.getByRole('button', {name: '저장한 여정', exact: true}).click();
   await page.locator('#serverplans').getByRole('button').first().click();
   assert.equal(await page.locator('#ml-game-net').innerText(), '500,000원');
@@ -803,7 +824,7 @@ test('낮은 소득의 휴식 이벤트도 음수가 되지 않고 서버에 저
 
 test('재질문 답변은 동일 계획·질문 ID에 연결하고 승인 전 상태를 유지한다', {timeout: 30000}, async t => {
   const page = await pageFor(t);
-  await page.locator('#ml-main-nav [data-page=dashboard]').click();
+  await goPage(page,'dashboard');
   const before = await page.evaluate(() => localStorage.getItem('money-life-v1'));
   const clarificationId = crypto.randomUUID(), requests = [];
   await page.route('**/api/ai/parse-change', async route => {
@@ -825,7 +846,7 @@ test('재질문 답변은 동일 계획·질문 ID에 연결하고 승인 전 �
 
 test('늦은 AI 적용 응답은 그동안 바꾼 최신 조건을 덮어쓰지 않는다', {timeout: 30000}, async t => {
   const page = await pageFor(t);
-  await page.locator('#ml-main-nav [data-page=dashboard]').click();
+  await goPage(page,'dashboard');
   let planId, release;
   const delay = new Promise(resolve => { release = resolve; });
   await page.route('**/api/ai/parse-change', async route => {
@@ -852,15 +873,15 @@ test('늦은 AI 적용 응답은 그동안 바꾼 최신 조건을 덮어쓰지 
 test('새 모바일 메뉴에서 재무 입력·목표·투자 화면을 이동할 수 있다', {timeout: 30000}, async t => {
   const page = await pageFor(t, {width: 390, height: 844});
   await page.locator('#ml-mobile-toggle').click();
-  await page.locator('#ml-main-nav [data-page=finance]').click();
+  await goPage(page,'finance');
   await page.locator('#ml-finance-form').waitFor({state:'visible'});
   assert.equal(await page.locator('#ml-mobile-toggle').getAttribute('aria-expanded'), 'false');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.locator('#ml-mobile-toggle').click();
-  await page.locator('#ml-main-nav [data-page=goal]').click();
+  await goPage(page,'goal');
   await page.locator('#ml-goal-form').waitFor({state:'visible'});
   await page.locator('#ml-mobile-toggle').click();
-  await page.locator('#ml-main-nav [data-page=investment]').click();
+  await goPage(page,'investment');
   await page.getByRole('button', {name:'예시 조건으로 체험', exact:true}).waitFor();
 });
 
@@ -892,7 +913,7 @@ test('만료 세션 안내에서 새 세션을 시작해도 로컬 여정은 유
 
 test('AI 승인 전 항목별 변경 금액·기간과 요청 수정은 현재 여정을 보존한다', async t => {
   const page = await pageFor(t);
-  await page.locator('#ml-main-nav [data-page=dashboard]').click();
+  await goPage(page,'dashboard');
   await page.evaluate(() => closeModal());
   const before = await page.evaluate(() => aiSnapshot());
   let applyCalls = 0;
@@ -996,7 +1017,7 @@ test('두 탭에서 같은 모의투자 요청을 동시에 보내지 않는다'
  let release,seen;const waiting=new Promise(resolve=>{release=resolve;});const requested=new Promise(resolve=>{seen=resolve;});
  await page.route('**/api/paper-plans/*/advance',async route=>{seen();await waiting;const response=await route.fetch();await route.fulfill({response});});
  await page.getByRole('button',{name:'다음 달로 +1개월',exact:true}).click();await requested;
- const other=await page.context().newPage();await other.goto(url);await other.getByRole('button',{name:'닫기',exact:true}).click();await other.getByRole('button',{name:'모의투자 열기'}).click();
+ const other=await page.context().newPage();await other.goto(url);await other.getByRole('button',{name:'닫기',exact:true}).click();await goPage(other,'investment');
  const before=await page.evaluate(()=>localStorage.getItem('money-life-paper-pending'));
  await other.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
  await other.waitForFunction(()=>document.querySelector('#paperstatus').textContent.includes('다른 탭'));
@@ -1021,7 +1042,7 @@ for (const viewport of [{width:1440,height:1000},{width:390,height:844}]) {
     const page=await pageFor(t,viewport);
     await page.evaluate(()=>closeModal());
     if(viewport.width<700)await page.locator('#ml-mobile-toggle').click();
-    await page.locator('#ml-main-nav [data-page=dashboard]').click();
+    await goPage(page,'dashboard');
     const before=await page.evaluate(()=>JSON.stringify(JourneyStore.snapshot()));
     const proposalId=crypto.randomUUID();let basePlan,applyCalls=0;
     await page.route('**/api/ai/parse-change',async route=>{

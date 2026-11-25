@@ -203,6 +203,8 @@ function mlRenderReport() {
   });
   const difference =
     Math.round(current[120].total) - Math.round(base[120].total);
+  $("ml-report-net-difference").dataset.moneyDirection =
+    difference === 0 ? "neutral" : difference > 0 ? "positive" : "negative";
   $("ml-report-net-difference").textContent =
     difference === 0
       ? "차이 없음"

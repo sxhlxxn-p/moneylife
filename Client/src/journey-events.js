@@ -35,12 +35,15 @@ function eventPreview(m) {
   const reference = simulate(),
     candidate = simulate([...JourneyStore.current.mods, ...eventMods(m)]),
     next = JourneyStore.current.month + 1;
+  const difference =
+    Math.round(candidate[next].total * 10000) -
+    Math.round(reference[next].total * 10000);
+  const direction =
+    difference === 0 ? "neutral" : difference > 0 ? "positive" : "negative";
   show(
-    '<div class="eyebrow">' +
+    '<div class="game-dialog-kicker">' +
       dates(JourneyStore.current.month) +
       " · 인생 이벤트</div><h2>" +
-      event.emoji +
-      " " +
       event.title +
       "</h2><p>" +
       event.body +
@@ -48,21 +51,25 @@ function eventPreview(m) {
       event.a +
       '" onclick="choose(' +
       m +
-      ',true)"><strong>' +
+      ',true)" data-plan-action="event-choice"><strong>' +
       event.a +
       "</strong><small>" +
       event.ad +
-      "</small><span>다음 달 순자산 " +
-      money(candidate[next].total - reference[next].total) +
+      '</small><span class="life-choice-money" data-money-direction="' +
+      direction +
+      '">다음 달 순자산 ' +
+      (difference === 0
+        ? "변화 없음"
+        : (difference > 0 ? "+" : "") + mlFormatKoreanWon(difference)) +
       '</span></button><button class="choice" aria-label="' +
       event.b +
       '" onclick="choose(' +
       m +
-      ',false)"><strong>' +
+      ',false)" data-plan-action="event-choice"><strong>' +
       event.b +
       "</strong><small>" +
       event.bd +
-      '</small></button></div><p class="note">선택은 다음 달부터 반영해요. 확정하면 선택 전 원본과 새 계획을 서버에 함께 저장해요. 서버 연결이 필요합니다.</p>',
+      '</small><span>지금의 계획을 이어가요.</span></button></div><p class="note" role="status" id="life-choice-status">선택은 다음 달부터 반영돼요. 선택 전후의 여정을 보관하려면 서버 연결이 필요합니다.</p>',
   );
 }
 function choose(m, accepted) {
@@ -81,6 +88,7 @@ function step() {
   if (JourneyStore.current.month >= 120) return;
   JourneyStore.increment("month", 1);
   render();
+  if (JourneyStore.current.month === 120) showLifeEnding();
   if (
     EV[JourneyStore.current.month] &&
     !JourneyStore.current.events.has(JourneyStore.current.month)
@@ -111,6 +119,12 @@ function toggle() {
       }
       JourneyStore.increment("month", 1);
       render();
+      if (JourneyStore.current.month === 120) {
+        stop();
+        render();
+        showLifeEnding();
+        return;
+      }
       if (
         EV[JourneyStore.current.month] &&
         !JourneyStore.current.events.has(JourneyStore.current.month)
@@ -131,7 +145,9 @@ function nextEvent() {
         m >= JourneyStore.current.month && !JourneyStore.current.events.has(m),
     );
   if (next === undefined) {
-    mlShowPage("report");
+    JourneyStore.set("month", 120);
+    render();
+    showLifeEnding();
     return;
   }
   JourneyStore.set("month", next);

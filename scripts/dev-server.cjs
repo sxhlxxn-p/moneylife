@@ -38,7 +38,11 @@ http.createServer(async (req,res) => {
       req.pipe(upstream);
       return;
     }
-    const relativePath = routes.get(pathname);
+    // Pick up added client assets without restarting the local development server.
+    const currentRoutes = prototypeMode ? routes : new Map(Object.entries(
+      JSON.parse(await fs.readFile(path.join(projectRoot, 'Client/assets.json'), 'utf8'))
+    ));
+    const relativePath = currentRoutes.get(pathname);
     if (!relativePath) { res.writeHead(404); return res.end('Not found'); }
     const file = path.resolve(projectRoot, relativePath);
     const data = await fs.readFile(file);

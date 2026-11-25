@@ -13,6 +13,7 @@ const planSaves = createRequestJournal(
     ),
 );
 function renderSaveRecovery() {
+  if (planSaves.get() && $("life-archive")) $("life-archive").open = true;
   for (const id of ["plansave-retry", "plansave-archive"]) {
     const node = $(id);
     if (node) node.hidden = !planSaves.get();

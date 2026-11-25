@@ -51,5 +51,12 @@
   "/interest.js": "Engine/src/interest.cjs",
   "/snapshot.js": "Engine/src/snapshot.cjs",
   "/mutation-lock.js": "Client/src/mutation-lock.js",
-  "/plan-save.js": "Client/src/plan-save.js"
+  "/plan-save.js": "Client/src/plan-save.js",
+  "/life-game.js": "Client/src/life-game.js",
+  "/styles/play.css": "Client/src/styles/play.css",
+  "/styles/game-ui.css": "Client/src/styles/game-ui.css",
+  "/styles/clean-ui.css": "Client/src/styles/clean-ui.css",
+  "/phaser.js": "node_modules/phaser/dist/phaser.min.js",
+  "/life-animation.js": "Client/src/life-animation.js",
+  "/life-art.js": "Client/src/life-art.js"
 }

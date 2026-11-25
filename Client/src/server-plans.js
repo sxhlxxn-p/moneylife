@@ -108,8 +108,6 @@ function restoreServerPlan(plan) {
   try {
     localStorage.setItem("money-life-server-plan", plan.id);
   } catch {}
-  $("ml-world-title").textContent = "저장한 여정에서 다시 시작해요";
-  $("ml-world-desc").textContent = "이 시점의 조건과 선택 기록을 불러왔어요.";
   closeModal();
   render();
   $("serverstatus").textContent =

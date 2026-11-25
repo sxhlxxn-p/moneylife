@@ -1,0 +1,1558 @@
+/* Money Life: a paper board, a moving piece, and one decision at a time. */
+:root {
+  --play-ink: #283e4a;
+  --play-paper: #fffdf8;
+  --play-line: #e3dfd5;
+  --play-gold: #ed8c6e;
+  --play-muted: #64747b;
+  --board-coral: #eb8064;
+  --board-blue: #6d9ca6;
+}
+body,
+#money-life-app {
+  background: #f5f3ee;
+  color: var(--play-ink);
+}
+#money-life-app {
+  font-size: 16px;
+  line-height: 1.6;
+}
+#money-life-app button {
+  font-size: 15px;
+}
+.ml-topbar {
+  height: 64px;
+  background: var(--play-paper);
+  border-color: var(--play-line);
+}
+.ml-brand {
+  font-size: 22px;
+  letter-spacing: -0.8px;
+}
+.ml-brand-mark {
+  background: #ee9c81;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.ml-top-user {
+  font-size: 14px;
+  color: #63757b;
+}
+.ml-layout {
+  grid-template-columns: 198px minmax(0, 1fr);
+  min-height: calc(100vh - 64px);
+}
+.ml-sidebar {
+  top: 64px;
+  height: calc(100vh - 64px);
+  background: var(--play-paper);
+  border-color: var(--play-line);
+  padding: 24px 12px;
+}
+.ml-side-caption {
+  color: #8b9897;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.ml-nav {
+  gap: 7px;
+}
+#money-life-app .ml-nav button {
+  font-size: 15px;
+  min-height: 48px;
+  color: #64787e;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+#money-life-app .ml-nav button.active {
+  background: #f9e6de;
+  color: #964e3b;
+  box-shadow: inset 3px 0 #e98b6c;
+  font-weight: 800;
+}
+.ml-nav button:hover {
+  background: #f7f1e9;
+}
+.ml-side-bottom {
+  background: #f0ede4;
+  border-radius: 18px;
+}
+.ml-side-bottom strong {
+  color: #526968;
+  font-size: 14px;
+}
+.ml-side-bottom p {
+  color: #7a8983;
+  font-size: 12px;
+}
+.ml-main {
+  padding: 26px clamp(18px, 2.7vw, 42px) 40px;
+}
+.ml-page {
+  max-width: 1280px;
+}
+.ml-page-head {
+  margin-bottom: 24px;
+}
+.ml-page-head h1 {
+  font-size: clamp(28px, 2.6vw, 36px);
+  color: var(--play-ink);
+  font-weight: 900;
+}
+.ml-page-head p,
+.ml-desc {
+  font-size: 15px;
+  color: var(--play-muted);
+  line-height: 1.8;
+  word-break: keep-all;
+}
+.ml-eyebrow {
+  color: #a5806a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.ml-card {
+  background: var(--play-paper);
+  border: 1px solid var(--play-line);
+  border-radius: 18px;
+  box-shadow: 0 5px 18px #334b4606;
+}
+.ml-card h2,
+.ml-card h3 {
+  font-size: 19px;
+  color: var(--play-ink);
+  font-weight: 800;
+}
+.ml-main .ml-note {
+  background: #f0eee6;
+  color: #6e7c72;
+}
+.ml-note,
+.ml-hint {
+  font-size: 13px;
+  color: #64766d;
+  line-height: 1.8;
+}
+#money-life-app .ml-btn,
+.btn {
+  min-height: 46px;
+  border-radius: 12px;
+  border-color: #d9dfd8;
+  color: #49636a;
+  background: #fffdf8;
+}
+#money-life-app .ml-btn.primary,
+.modal .btn.primary,
+.server-tools .btn.primary {
+  background: var(--board-coral);
+  color: #fff;
+  border: 1px solid #dc7359;
+  font-weight: 800;
+  box-shadow: 0 4px 0 #c6664e;
+}
+#money-life-app .ml-btn.primary:hover,
+.modal .btn.primary:hover {
+  background: #e87558;
+}
+#money-life-app .ml-btn.primary:active,
+.modal .btn.primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c6664e;
+}
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px solid #487c92;
+  outline-offset: 4px;
+}
+.ml-input-wrap {
+  min-height: 52px;
+  height: 52px;
+  border: 1px solid #cad6d5;
+  background: #fff;
+  border-radius: 12px;
+}
+.ml-input-wrap:focus-within {
+  border-color: #8eafb5;
+  box-shadow: 0 0 0 3px #6f9eaa22;
+}
+#money-life-app .ml-input-wrap input {
+  font-size: 18px;
+  color: #344f5c;
+  font-weight: 700;
+}
+#money-life-app .ml-field label {
+  font-size: 14px;
+  color: #55707a;
+  font-weight: 700;
+}
+.ml-summary {
+  background: #edf2ed;
+  border-color: #d7e2d6;
+}
+.ml-summary-row,
+.ml-table {
+  font-size: 15px;
+  line-height: 1.7;
+}
+.ml-table th {
+  font-size: 13px;
+}
+.ml-bar {
+  background: #eeede5;
+}
+.ml-bar span {
+  background: #82a8a0;
+}
+.ml-goal-money {
+  font-size: 28px;
+}
+.ml-report-item {
+  background: var(--play-paper);
+  border-color: var(--play-line);
+  border-radius: 16px;
+}
+.ml-report-item.featured {
+  background: #edf3f3;
+  border-color: #b9d0d4;
+}
+.ml-report-item .ml-report-net {
+  font-size: 24px;
+  color: #345867;
+}
+.ml-report-item p,
+.ml-report-item dt,
+.ml-report-goal-note {
+  font-size: 14px;
+  color: #698087;
+}
+.ml-report-summary dt {
+  font-size: 13px;
+}
+.life-form-chapter {
+  min-width: 0;
+  border: 0;
+  border-top: 1px solid var(--play-line);
+  padding: 22px 0 0;
+  margin: 25px 0 0;
+}
+.life-form-chapter legend {
+  font-size: 18px;
+  font-weight: 800;
+  padding-right: 14px;
+}
+.life-form-chapter legend span {
+  display: inline-grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: #f9e4d9;
+  color: #ad674d;
+  font: 700 11px monospace;
+  margin-right: 8px;
+}
+#ml-finance-form > .ml-card:first-child {
+  padding: 28px;
+}
+#ml-finance-form button[type="submit"] {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 20px;
+}
+.ml-finance-summary h2 {
+  margin-bottom: 20px;
+}
+.ml-finance-summary .ml-note {
+  margin-block: 20px;
+}
+.ml-main > .server-tools {
+  display: block;
+  max-width: 1280px;
+  margin: 26px auto 0;
+  padding: 17px 20px;
+  border-radius: 14px;
+  background: var(--play-paper);
+  border: 1px solid var(--play-line);
+  scroll-margin-top: 85px;
+}
+.server-tools > summary {
+  font-size: 14px;
+  color: #627a7a;
+  cursor: pointer;
+}
+.server-tools[open] > div {
+  margin-top: 16px;
+}
+.server-tools p {
+  color: #73817b;
+  line-height: 1.7;
+}
+body[data-life-page="dashboard"] .ml-main > .ml-note {
+  display: none;
+}
+body[data-life-page="dashboard"] #life-archive:not([open]) {
+  display: none;
+}
+#ml-page-dashboard {
+  max-width: 1150px;
+}
+.game-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.game-heading h1 {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 6px 0 0;
+}
+#money-life-app .game-heading .ml-btn {
+  border-radius: 24px;
+  background: #fffdf8;
+  padding-inline: 18px;
+  color: #5c767d;
+}
+.life-console {
+  overflow: hidden;
+  border: 1px solid #dedbd0;
+  border-radius: 26px;
+  background: #fffcf3;
+  box-shadow:
+    0 8px 0 #e4ddcd,
+    0 20px 50px #675c3f0a;
+}
+.life-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 28px;
+  padding: 20px 0;
+  border-bottom: 1px solid #e8e2d6;
+}
+.life-hud > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.life-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e89a7d;
+}
+.life-hud #ml-game-age {
+  font-size: 25px;
+  font-weight: 900;
+  color: #2d4c59;
+}
+.life-hud #ml-game-date {
+  font-size: 14px;
+  color: #79908e;
+}
+.life-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 15px;
+  min-height: 42px;
+  border-radius: 24px;
+  border: 1px solid #efcfac;
+  background: #fff4df;
+  color: #966a39;
+}
+.life-wallet strong {
+  font-size: 17px;
+}
+.life-wallet > span {
+  color: #b78945;
+}
+.life-dialogue {
+  margin: 0 28px;
+  padding: 20px 0 24px;
+  border-top: 1px solid #e8e2d6;
+}
+.life-dialogue-label {
+  display: flex;
+  justify-content: space-between;
+  color: #8d9b91;
+  font-size: 12px;
+  font-weight: 700;
+}
+.life-dialogue-label > span {
+  font-weight: 500;
+  color: #8a9a92;
+}
+.life-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 12px 0 24px;
+  flex-wrap: nowrap;
+}
+#life-next-hint {
+  font-size: 16px;
+  font-weight: 600;
+  color: #506f78;
+  line-height: 1.7;
+  margin: 12px 0 0;
+  word-break: keep-all;
+}
+#money-life-app .life-action-row > .ml-btn {
+  min-width: 190px;
+  min-height: 54px;
+  font-size: 18px;
+  border-radius: 16px;
+  flex-shrink: 0;
+  font-weight: 800;
+  white-space: nowrap;
+}
+#life-pause[hidden] {
+  display: none;
+}
+.life-action-row:has(#life-pause:not([hidden])) > .primary {
+  display: none;
+}
+.life-speed-control {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--play-line);
+  border-radius: 14px;
+  background: #f0f2ec;
+}
+#money-life-app .life-speed-control .ml-speed {
+  padding: 0 10px;
+  border: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.life-speed-control .ml-speed:focus-visible {
+  outline: 2px solid #506f78;
+  outline-offset: 2px;
+}
+.life-timeline {
+  position: relative;
+  height: 15px;
+  margin-inline: 8px;
+}
+.life-timeline-track {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  border-radius: 5px;
+  background: #e9e6da;
+}
+.life-timeline-track > span {
+  display: block;
+  height: 100%;
+  background: #89aaa8;
+  border-radius: 5px;
+  transition: width 110ms;
+}
+.life-waypoint {
+  position: absolute;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 3px solid #d4dccf;
+  background: #fffcf3;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+.life-waypoint.completed {
+  background: #80a69a;
+  border-color: #80a69a;
+}
+.life-waypoint.current {
+  background: #fffcf3;
+  border-color: #eea585;
+}
+.life-understage {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 24px 0 8px;
+}
+.life-understage > button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+.life-understage > button > span {
+  font-size: 13px;
+  color: #8a9a90;
+}
+.life-understage > button > strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: #5c777a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.life-understage #life-goal-progress {
+  background: #e7efe9;
+  color: #62877c;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 14px;
+  font-weight: 800;
+}
+#life-time-options {
+  flex-shrink: 0;
+}
+#life-time-options > summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #7f9290;
+  padding: 12px 0;
+}
+#life-time-options[open] {
+  width: 100%;
+}
+.life-understage:has(#life-time-options[open]) {
+  flex-wrap: wrap;
+}
+#life-time-options > .ml-button-row {
+  padding: 16px;
+  border: 1px solid var(--play-line);
+  border-radius: 16px;
+  background: #f0f2ec;
+  flex-wrap: wrap;
+}
+.ml-speed {
+  min-height: 44px;
+  min-width: 40px;
+  border-radius: 10px;
+  background: #fffdf7;
+  color: #799188;
+}
+.ml-speed.active {
+  background: #789da1;
+  color: white;
+}
+.life-warning {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #fff0d7;
+  border: 1px solid #eacb9b;
+  color: #936a36;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.life-warning[hidden] {
+  display: none;
+}
+.life-details {
+  margin-top: 12px;
+  border-top: 1px solid var(--play-line);
+}
+.life-details > summary {
+  padding: 18px 0;
+  color: #6b8685;
+  font-size: 14px;
+  cursor: pointer;
+}
+.life-details > summary > span {
+  margin-left: 10px;
+  font-size: 12px;
+  color: #9ca59a;
+}
+.life-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: 8px 0 16px;
+}
+.life-detail-grid > .ml-hud,
+.life-detail-grid > .ml-bottom-grid,
+.life-detail-grid > button {
+  grid-column: 1/-1;
+  margin: 0;
+}
+.life-detail-grid > .ml-card:has(.ml-profile) {
+  grid-column: 1/-1;
+}
+.life-detail-grid .ml-metric {
+  border-radius: 14px;
+  border-color: var(--play-line);
+  background: var(--play-paper);
+}
+.life-detail-grid .ml-metric label {
+  font-size: 12px;
+  color: #789087;
+}
+.life-detail-grid .ml-metric strong {
+  font-size: 20px;
+  color: #395b61;
+}
+.life-detail-grid .ml-log {
+  max-height: 180px;
+  font-size: 14px;
+  color: #687f79;
+}
+.life-detail-grid .ml-profile p {
+  font-size: 13px;
+}
+.life-detail-grid .ml-input-wrap {
+  margin-bottom: 12px;
+}
+.overlay {
+  background: #304a527d;
+  backdrop-filter: blur(7px);
+}
+.modal {
+  max-width: 660px;
+  background: #fffdf8;
+  border: 1px solid #e1dccf;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 25px 90px #283f4b30;
+}
+.modal h2 {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.4;
+  color: #2c4b59;
+  word-break: keep-all;
+}
+.modal p {
+  font-size: 16px;
+  color: #6a8082;
+  line-height: 1.8;
+}
+.modal .close {
+  min-width: 40px;
+  min-height: 40px;
+  background: #f1eee7;
+  border-radius: 50%;
+  color: #8b9b92;
+}
+.game-dialog-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #bf8268;
+}
+.life-intro-art,
+.life-event-art {
+  padding: 22px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #e7efdf, #f9e6cf);
+  border-radius: 18px;
+  text-align: center;
+  font-size: 56px;
+}
+.life-intro-art {
+  letter-spacing: 18px;
+}
+.life-full-button {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 12px;
+  font-size: 17px;
+}
+.life-impact {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #fcf0e5;
+  color: #a27a57;
+}
+.life-result-details {
+  margin: 22px 0;
+  padding: 10px 0;
+  border-block: 1px solid var(--play-line);
+}
+.life-result-details > summary {
+  cursor: pointer;
+  color: #6a8584;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 7px 0;
+}
+.life-result-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.life-result-stats > div {
+  background: #eff3ed;
+  padding: 16px;
+  border-radius: 14px;
+  min-width: 0;
+}
+.life-result-stats dt {
+  color: #81917d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.life-result-stats dd {
+  margin: 8px 0 0;
+  color: #4d7168;
+  font-size: 21px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.eventoptions {
+  gap: 14px;
+}
+.choice {
+  position: relative;
+  padding: 22px;
+  border: 2px solid #dfddd2;
+  border-radius: 18px;
+  background: #fffdf8;
+  gap: 12px;
+  min-width: 0;
+}
+.choice::before {
+  content: "A";
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f3e0d3;
+  color: #ba7960;
+  font: 800 13px sans-serif;
+}
+.choice:nth-child(2)::before {
+  content: "B";
+  background: #e4edef;
+  color: #73959f;
+}
+.choice:first-child {
+  background: #fff5ec;
+  border-color: #efc7b2;
+}
+.choice:hover {
+  border-color: #d99d83;
+  background: #fcf4e9;
+}
+.choice strong {
+  color: #405f6b;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.choice small {
+  color: #6e8582;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.choice span {
+  color: #a17b53;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: auto;
+}
+.life-memory-list {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+  max-height: 45vh;
+  overflow: auto;
+}
+.life-memory-list article {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #f6f2e9;
+  border: 1px solid #e6dece;
+  border-radius: 16px;
+  padding: 18px;
+}
+.life-memory-list article > span {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: #fffaf0;
+  font-size: 30px;
+  flex-shrink: 0;
+}
+.life-memory-list small {
+  color: #9b9f8b;
+  font-size: 12px;
+}
+.life-memory-list h3 {
+  font-size: 17px;
+  color: #597577;
+  margin: 7px 0 0;
+  font-weight: 800;
+}
+.modalactions {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.modalactions .btn {
+  min-width: 130px;
+}
+@keyframes boardPulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+@media (max-width: 1100px) {
+  .life-detail-grid > .ml-hud {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .life-scene {
+    gap: 6px;
+    padding: 18px 20px;
+    min-height: 340px;
+  }
+  .life-scene-title h2 {
+    font-size: 30px;
+  }
+  .life-scene-title p {
+    font-size: 15px;
+  }
+  .life-action-row {
+    flex-wrap: nowrap;
+  }
+  .life-action-row > .ml-btn {
+    min-width: 150px;
+  }
+}
+@media (max-width: 900px) and (min-width: 761px) {
+  .ml-layout {
+    grid-template-columns: 174px minmax(0, 1fr);
+  }
+  .ml-main {
+    padding-inline: 18px;
+  }
+  .ml-nav button {
+    padding-inline: 10px;
+    gap: 8px;
+  }
+  .life-scene {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .life-scene-title {
+    padding: 8px 6px 0;
+  }
+  .life-scene-title h2 {
+    margin-block: 12px;
+    font-size: 30px;
+  }
+  .board-note {
+    display: none;
+  }
+  .life-board-map {
+    max-width: 600px;
+    margin: auto;
+  }
+  .life-scene-title p {
+    font-size: 16px;
+  }
+}
+@media (max-width: 760px) {
+  .ml-topbar {
+    height: 56px;
+    padding-inline: 16px;
+  }
+  .ml-brand {
+    font-size: 20px;
+  }
+  .ml-layout {
+    grid-template-columns: 1fr;
+    min-height: calc(100vh - 56px);
+  }
+  .ml-sidebar {
+    top: 56px;
+    height: auto;
+    padding: 6px 14px;
+  }
+  .ml-side-bottom {
+    display: none;
+  }
+  .ml-main {
+    padding: 20px 14px 28px;
+  }
+  .ml-mobile-menu {
+    color: #6d8485;
+  }
+  .game-heading {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .game-heading h1 {
+    font-size: 24px;
+  }
+  .game-heading .ml-btn {
+    padding-inline: 12px;
+  }
+  #money-life-app .game-heading .ml-btn {
+    font-size: 13px;
+    padding-inline: 12px;
+  }
+  .life-console {
+    border-radius: 22px;
+    box-shadow: 0 5px 0 #e4ddcd;
+  }
+  .life-hud {
+    margin-inline: 18px;
+    padding: 14px 0;
+    gap: 12px;
+  }
+  .life-hud > div {
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .life-hud #ml-game-age {
+    font-size: 23px;
+  }
+  .life-hud #ml-game-date {
+    font-size: 11px;
+  }
+  .life-live-dot {
+    display: none;
+  }
+  .life-wallet {
+    flex-shrink: 0;
+    padding: 5px 9px;
+  }
+  .life-wallet strong {
+    font-size: 14px;
+  }
+  .life-scene {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    min-height: 0;
+    padding: 20px 16px 18px;
+  }
+  .life-scene-title {
+    padding: 0 4px;
+  }
+  .life-scene-title > span {
+    font-size: 11px;
+  }
+  .life-scene-title h2 {
+    font-size: 29px;
+    margin: 12px 0 9px;
+    line-height: 1.35;
+  }
+  .life-scene-title p {
+    font-size: 15px;
+  }
+  .board-note {
+    display: none;
+  }
+  .life-board-map {
+    margin: 18px 0 0;
+  }
+  .life-character {
+    width: 40px;
+    height: 40px;
+    font-size: 26px;
+    border-width: 2px;
+  }
+  .life-character::before {
+    left: 12px;
+  }
+  .board-stop-label {
+    display: none;
+  }
+  .board-stop-icon {
+    font-size: 36px;
+  }
+  .board-map-label {
+    font-size: 8px;
+    letter-spacing: 1.4px;
+  }
+  .life-souvenirs {
+    font-size: 17px;
+  }
+  .life-dialogue {
+    margin-inline: 18px;
+    padding: 16px 0 20px;
+  }
+  .life-action-row {
+    margin: 10px 0 22px;
+    gap: 8px;
+  }
+  #money-life-app .life-speed-control .ml-speed {
+    min-width: 34px;
+    padding-inline: 6px;
+  }
+  #life-next-hint {
+    font-size: 14px;
+  }
+  #money-life-app .life-action-row > .ml-btn {
+    min-width: 0;
+    width: auto;
+    flex: 1;
+    min-height: 52px;
+    font-size: 16px;
+    padding-inline: 10px;
+  }
+  .life-action-row:has(#life-pause:not([hidden])) > .primary {
+    display: none;
+  }
+  .life-dialogue-label,
+  .life-dialogue-label > span {
+    font-size: 11px;
+  }
+  .life-understage {
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .life-understage > button {
+    max-width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .life-understage > button > strong {
+    max-width: 210px;
+  }
+  .life-details > summary > span {
+    display: none;
+  }
+  .life-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .life-detail-grid .ml-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  #ml-finance-form > .ml-card:first-child {
+    padding: 22px 18px;
+  }
+  .life-form-chapter .ml-fields {
+    grid-template-columns: 1fr;
+  }
+  .ml-card {
+    padding: 20px 18px;
+  }
+  .modal {
+    padding: 25px 20px;
+    border-radius: 22px;
+  }
+  .modal h2 {
+    font-size: 27px;
+  }
+  .modal p {
+    font-size: 16px;
+  }
+  .life-result-stats,
+  .eventoptions {
+    grid-template-columns: 1fr;
+  }
+  .life-result-stats dd {
+    font-size: 20px;
+  }
+  .choice {
+    padding: 20px;
+    min-height: 180px;
+  }
+  .choice strong {
+    font-size: 21px;
+  }
+  .choice small,
+  .choice span {
+    font-size: 15px;
+  }
+}
+@media (max-width: 360px) {
+  .game-heading h1 {
+    font-size: 22px;
+  }
+  .game-heading .ml-eyebrow {
+    font-size: 10px;
+  }
+  .life-hud > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .life-hud #ml-game-date {
+    font-size: 10px;
+  }
+  .life-wallet strong {
+    font-size: 13px;
+  }
+  .life-scene-title h2 {
+    font-size: 27px;
+  }
+  .life-scene {
+    padding-inline: 14px;
+  }
+}
+/* The game viewport is a Phaser canvas; all text and controls stay accessible HTML. */
+.life-scene {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #cee2d9;
+}
+.life-animation-frame {
+  position: relative;
+  width: 100%;
+  height: clamp(330px, 43vh, 430px);
+  min-width: 0;
+  aspect-ratio: auto;
+  margin: 0;
+}
+.life-animation-frame canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+.life-scene-title {
+  position: absolute;
+  z-index: 2;
+  top: 22px;
+  left: 24px;
+  width: 46%;
+  max-width: 430px;
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px solid #e9e1cb;
+  border-left: 4px solid #e69c7c;
+  border-radius: 12px;
+  background: #fffdf2ed;
+  box-shadow: 0 5px 18px #4c68631a;
+  pointer-events: none;
+}
+.life-scene-title > span {
+  display: inline-block;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  color: #ad7057;
+  font-size: 12px;
+  font-weight: 800;
+}
+.life-scene-title h2 {
+  margin: 10px 0 8px;
+  font-size: clamp(27px, 2.5vw, 34px);
+  line-height: 1.35;
+  letter-spacing: -1px;
+  font-weight: 900;
+  color: #2b4c52;
+  word-break: keep-all;
+}
+.life-scene-title p {
+  margin: 0;
+  font-size: 15px;
+  color: #667e77;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.life-location-label {
+  position: absolute;
+  z-index: 2;
+  bottom: 13px;
+  right: 18px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  background: #fffaf0df;
+  color: #6d816b;
+  font-size: 11px;
+  font-weight: 700;
+}
+.life-scene .life-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  box-shadow: none;
+  background: none;
+  transform: none;
+}
+.life-souvenirs {
+  position: absolute;
+  bottom: 13px;
+  left: 18px;
+  font-size: 20px;
+  letter-spacing: 8px;
+}
+@media (max-width: 900px) and (min-width: 761px) {
+  .life-scene-title {
+    width: 52%;
+    left: 18px;
+    top: 18px;
+  }
+  .life-scene-title h2 {
+    font-size: 28px;
+  }
+}
+@media (max-width: 760px) {
+  .life-scene {
+    display: block;
+    padding: 0;
+    min-height: 0;
+  }
+  .life-animation-frame {
+    margin: 0;
+    width: 100%;
+    height: 360px;
+  }
+  .life-scene-title {
+    position: absolute;
+    width: calc(100% - 32px);
+    max-width: none;
+    top: 16px;
+    left: 16px;
+    padding: 14px 16px;
+    margin: 0;
+  }
+  .life-scene-title h2 {
+    margin: 8px 0 6px;
+    font-size: 27px;
+    line-height: 1.35;
+  }
+  .life-scene-title p {
+    font-size: 14px;
+  }
+  .life-scene-title > span {
+    font-size: 11px;
+  }
+  .life-location-label {
+    font-size: 10px;
+    bottom: 10px;
+    right: 12px;
+  }
+  .life-souvenirs {
+    font-size: 17px;
+    left: 12px;
+    bottom: 9px;
+  }
+}
+@media (max-width: 360px) {
+  .life-scene-title {
+    left: 12px;
+    top: 12px;
+    width: calc(100% - 24px);
+    padding: 12px 14px;
+  }
+  .life-scene-title h2 {
+    font-size: 25px;
+  }
+}
+
+/* Keep the main game and its touch controls inside the current viewport. */
+.life-mobile-journal {
+  display: none;
+}
+body[data-life-page="dashboard"] .ml-main {
+  height: calc(100dvh - 64px);
+  min-height: 0;
+  padding-block: 12px;
+}
+#ml-page-dashboard.active {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+#ml-page-dashboard > :not(.life-console) {
+  flex-shrink: 0;
+}
+#ml-page-dashboard .game-heading {
+  margin: 0;
+  min-height: 44px;
+}
+#ml-page-dashboard .game-heading .ml-eyebrow {
+  display: none;
+}
+#ml-page-dashboard .game-heading h1 {
+  margin: 0;
+  font-size: 24px;
+}
+#ml-page-dashboard .life-console {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  flex: 1;
+  min-height: 0;
+  box-shadow: 0 4px 0 #e4ddcd;
+}
+#ml-page-dashboard .life-hud {
+  padding-block: 4px;
+}
+#ml-page-dashboard .life-scene {
+  min-height: 0;
+}
+#ml-page-dashboard .life-animation-frame {
+  height: 100%;
+}
+#ml-page-dashboard .life-dialogue {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 16px;
+  padding-block: 8px 10px;
+}
+#ml-page-dashboard .life-dialogue-label {
+  grid-area: 2 / 2;
+  justify-self: end;
+  display: block;
+  font-size: 0;
+}
+#ml-page-dashboard .life-dialogue-label > span {
+  font-size: 11px;
+  white-space: nowrap;
+}
+#ml-page-dashboard #life-next-hint {
+  grid-area: 1 / 1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+#ml-page-dashboard .life-action-row {
+  grid-area: 1 / 2;
+  margin: 0;
+}
+#ml-page-dashboard .life-timeline {
+  grid-area: 2 / 1;
+}
+#money-life-app #ml-page-dashboard .life-action-row > .ml-btn {
+  min-height: 48px;
+}
+#ml-page-dashboard .life-understage {
+  margin: 0;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+#ml-page-dashboard .life-understage > button {
+  flex: 1;
+  flex-wrap: nowrap;
+}
+#ml-page-dashboard .life-understage > button > strong {
+  min-width: 0;
+}
+#ml-page-dashboard .life-details {
+  margin: 0;
+}
+#ml-page-dashboard .life-details > summary {
+  padding-block: 10px;
+  min-height: 44px;
+}
+#ml-page-dashboard .life-warning {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+body[data-life-page="dashboard"]
+  :is(#life-details, #life-time-options, #life-archive)[open] {
+  position: fixed;
+  z-index: 8;
+  inset: auto 24px 16px auto;
+  width: min(760px, calc(100vw - 246px));
+  max-height: calc(100dvh - 96px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0 20px 20px;
+  border: 1px solid var(--play-line);
+  border-radius: 18px;
+  background: var(--play-paper);
+  box-shadow: 0 12px 70px #283e4a40;
+}
+body[data-life-page="dashboard"]
+  :is(#life-details, #life-time-options, #life-archive)[open]
+  > summary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-height: 44px;
+  padding-block: 12px;
+  background: var(--play-paper);
+}
+body[data-life-page="dashboard"] #life-time-options[open] {
+  width: min(400px, calc(100vw - 40px));
+}
+body[data-life-page="dashboard"] #life-archive[open] {
+  z-index: 9;
+}
+@media (max-width: 760px) {
+  body[data-life-page="dashboard"] .ml-main {
+    height: calc(100dvh - 115px);
+    padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+  }
+  body[data-life-page="dashboard"] .ml-sidebar {
+    overflow: visible;
+  }
+  body[data-life-page="dashboard"] .ml-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: var(--play-paper);
+    border-bottom: 1px solid var(--play-line);
+    box-shadow: 0 12px 24px #283e4a20;
+  }
+  #ml-page-dashboard.active {
+    gap: 6px;
+  }
+  #ml-page-dashboard .game-heading h1 {
+    font-size: 20px;
+  }
+  #ml-page-dashboard .game-heading {
+    display: none;
+  }
+  #ml-page-dashboard .life-hud {
+    gap: 8px;
+  }
+  #ml-page-dashboard .life-mobile-journal {
+    display: block;
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: auto;
+    border: 1px solid var(--play-line);
+    border-radius: 12px;
+    background: var(--play-paper);
+    color: #5c767d;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  #ml-page-dashboard .life-hud,
+  #ml-page-dashboard .life-dialogue {
+    margin-inline: 12px;
+  }
+  #ml-page-dashboard .life-hud > div {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  #ml-page-dashboard .life-hud #ml-game-age {
+    font-size: 21px;
+    white-space: nowrap;
+  }
+  #ml-page-dashboard .life-hud #ml-game-date {
+    width: auto;
+    margin: 0;
+  }
+  #ml-page-dashboard .life-wallet {
+    min-height: 44px;
+  }
+  #ml-page-dashboard .life-dialogue {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding-block: 6px 8px;
+  }
+  #ml-page-dashboard #life-next-hint {
+    grid-area: 1 / 1;
+    font-size: 13px;
+  }
+  #ml-page-dashboard .life-action-row {
+    grid-area: 2 / 1;
+  }
+  #ml-page-dashboard .life-timeline {
+    grid-area: 3 / 1;
+    width: calc(100% - 88px);
+  }
+  #ml-page-dashboard .life-dialogue-label {
+    grid-area: 3 / 1;
+  }
+  #ml-page-dashboard .life-understage {
+    gap: 8px;
+  }
+  #ml-page-dashboard .life-understage > button {
+    gap: 6px;
+  }
+  #ml-page-dashboard .life-understage > button > span:first-child {
+    display: none;
+  }
+  #ml-page-dashboard .life-understage > button > strong {
+    font-size: 13px;
+  }
+  #ml-page-dashboard .life-understage #life-goal-progress {
+    font-size: 12px;
+    padding: 3px 7px;
+  }
+  body[data-life-page="dashboard"]
+    :is(#life-details, #life-time-options, #life-archive)[open] {
+    inset-inline: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: calc(100dvh - 132px);
+    padding-inline: 14px;
+  }
+}
+@media (max-width: 360px) {
+  #ml-page-dashboard .life-hud > div {
+    display: grid;
+    gap: 0;
+  }
+  #ml-page-dashboard .life-hud #ml-game-age {
+    line-height: 1.2;
+  }
+  #ml-page-dashboard .life-hud #ml-game-date {
+    line-height: 1.3;
+  }
+}
+@media (max-height: 800px) {
+  #ml-page-dashboard .life-scene-title {
+    top: 10px;
+    left: 12px;
+    padding: 10px 12px;
+  }
+  #ml-page-dashboard .life-scene-title > span {
+    display: none;
+  }
+  #ml-page-dashboard .life-scene-title h2 {
+    margin: 0 0 4px;
+    font-size: 23px;
+  }
+  #ml-page-dashboard .life-scene-title p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -13,6 +13,9 @@ function financeSummary() {
     (value("cash") + value("saved")).toLocaleString("ko-KR") + "원";
   $("ml-month-balance").textContent =
     (value("income") - value("expense")).toLocaleString("ko-KR") + "원";
+  const balance = value("income") - value("expense");
+  $("ml-month-balance").dataset.moneyDirection =
+    balance === 0 ? "neutral" : balance > 0 ? "positive" : "negative";
 }
 function applyFinance(values) {
   JourneyStore.set("start", {

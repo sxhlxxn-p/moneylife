@@ -1,11 +1,24 @@
 "use strict";
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeModal();
+  if (event.key === "Escape") {
+    if (!$("overlay").classList.contains("hidden")) closeModal();
+    else {
+      const panel = ["life-archive", "life-details", "life-time-options"]
+        .map($)
+        .find((node) => node?.open && node.getClientRects().length);
+      if (panel) {
+        panel.open = false;
+        panel.querySelector("summary")?.focus({ preventScroll: true });
+      }
+    }
+  }
   if (event.key === "Tab" && !$("overlay").classList.contains("hidden")) {
     const nodes = [
-      ...$("modal").querySelectorAll("button,input,select,textarea,a[href]"),
-    ].filter((node) => !node.disabled);
+      ...$("modal").querySelectorAll(
+        "button,input,select,textarea,a[href],summary,[tabindex='0']",
+      ),
+    ].filter((node) => !node.disabled && node.getClientRects().length > 0);
     if (event.shiftKey && document.activeElement === nodes[0]) {
       event.preventDefault();
       nodes.at(-1)?.focus();
@@ -30,10 +43,46 @@ $("ml-mobile-toggle").onclick = () => {
   );
 };
 $("ml-play").onclick = toggle;
+
+const lifePanels = ["life-details", "life-time-options", "life-archive"].map($);
+lifePanels.forEach((panel) => {
+  panel.addEventListener("toggle", () => {
+    if (!panel.open || JourneyStore.current.activePage !== "dashboard") return;
+    lifePanels.forEach((other) => {
+      if (other !== panel) other.open = false;
+    });
+    panel.querySelector("summary")?.focus({ preventScroll: true });
+  });
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && JourneyStore.current.timer) {
+    stop();
+    render();
+  }
+});
 $("ml-one-month").onclick = step;
-$("ml-next-event").onclick = nextEvent;
-$("ml-event-yes").onclick = nextEvent;
-$("ml-event-later").onclick = toggle;
+$("ml-next-event").onclick = playLifeStory;
+$("life-pause").onclick = () => {
+  stop();
+  render();
+};
+$("life-time-options").addEventListener("toggle", () => {
+  if (!$("life-time-options").open && !lifeStoryRunning) {
+    stop();
+    render();
+  }
+});
+$("life-details").addEventListener("toggle", () => {
+  if ($("life-details").open) {
+    stop();
+    render();
+  }
+});
+$("life-open-archive").onclick = () => {
+  stop();
+  $("life-archive").open = true;
+  $("life-archive").scrollIntoView({ block: "start" });
+};
 document.querySelectorAll("[data-speed]").forEach(
   (node) =>
     (node.onclick = () => {
@@ -43,8 +92,10 @@ document.querySelectorAll("[data-speed]").forEach(
         item.setAttribute("aria-pressed", String(item === node));
       });
       if (JourneyStore.current.timer) {
+        const resumeStory = lifeStoryRunning;
         stop();
-        toggle();
+        if (resumeStory) playLifeStory();
+        else toggle();
       }
     }),
 );
