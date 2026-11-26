@@ -15,6 +15,7 @@ function financeSummary() {
     (value("income") - value("expense")).toLocaleString("ko-KR") + "원";
 }
 function applyFinance(values) {
+  $("game-choice-result").hidden = true;
   JourneyStore.set("start", {
     ...JourneyStore.current.start,
     ...values.initial,

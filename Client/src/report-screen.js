@@ -6,7 +6,8 @@ function mlFormatDuration(months) {
     .join(" ");
 }
 function mlCompareNetWorth(difference, baseline) {
-  if (Math.round(Math.abs(difference)) === 0) return baseline + "과 같아요.";
+  if (Math.round(Math.abs(difference) * 10000) === 0)
+    return baseline + "과 같아요.";
   return (
     baseline +
     "보다 " +
@@ -145,11 +146,11 @@ function mlDrawChart(svgId, paths, large = false) {
   svg.innerHTML = html;
   return showGoal;
 }
-function mlRenderReport() {
-  const base = simulate([], [], JourneyStore.current.baseSaving);
-  const current = simulate();
+function mlRenderReport(paths = null) {
+  const base = paths?.base ?? simulate([], [], JourneyStore.current.baseSaving);
+  const current = paths?.current ?? simulate();
   const stressMonths = Math.min(6, 120 - JourneyStore.current.month);
-  const stress = simulate(stressChanges());
+  const stress = paths?.stress ?? simulate(stressChanges(current));
   const goalAmount = mlFormatKoreanWon(financialProfile().goalAmount);
   const goalMonths = {
     base: mlGoalMonth(base),
@@ -174,7 +175,7 @@ function mlRenderReport() {
   }).forEach(([id, path]) => {
     const hit = goalMonths[id];
     $("ml-report-" + id).textContent = mlFormatKoreanWon(
-      Math.round(path[120].total) * 10000,
+      Math.round(path[120].total * 10000),
     );
     $("ml-report-" + id + "-goal").textContent =
       hit < 0
@@ -202,11 +203,12 @@ function mlRenderReport() {
       : "";
   });
   const difference =
-    Math.round(current[120].total) - Math.round(base[120].total);
+    Math.round(current[120].total * 10000) -
+    Math.round(base[120].total * 10000);
   $("ml-report-net-difference").textContent =
     difference === 0
       ? "차이 없음"
-      : mlFormatKoreanWon(Math.abs(difference) * 10000) +
+      : mlFormatKoreanWon(Math.abs(difference)) +
         (difference < 0 ? " 감소" : " 증가");
   $("ml-report-goal-difference").textContent = mlCompareGoalTiming(
     goalMonths.base,

@@ -36,33 +36,13 @@ function eventPreview(m) {
     candidate = simulate([...JourneyStore.current.mods, ...eventMods(m)]),
     next = JourneyStore.current.month + 1;
   show(
-    '<div class="eyebrow">' +
-      dates(JourneyStore.current.month) +
-      " · 인생 이벤트</div><h2>" +
-      event.emoji +
-      " " +
-      event.title +
-      "</h2><p>" +
-      event.body +
-      '</p><div class="eventoptions"><button class="choice" aria-label="' +
-      event.a +
-      '" onclick="choose(' +
-      m +
-      ',true)"><strong>' +
-      event.a +
-      "</strong><small>" +
-      event.ad +
-      "</small><span>다음 달 순자산 " +
-      money(candidate[next].total - reference[next].total) +
-      '</span></button><button class="choice" aria-label="' +
-      event.b +
-      '" onclick="choose(' +
-      m +
-      ',false)"><strong>' +
-      event.b +
-      "</strong><small>" +
-      event.bd +
-      '</small></button></div><p class="note">선택은 다음 달부터 반영해요. 확정하면 선택 전 원본과 새 계획을 서버에 함께 저장해요. 서버 연결이 필요합니다.</p>',
+    `<header class="event-scene-header"><div class="event-scene-icon" aria-hidden="true">${escapeHtml(event.emoji)}</div><div><div class="game-kicker">${dates(JourneyStore.current.month)} · 인생의 갈림길</div><h2>${escapeHtml(event.title)}</h2></div></header>
+    <p>${escapeHtml(event.body)}</p>
+    <div class="game-event-forecast"><span>지금 계획의 목표 도달<strong>${gameGoalLabel(reference)}</strong></span><span aria-hidden="true">→</span><span>첫 번째 선택을 한다면<strong>${gameGoalLabel(candidate)}</strong></span></div>
+    <div class="eventoptions"><button class="choice" aria-label="${escapeHtml(event.a)}" onclick="choose(${m},true)"><strong>${escapeHtml(event.a)} ↗</strong><small>${escapeHtml(event.ad)}</small><span>다음 달 순자산 차이 ${money(candidate[next].total - reference[next].total)}</span></button>
+    <button class="choice" aria-label="${escapeHtml(event.b)}" onclick="choose(${m},false)"><strong>${escapeHtml(event.b)}</strong><small>${escapeHtml(event.bd)}</small><span>이번 이벤트의 비용·조건 변경 없이 계속</span></button></div>
+    <p class="note">선택은 다음 달부터 반영합니다. 확정하면 선택 전후 계획을 서버에 함께 보관해요. 서버 연결이 필요합니다.</p>`,
+    "event",
   );
 }
 function choose(m, accepted) {

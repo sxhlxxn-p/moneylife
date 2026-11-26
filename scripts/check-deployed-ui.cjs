@@ -12,6 +12,7 @@ const assert = require("node:assert/strict");
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto(url);
     await page.getByRole("button", { name: "닫기", exact: true }).click();
+    await page.locator(".journey-drawer > summary").click();
     await page
       .getByRole("button", { name: "서버 계산·저장", exact: true })
       .click();

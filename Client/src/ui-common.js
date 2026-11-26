@@ -24,7 +24,7 @@ function stop() {
   JourneyStore.set("timer", null);
   if ($("ml-play"))
     $("ml-play").textContent =
-      JourneyStore.current.month >= 120 ? "여정 완료" : "▶ 시간 시작";
+      JourneyStore.current.month >= 120 ? "여정 완료" : "▶ 자동 진행";
 }
 function toast(message) {
   $("toast").textContent = message;
@@ -32,7 +32,8 @@ function toast(message) {
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => $("toast").classList.add("hidden"), 3500);
 }
-function show(html) {
+function show(html, scene = "default") {
+  $("overlay").dataset.scene = scene;
   stop();
   JourneyStore.set("focusBefore", document.activeElement);
   $("modal").innerHTML =
@@ -47,6 +48,7 @@ function closeModal() {
     JourneyStore.current.focusBefore.focus();
 }
 function mlShowPage(page) {
+  document.body.classList.toggle("is-playing", page === "dashboard");
   if (page !== "dashboard") stop();
   JourneyStore.set("activePage", page);
   document
@@ -90,8 +92,5 @@ function journal() {
   );
 }
 function welcome() {
-  show(
-    '<div class="eyebrow">WELCOME TO MONEY LIFE</div><h2>돈을 모으는 시간도,<br>당신의 인생이니까요.</h2><p>개인의 조건으로 선택 전후의 계획을 비교해요. 저장한 진행은 같은 기기에서 이어집니다.</p><div class="modalactions"><button class="btn" onclick="closeModal();settings()">재무 정보 입력</button><button class="btn primary" onclick="closeModal()">마을로 시작하기 →</button></div>',
-  );
+  showJourneyStart();
 }
-// Restore the established version-1 game snapshot; do not reinterpret legacy stock inputs as deposits.

@@ -103,9 +103,16 @@ async function retryPendingEventTransaction() {
     try {
       localStorage.setItem("money-life-server-plan", serverPlanId);
     } catch {}
+    const reference = simulate();
     JourneyStore.restore(decoded);
     closeModal();
     render();
+    showChoiceResult(
+      reference,
+      simulate(),
+      pending.command.eventMonth,
+      pending.command.accepted,
+    );
     $("serverstatus").textContent =
       "선택 전 원본과 선택 후 계획·계산 결과를 저장했어요.";
     toast("선택을 반영했어요. 이전 계획은 저장한 여정에서 확인할 수 있어요.");
