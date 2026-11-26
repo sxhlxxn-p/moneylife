@@ -67,7 +67,7 @@ async function pageFor(t, viewport = {width: 1440, height: 1000}) {
   await page.goto(url);
   await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.getByRole('button', {name: '예시 조건으로 체험', exact: true}).waitFor();
   return page;
 }
@@ -112,7 +112,7 @@ test('주문·월 진행·손익 비교·새로고침·저장 목록과 본편 �
   assert.equal(await page.evaluate(() => localStorage.getItem('money-life-v1')), before);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.getByText('1,410,000원', {exact: true}).waitFor();
   await page.getByRole('button', {name: '저장한 투자 연습', exact: true}).click();
   const saved = page.locator('#papercontent .saved-plans');
@@ -142,7 +142,7 @@ test('응답 유실 후 새로고침·동일 요청 재확인으로 주문 중�
   await page.unroute('**/api/paper-plans/*/orders');
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).click();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), accepted.plan.id);
   assert.equal(accepted.plan.orders[0].id, pendingId);
@@ -213,7 +213,7 @@ test('모의투자 이후 기존 여정 저장·계산 결과·AI 오류 안내 
   await page.getByLabel('조건 변경 요청').fill('저축을 100만 원으로 변경');
   await page.getByRole('button', {name: '변경안 확인', exact: true}).click();
   await page.waitForFunction(() => document.getElementById('serverstatus').textContent.includes('LLM API 키'));
-  await page.locator('#ml-main-nav [data-page=investment]').click();
+  await page.getByRole('button', {name: '은행에서 모의투자 열기', exact: true}).click();
   await page.waitForFunction(() => !document.querySelector('[data-plan-action=paper-open]').disabled);
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), false);
 });
@@ -237,7 +237,7 @@ test('등록 가격 선택·과거 월 표시·출처와 이전 시점 복원', 
   assert.equal(await page.getByRole('button', {name: '다음 달로 +1개월', exact: true}).isDisabled(), true);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.locator('.paper-provenance').waitFor();
   assert.match(await page.locator('.paper-date').innerText(), /2024년 3월/);
 });
@@ -247,7 +247,7 @@ test('가격 목록 오류에도 저장된 원본으로 복원·월 진행', {ti
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
   await page.route('**/api/market/series', route => route.fulfill({status: 503, contentType: 'application/json', body: JSON.stringify({detail: 'MARKET_CATALOG_INVALID'})}));
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.waitForFunction(() => document.getElementById('paperstatus').textContent.includes('저장된 가격으로 진행'));
   const result = await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(result.plan.month, 1);
@@ -403,7 +403,7 @@ test('대기 매수 취소 확인·주문 유지·취소 사본 저장과 재접
   assert.equal((await original.json()).orders.length, 1);
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.getByText('주문 취소를 반영한 사본이에요.', {exact: false}).waitFor();
   const advanced = await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(advanced.run.result.invested.account.quantity, 0);
@@ -430,7 +430,7 @@ test('취소 응답 유실 뒤 동일 요청 복원·중복 취소 방지', {tim
   await page.unroute('**/orders/*/cancel');
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).click();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), accepted.plan.id);
   assert.equal(await page.locator('.paper-pending-row').count(), 0);
@@ -520,7 +520,7 @@ test('조건 변경 응답 유실 뒤 동일 요청으로 복원한다', {timeou
   await page.unroute('**/conditions');
   await page.reload(); await page.getByRole('button', {name: '닫기', exact: true}).click();
   await revealJourneyTools(page);
-  await page.getByRole('button', {name: '모의투자 열기'}).click();
+  await page.getByRole('button', {name: '모의투자 열기 ↗', exact: true}).click();
   await page.getByRole('button', {name: '같은 요청 다시 확인', exact: true}).click();
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), saved.plan.id);
   assert.equal((await (await page.request.get('/api/paper-plans')).json()).length, 2);
@@ -1017,7 +1017,7 @@ test('두 탭에서 같은 모의투자 요청을 동시에 보내지 않는다'
  let release,seen;const waiting=new Promise(resolve=>{release=resolve;});const requested=new Promise(resolve=>{seen=resolve;});
  await page.route('**/api/paper-plans/*/advance',async route=>{seen();await waiting;const response=await route.fetch();await route.fulfill({response});});
  await page.getByRole('button',{name:'다음 달로 +1개월',exact:true}).click();await requested;
- const other=await page.context().newPage();await other.goto(url);await other.getByRole('button',{name:'닫기',exact:true}).click();await other.getByRole('button',{name:'모의투자 열기'}).click();
+ const other=await page.context().newPage();await other.goto(url);await other.getByRole('button',{name:'닫기',exact:true}).click();await other.getByRole('button',{name:'은행에서 모의투자 열기',exact:true}).click();
  const before=await page.evaluate(()=>localStorage.getItem('money-life-paper-pending'));
  await other.getByRole('button',{name:'같은 요청 다시 확인',exact:true}).click();
  await other.waitForFunction(()=>document.querySelector('#paperstatus').textContent.includes('다른 탭'));
