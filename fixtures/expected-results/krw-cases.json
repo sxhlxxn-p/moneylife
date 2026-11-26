@@ -1,0 +1,491 @@
+{
+  "description": "원 단위 서버 계산(cash-savings-krw-v1)의 월 이자·이체·부족 규칙을 엔진 출력이 아닌 명세 기준으로 독립 계산한 기대값이다. notes는 월별 검산 근거다.",
+  "units": "KRW",
+  "engineVersion": "cash-savings-krw-v1",
+  "sources": [
+    "Shared/simulation-contract.md",
+    "docs/simulation-rules.md"
+  ],
+  "cases": [
+    {
+      "id": "interest-rounding-and-transfer",
+      "rules": [
+        "월초 저축 이자 원 단위 HALF_UP",
+        "월말 이체는 다음 달부터 이자",
+        "현금이 부족하면 가능한 만큼만 이체"
+      ],
+      "months": 3,
+      "state": {
+        "initial": {
+          "cash": 1000000,
+          "saved": 1000000,
+          "income": 0,
+          "expense": 0,
+          "target": 100000000
+        },
+        "changes": [],
+        "rateChanges": [],
+        "monthlySaving": 700000,
+        "annualRate": 12
+      },
+      "notes": [
+        "1개월: 이자 1,000,000 × 연12%의 월금리 0.0094887929 = 9488.7929 → 9,489원; 현금 1,000,000 + 소득 0 − 지출 0 = 1,000,000; 이체 min(700,000, 1,000,000) = 700,000",
+        "2개월: 이자 1,709,489 × 연12%의 월금리 0.0094887929 = 16220.9871 → 16,221원; 현금 300,000 + 소득 0 − 지출 0 = 300,000; 이체 min(700,000, 300,000) = 300,000",
+        "3개월: 이자 2,025,710 × 연12%의 월금리 0.0094887929 = 19221.5427 → 19,222원; 현금 0 + 소득 0 − 지출 0 = 0; 이체 min(700,000, 0) = 0"
+      ],
+      "expected": {
+        "monthlyResults": [
+          {
+            "month": 0,
+            "cash": 1000000,
+            "saved": 1000000,
+            "unpaid": 0,
+            "total": 2000000,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 1,
+            "cash": 300000,
+            "saved": 1709489,
+            "unpaid": 0,
+            "total": 2009489,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 2,
+            "cash": 0,
+            "saved": 2025710,
+            "unpaid": 0,
+            "total": 2025710,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 3,
+            "cash": 0,
+            "saved": 2044932,
+            "unpaid": 0,
+            "total": 2044932,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          }
+        ],
+        "summary": {
+          "goalMonth": null,
+          "finalNetAssets": 2044932,
+          "finalCash": 0,
+          "finalSaved": 2044932,
+          "firstShortageMonth": null,
+          "shortageMonths": 0,
+          "unmetTotal": 0
+        }
+      }
+    },
+    {
+      "id": "rate-change-month",
+      "rules": [
+        "금리 변경 월의 월초 이자부터 새 금리 적용",
+        "변경 전 월은 기존 금리 유지"
+      ],
+      "months": 4,
+      "state": {
+        "initial": {
+          "cash": 0,
+          "saved": 1000000,
+          "income": 0,
+          "expense": 0,
+          "target": 100000000
+        },
+        "changes": [],
+        "rateChanges": [
+          {
+            "m": 3,
+            "v": 12
+          }
+        ],
+        "monthlySaving": 0,
+        "annualRate": 6
+      },
+      "notes": [
+        "1개월: 이자 1,000,000 × 연6%의 월금리 0.0048675506 = 4867.5506 → 4,868원; 현금 0 + 소득 0 − 지출 0 = 0; 이체 min(0, 0) = 0",
+        "2개월: 이자 1,004,868 × 연6%의 월금리 0.0048675506 = 4891.2458 → 4,891원; 현금 0 + 소득 0 − 지출 0 = 0; 이체 min(0, 0) = 0",
+        "3개월: 이자 1,009,759 × 연12%의 월금리 0.0094887929 = 9581.3941 → 9,581원; 현금 0 + 소득 0 − 지출 0 = 0; 이체 min(0, 0) = 0",
+        "4개월: 이자 1,019,340 × 연12%의 월금리 0.0094887929 = 9672.3062 → 9,672원; 현금 0 + 소득 0 − 지출 0 = 0; 이체 min(0, 0) = 0"
+      ],
+      "expected": {
+        "monthlyResults": [
+          {
+            "month": 0,
+            "cash": 0,
+            "saved": 1000000,
+            "unpaid": 0,
+            "total": 1000000,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 1,
+            "cash": 0,
+            "saved": 1004868,
+            "unpaid": 0,
+            "total": 1004868,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 2,
+            "cash": 0,
+            "saved": 1009759,
+            "unpaid": 0,
+            "total": 1009759,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 3,
+            "cash": 0,
+            "saved": 1019340,
+            "unpaid": 0,
+            "total": 1019340,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          },
+          {
+            "month": 4,
+            "cash": 0,
+            "saved": 1029012,
+            "unpaid": 0,
+            "total": 1029012,
+            "income": 0,
+            "expense": 0,
+            "short": 0
+          }
+        ],
+        "summary": {
+          "goalMonth": null,
+          "finalNetAssets": 1029012,
+          "finalCash": 0,
+          "finalSaved": 1029012,
+          "firstShortageMonth": null,
+          "shortageMonths": 0,
+          "unmetTotal": 0
+        }
+      }
+    },
+    {
+      "id": "shortage-accumulates-without-repayment",
+      "rules": [
+        "현금 부족액은 누적 미충족액",
+        "저축 자동 인출 없음",
+        "이후 흑자여도 미충족액 자동 상환 없음",
+        "목표 미달성은 null"
+      ],
+      "months": 4,
+      "state": {
+        "initial": {
+          "cash": 0,
+          "saved": 300000,
+          "income": 500000,
+          "expense": 1000000,
+          "target": 100000000
+        },
+        "changes": [
+          {
+            "type": "income",
+            "v": 700000,
+            "m": 3,
+            "end": null
+          }
+        ],
+        "rateChanges": [],
+        "monthlySaving": 100000,
+        "annualRate": 0
+      },
+      "notes": [
+        "1개월: 현금 0 + 소득 500,000 − 지출 1,000,000 = -500,000 → 부족 500,000(누적 500,000), 현금 0; 이체 min(100,000, 0) = 0",
+        "2개월: 현금 0 + 소득 500,000 − 지출 1,000,000 = -500,000 → 부족 500,000(누적 1,000,000), 현금 0; 이체 min(100,000, 0) = 0",
+        "3개월: 현금 0 + 소득 1,200,000 − 지출 1,000,000 = 200,000; 이체 min(100,000, 200,000) = 100,000",
+        "4개월: 현금 100,000 + 소득 1,200,000 − 지출 1,000,000 = 300,000; 이체 min(100,000, 300,000) = 100,000"
+      ],
+      "expected": {
+        "monthlyResults": [
+          {
+            "month": 0,
+            "cash": 0,
+            "saved": 300000,
+            "unpaid": 0,
+            "total": 300000,
+            "income": 500000,
+            "expense": 1000000,
+            "short": 0
+          },
+          {
+            "month": 1,
+            "cash": 0,
+            "saved": 300000,
+            "unpaid": 500000,
+            "total": -200000,
+            "income": 500000,
+            "expense": 1000000,
+            "short": 500000
+          },
+          {
+            "month": 2,
+            "cash": 0,
+            "saved": 300000,
+            "unpaid": 1000000,
+            "total": -700000,
+            "income": 500000,
+            "expense": 1000000,
+            "short": 500000
+          },
+          {
+            "month": 3,
+            "cash": 100000,
+            "saved": 400000,
+            "unpaid": 1000000,
+            "total": -500000,
+            "income": 1200000,
+            "expense": 1000000,
+            "short": 0
+          },
+          {
+            "month": 4,
+            "cash": 200000,
+            "saved": 500000,
+            "unpaid": 1000000,
+            "total": -300000,
+            "income": 1200000,
+            "expense": 1000000,
+            "short": 0
+          }
+        ],
+        "summary": {
+          "goalMonth": null,
+          "finalNetAssets": -300000,
+          "finalCash": 200000,
+          "finalSaved": 500000,
+          "firstShortageMonth": 1,
+          "shortageMonths": 2,
+          "unmetTotal": 1000000
+        }
+      }
+    },
+    {
+      "id": "change-period-boundaries",
+      "rules": [
+        "기간 변경은 시작·종료 월 포함",
+        "종료 없는 지출 변경은 이후 계속",
+        "일회성 이벤트는 지정 월 1회",
+        "저축액 변경은 금액을 대체"
+      ],
+      "months": 5,
+      "state": {
+        "initial": {
+          "cash": 1000000,
+          "saved": 0,
+          "income": 2000000,
+          "expense": 1500000,
+          "target": 100000000
+        },
+        "changes": [
+          {
+            "type": "income",
+            "v": 300000,
+            "m": 2,
+            "end": 3
+          },
+          {
+            "type": "expense",
+            "v": 100000,
+            "m": 3,
+            "end": null
+          },
+          {
+            "type": "once",
+            "v": 400000,
+            "m": 3,
+            "end": null
+          },
+          {
+            "type": "saving",
+            "v": 200000,
+            "m": 4,
+            "end": null
+          }
+        ],
+        "rateChanges": [],
+        "monthlySaving": 0,
+        "annualRate": 0
+      },
+      "notes": [
+        "1개월: 현금 1,000,000 + 소득 2,000,000 − 지출 1,500,000 = 1,500,000; 이체 min(0, 1,500,000) = 0",
+        "2개월: 현금 1,500,000 + 소득 2,300,000 − 지출 1,500,000 = 2,300,000; 이체 min(0, 2,300,000) = 0",
+        "3개월: 현금 2,300,000 + 소득 2,300,000 − 지출 1,600,000 − 일회성 400,000 = 2,600,000; 이체 min(0, 2,600,000) = 0",
+        "4개월: 현금 2,600,000 + 소득 2,000,000 − 지출 1,600,000 = 3,000,000; 이체 min(200,000, 3,000,000) = 200,000",
+        "5개월: 현금 2,800,000 + 소득 2,000,000 − 지출 1,600,000 = 3,200,000; 이체 min(200,000, 3,200,000) = 200,000"
+      ],
+      "expected": {
+        "monthlyResults": [
+          {
+            "month": 0,
+            "cash": 1000000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 1000000,
+            "income": 2000000,
+            "expense": 1500000,
+            "short": 0
+          },
+          {
+            "month": 1,
+            "cash": 1500000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 1500000,
+            "income": 2000000,
+            "expense": 1500000,
+            "short": 0
+          },
+          {
+            "month": 2,
+            "cash": 2300000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 2300000,
+            "income": 2300000,
+            "expense": 1500000,
+            "short": 0
+          },
+          {
+            "month": 3,
+            "cash": 2600000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 2600000,
+            "income": 2300000,
+            "expense": 2000000,
+            "short": 0
+          },
+          {
+            "month": 4,
+            "cash": 2800000,
+            "saved": 200000,
+            "unpaid": 0,
+            "total": 3000000,
+            "income": 2000000,
+            "expense": 1600000,
+            "short": 0
+          },
+          {
+            "month": 5,
+            "cash": 3000000,
+            "saved": 400000,
+            "unpaid": 0,
+            "total": 3400000,
+            "income": 2000000,
+            "expense": 1600000,
+            "short": 0
+          }
+        ],
+        "summary": {
+          "goalMonth": null,
+          "finalNetAssets": 3400000,
+          "finalCash": 3000000,
+          "finalSaved": 400000,
+          "firstShortageMonth": null,
+          "shortageMonths": 0,
+          "unmetTotal": 0
+        }
+      }
+    },
+    {
+      "id": "goal-reached-at-exact-target",
+      "rules": [
+        "cash + saved - unpaid가 목표와 같은 첫 달을 달성으로 본다"
+      ],
+      "months": 3,
+      "state": {
+        "initial": {
+          "cash": 1000000,
+          "saved": 0,
+          "income": 1000000,
+          "expense": 500000,
+          "target": 2000000
+        },
+        "changes": [],
+        "rateChanges": [],
+        "monthlySaving": 0,
+        "annualRate": 0
+      },
+      "notes": [
+        "1개월: 현금 1,000,000 + 소득 1,000,000 − 지출 500,000 = 1,500,000; 이체 min(0, 1,500,000) = 0",
+        "2개월: 현금 1,500,000 + 소득 1,000,000 − 지출 500,000 = 2,000,000; 이체 min(0, 2,000,000) = 0",
+        "3개월: 현금 2,000,000 + 소득 1,000,000 − 지출 500,000 = 2,500,000; 이체 min(0, 2,500,000) = 0"
+      ],
+      "expected": {
+        "monthlyResults": [
+          {
+            "month": 0,
+            "cash": 1000000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 1000000,
+            "income": 1000000,
+            "expense": 500000,
+            "short": 0
+          },
+          {
+            "month": 1,
+            "cash": 1500000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 1500000,
+            "income": 1000000,
+            "expense": 500000,
+            "short": 0
+          },
+          {
+            "month": 2,
+            "cash": 2000000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 2000000,
+            "income": 1000000,
+            "expense": 500000,
+            "short": 0
+          },
+          {
+            "month": 3,
+            "cash": 2500000,
+            "saved": 0,
+            "unpaid": 0,
+            "total": 2500000,
+            "income": 1000000,
+            "expense": 500000,
+            "short": 0
+          }
+        ],
+        "summary": {
+          "goalMonth": 2,
+          "finalNetAssets": 2500000,
+          "finalCash": 2500000,
+          "finalSaved": 0,
+          "firstShortageMonth": null,
+          "shortageMonths": 0,
+          "unmetTotal": 0
+        }
+      }
+    }
+  ]
+}
