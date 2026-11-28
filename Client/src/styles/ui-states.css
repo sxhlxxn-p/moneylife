@@ -1,0 +1,229 @@
+/* Shared interaction states and balanced information groups. */
+.goal-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ui-space-12);
+  margin-bottom: var(--ui-space-12);
+}
+.goal-editor-heading h2 {
+  margin: 0;
+}
+#goal-save-state {
+  color: var(--ui-muted);
+  font-size: var(--ui-font-caption);
+  white-space: nowrap;
+}
+#goal-save-state[data-state="dirty"] {
+  color: #916127;
+  font-weight: 700;
+}
+.settings-change-receipt {
+  padding: var(--ui-space-16);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-control);
+  color: var(--ui-ink);
+}
+.settings-change-receipt[hidden],
+.paper-tab-panel[hidden] {
+  display: none !important;
+}
+.settings-change-receipt h3 {
+  margin: 0 0 var(--ui-space-12);
+  font-size: var(--ui-font-lead);
+}
+.settings-change-receipt dl {
+  display: grid;
+  gap: var(--ui-space-12);
+  margin: 0;
+}
+.settings-change-receipt dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px var(--ui-space-16);
+  justify-content: space-between;
+}
+.settings-change-receipt dt {
+  color: var(--ui-muted);
+}
+.settings-change-receipt dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.assumption-label {
+  display: block;
+  color: #916127;
+  font-size: var(--ui-font-small);
+  font-weight: 700;
+  margin-bottom: var(--ui-space-8);
+}
+#paperlab .paper-tabs {
+  display: flex;
+  gap: var(--ui-space-4);
+  margin: var(--ui-space-16) 0;
+  border-bottom: 1px solid var(--ui-line);
+}
+#paperlab .paper-tabs button {
+  flex: 1;
+  min-height: var(--ui-control-height);
+  padding: var(--ui-space-8) var(--ui-space-12);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--ui-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#paperlab .paper-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--ui-accent);
+  color: var(--ui-accent);
+}
+#paperlab .paper-tabs button:hover {
+  background: #f0f3e9;
+}
+#paperlab .paper-tabs button:focus-visible,
+#paperlab .paper-tab-panel:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+#paperlab .stock-position {
+  color: var(--ui-ink);
+  font-weight: 600;
+  margin: var(--ui-space-8) 0;
+}
+.ml-input-wrap:has(input[aria-invalid="true"]) {
+  border-color: var(--finance-negative);
+  box-shadow: 0 0 0 2px #bd434810;
+}
+.ml-field-error {
+  display: block;
+  margin-top: 7px;
+  color: var(--finance-negative);
+  font-size: var(--ui-font-small);
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.ml-field-error[hidden],
+.ml-cashflow-warning[hidden] {
+  display: none;
+}
+.ml-cashflow-warning {
+  margin: 14px 0;
+  color: var(--finance-negative);
+  font-size: var(--ui-font-caption);
+  line-height: 1.8;
+}
+#ml-settings-form {
+  display: grid;
+  gap: 18px;
+}
+#ml-settings-form .ml-button-row {
+  margin: 0;
+}
+#ml-settings-form #experience-settings-note {
+  margin-top: 0;
+}
+#money-life-app
+  :is(
+    .ml-page-head .ml-eyebrow,
+    .ml-report-item dt,
+    .ml-report-item > p,
+    .ml-hint
+  ) {
+  color: #607257;
+}
+#money-life-app .ml-page-head .ml-eyebrow {
+  font-size: 11px;
+}
+#overlay .game-kicker {
+  color: #637556;
+  font-size: 11px;
+}
+#overlay .modal > p.note {
+  font-size: 11px;
+  line-height: 1.7;
+}
+#money-life-app .ml-page:not(#ml-page-dashboard) .ml-btn,
+#overlay .btn,
+#paperlab .paper-toolbar .btn {
+  min-height: 44px;
+}
+#money-life-app .experience-back {
+  min-height: 40px;
+}
+#overlay [aria-busy="true"] .choice:disabled {
+  cursor: progress;
+}
+#ml-page-investment #paperlab .paper-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-space-12);
+}
+#ml-page-investment #paperlab .paper-metrics > div {
+  min-width: 0;
+}
+#overlay .run-summary,
+#overlay .news-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+#overlay .news-metrics > div:last-child:nth-child(odd) {
+  grid-column: 1/-1;
+}
+@media (max-width: 900px) {
+  #ml-page-investment #paperlab .paper-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 440px) {
+  #overlay .run-summary {
+    grid-template-columns: 1fr;
+  }
+  #ml-settings-form {
+    gap: var(--ui-space-16);
+  }
+}
+@media (max-width: 360px) {
+  #overlay .news-metrics {
+    grid-template-columns: 1fr;
+  }
+  #ml-page-investment #paperlab .paper-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  #money-life-app #ml-mobile-toggle,
+  #money-life-app #game-play-toggle,
+  #money-life-app .experience-time-controls .play-speed > summary,
+  #money-life-app .experience-back {
+    min-height: 44px;
+  }
+  .ml-input-wrap input,
+  #overlay :is(input, textarea, select) {
+    font-size: var(--ui-font-lead);
+  }
+}
+#money-life-app .ml-input-wrap input:focus-visible,
+#overlay .ml-input-wrap input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+#money-life-app .ml-input-wrap:has(input:focus-visible),
+#overlay .ml-input-wrap:has(input:focus-visible) {
+  outline: 2px solid #6f8e61;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+#money-life-app .ml-input-wrap:has(input[aria-invalid="true"]):focus-within,
+#overlay .ml-input-wrap:has(input[aria-invalid="true"]):focus-within {
+  outline-color: var(--finance-negative);
+}
+#money-life-app [data-money-direction="negative"],
+#overlay [data-money-direction="negative"] {
+  color: var(--finance-negative);
+}
+#money-life-app [data-money-direction="positive"],
+#overlay [data-money-direction="positive"] {
+  color: var(--finance-positive);
+}

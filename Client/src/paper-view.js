@@ -1,4 +1,56 @@
 function installPaperView(paper) {
+  paper.activeTab = "trade";
+  paper.renderTabs = function (root, groups) {
+    const tabs = paper.node("div", undefined, "paper-tabs");
+    tabs.setAttribute("role", "tablist");
+    tabs.setAttribute("aria-label", "투자 연습 화면");
+    const buttons = [];
+    const panels = [];
+    const select = (key, focus = false) => {
+      paper.activeTab = key;
+      buttons.forEach((button, index) => {
+        const selected = groups[index][0] === key;
+        button.setAttribute("aria-selected", String(selected));
+        button.tabIndex = selected ? 0 : -1;
+        panels[index].hidden = !selected;
+        if (selected && focus) button.focus();
+      });
+    };
+    groups.forEach(([key, label, nodes], index) => {
+      const button = paper.node("button", label);
+      button.type = "button";
+      button.id = "paper-tab-" + key;
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-controls", "paper-panel-" + key);
+      button.onclick = () => select(key);
+      button.onkeydown = (event) => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
+          return;
+        event.preventDefault();
+        const next =
+          event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? groups.length - 1
+              : (index +
+                  (event.key === "ArrowRight" ? 1 : -1) +
+                  groups.length) %
+                groups.length;
+        select(groups[next][0], true);
+      };
+      const panel = paper.node("div", undefined, "paper-tab-panel");
+      panel.id = "paper-panel-" + key;
+      panel.setAttribute("role", "tabpanel");
+      panel.setAttribute("aria-labelledby", button.id);
+      panel.tabIndex = 0;
+      panel.append(...nodes.filter(Boolean));
+      buttons.push(button);
+      panels.push(panel);
+      tabs.append(button);
+    });
+    root.append(tabs, ...panels);
+    select(paper.activeTab);
+  };
   paper.marketDate = function (source, offset) {
     if (!source.historicalStartMonth) return dates(offset);
     const [year, month] = source.historicalStartMonth.split("-").map(Number);
@@ -136,8 +188,9 @@ function installPaperView(paper) {
         "paper-caption",
       ),
     );
+    let provenance;
     if (plan.source.dataKind === "historical-market") {
-      const provenance = paper.node("div", undefined, "paper-provenance");
+      provenance = paper.node("div", undefined, "paper-provenance");
       provenance.append(
         paper.node(
           "p",
@@ -170,10 +223,65 @@ function installPaperView(paper) {
       card.append(paper.node("small", label), paper.node("strong", value));
       metrics.append(card);
     }
-    root.append(metrics);
+    const desk = paper.node("div", undefined, "stock-desk");
+    const watch = paper.node("aside", undefined, "stock-watch");
+    watch.append(
+      paper.node("span", "MONTHLY TRADING", "stock-kicker"),
+      paper.node("h3", "나의 투자 여정"),
+      paper.node(
+        "strong",
+        `${plan.month} / ${plan.source.lastMonth}`,
+        "stock-turn",
+      ),
+      paper.node("p", "개월 진행", "paper-caption"),
+    );
+    const progress = paper.node("progress");
+    progress.max = Math.max(1, plan.source.lastMonth);
+    progress.value = plan.month;
+    progress.setAttribute("aria-label", "모의투자 기간 진행률");
+    const selected = paper.node("div", undefined, "stock-selected");
+    selected.append(
+      paper.node("small", "선택한 종목"),
+      paper.node("strong", plan.source.symbol),
+      paper.node("span", paper.dataLabel(plan.source)),
+      paper.button(
+        "다른 종목·조건 선택",
+        () => paper.setup(),
+        Boolean(paper.queue.get()),
+      ),
+    );
+    watch.append(
+      progress,
+      selected,
+      paper.node("h4", "주문 가능 현금"),
+      paper.node("strong", paper.won(final.cash), "stock-cash"),
+      paper.node(
+        "p",
+        `보유 주식 ${position.quantity.toLocaleString("ko-KR")}주`,
+        "stock-position",
+      ),
+      paper.node(
+        "p",
+        "생활비와 투자금은 같은 현금에서 사용합니다. 다음 달 생활비도 확인하세요.",
+        "paper-caption",
+      ),
+    );
+    const ticket = paper.node("section", undefined, "stock-ticket");
+    ticket.append(
+      paper.node("h3", "주문하기"),
+      paper.node(
+        "p",
+        "다음 달 가격으로 체결되는 예약 주문",
+        "stock-ticket-note",
+      ),
+    );
+    desk.append(watch, paper.marketChart(plan, invested), ticket);
+    root.append(desk);
+    const account = paper.node("section", undefined, "stock-account");
+    account.append(paper.node("h3", "내 계좌 현황"), metrics);
     const quote =
       position.price === null ? "가격 없음" : paper.won(position.price);
-    root.append(
+    ticket.append(
       paper.node(
         "p",
         `현재 평가 가격 ${quote}${position.stale ? " · 이전 유효 가격으로 평가 중" : ""}${position.priceMonth === null ? "" : " · " + paper.marketDate(plan.source, position.priceMonth)}. 주문은 다음 달 가격으로 체결 여부가 결정됩니다.`,
@@ -214,7 +322,7 @@ function installPaperView(paper) {
       event.preventDefault();
       paper.submitOrder("buy");
     });
-    root.append(form);
+    ticket.append(form);
     const time = paper.node("div", undefined, "paper-toolbar");
     time.append(
       paper.button(
@@ -234,7 +342,7 @@ function installPaperView(paper) {
         "paper-caption",
       ),
     );
-    root.append(time);
+    ticket.append(time);
     const pendingList = paper.node("div", undefined, "paper-orders");
     pendingList.append(paper.node("h4", "다음 달 체결 대기"));
     if (!invested.pendingOrders.length)
@@ -262,10 +370,45 @@ function installPaperView(paper) {
           "paper-caption",
         ),
       );
-    root.append(
-      pendingList,
+    ticket.append(pendingList);
+    const holdings = paper.node("div", undefined, "stock-holdings");
+    const holdingTitle = paper.node("h4", "보유 종목");
+    holdings.append(holdingTitle);
+    if (position.quantity > 0) {
+      const row = paper.node("div", undefined, "stock-holding-row");
+      for (const [caption, amount] of [
+        ["종목", plan.source.symbol],
+        ["보유 수량", `${position.quantity.toLocaleString("ko-KR")}주`],
+        [
+          "평균 매입가",
+          position.averageCost === null
+            ? "없음"
+            : paper.won(Math.round(Number(position.averageCost))),
+        ],
+        ["평가 금액", paper.won(position.marketValue)],
+        ["평가 손익", paper.signed(position.unrealizedPnl)],
+      ]) {
+        const item = paper.node("div");
+        item.append(paper.node("small", caption), paper.node("strong", amount));
+        row.append(item);
+      }
+      holdings.append(row);
+    } else
+      holdings.append(
+        paper.node(
+          "p",
+          "아직 보유한 주식이 없어요. 주문 후 다음 달로 진행하면 체결 결과를 확인할 수 있어요.",
+          "paper-caption",
+        ),
+      );
+    account.append(holdings);
+    root.append(account);
+    const assets = paper.node("details", undefined, "stock-assets-chart");
+    assets.append(
+      paper.node("summary", "투자와 비투자 순자산 경로 비교"),
       paper.chart(invested.monthlyResults, baseline.monthlyResults),
     );
+    root.append(assets);
     const compare = paper.node("div", undefined, "paper-comparison");
     compare.append(
       paper.node("h4", "같은 조건에서 투자하지 않았다면?"),
@@ -279,7 +422,7 @@ function installPaperView(paper) {
       ),
       paper.node(
         "p",
-        `현금 부족: 투자 ${invested.summary.shortageMonths}개월 / 비투자 ${baseline.summary.shortageMonths}개월 · 투자 계획 미충족 지출 ${paper.won(final.unpaid)}`,
+        `현금 부족: 투자 ${invested.summary.shortageMonths}개월 / 비투자 ${baseline.summary.shortageMonths}개월 · 생활비 부족 누적액 ${paper.won(final.unpaid)}`,
       ),
     );
     const news = paper.node("section", undefined, "news-investment-entry");
@@ -297,7 +440,7 @@ function installPaperView(paper) {
         true,
       ),
     );
-    root.append(news, compare, paper.explanationPanel(run.id));
+    const explanation = paper.explanationPanel(run.id);
     const tableBox = paper.node("details", undefined, "paper-history");
     tableBox.append(
       paper.node("summary", `체결·거부 기록 ${invested.executions.length}건`),
@@ -336,6 +479,10 @@ function installPaperView(paper) {
     table.append(body);
     scroll.append(table);
     tableBox.append(scroll);
-    root.append(tableBox);
+    paper.renderTabs(root, [
+      ["trade", "매매", [desk]],
+      ["performance", "성과", [account, assets, compare, explanation]],
+      ["records", "기록·뉴스", [tableBox, news, provenance]],
+    ]);
   };
 }

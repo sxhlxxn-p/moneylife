@@ -12,7 +12,6 @@ const eventRequests = createRequestJournal(
     ),
 );
 function renderEventRecovery() {
-  if (eventRequests.get() && $("life-archive")) $("life-archive").open = true;
   const button = $("eventrequest-retry");
   if (button) button.hidden = !eventRequests.get();
   const archive = $("eventrequest-archive");
@@ -54,6 +53,7 @@ async function saveEventBranchTransaction(eventMonth, accepted) {
       return;
     }
   }
+  renderEventRecovery();
   return retryPendingEventTransaction();
 }
 function archivePendingEventTransaction() {
@@ -79,9 +79,6 @@ async function retryPendingEventTransaction() {
   if (serverPlanBusy || !pending) return;
   stop();
   setPlanBusy(true);
-  if ($("life-choice-status"))
-    $("life-choice-status").textContent =
-      "선택을 기록하고 미래를 계산하고 있어요…";
   try {
     const result = await apiRequest("event-branches", "", {
       method: "POST",
@@ -106,25 +103,25 @@ async function retryPendingEventTransaction() {
     try {
       localStorage.setItem("money-life-server-plan", serverPlanId);
     } catch {}
-    const before = simulate();
+    const reference = simulate();
     JourneyStore.restore(decoded);
     closeModal();
     render();
-    showLifeResult(
+    showChoiceResult(
+      reference,
+      simulate(),
       pending.command.eventMonth,
       pending.command.accepted,
-      before,
     );
     $("serverstatus").textContent =
       "선택 전 원본과 선택 후 계획·계산 결과를 저장했어요.";
     toast("선택을 반영했어요. 이전 계획은 저장한 여정에서 확인할 수 있어요.");
   } catch (error) {
-    if ($("life-choice-status"))
-      $("life-choice-status").textContent =
-        "선택을 확인하지 못했어요. 여정 보관함에서 같은 선택의 결과를 다시 확인해주세요.";
     $("serverstatus").textContent =
       "선택 반영을 확인하지 못했어요. 같은 요청으로 다시 확인할 수 있어요.";
     toast(error.message);
+    if (typeof GameExperience !== "undefined")
+      GameExperience.eventError(error.message);
   } finally {
     setPlanBusy(false);
     renderEventRecovery();

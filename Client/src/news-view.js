@@ -95,7 +95,7 @@ function installNewsView(news) {
         ),
       ],
       ["연습 보유 주식", `${session.state.quantity}주`],
-      ["미충족 생활비 누적", news.won(session.state.unpaid)],
+      ["생활비 부족 누적액", news.won(session.state.unpaid)],
     ]) {
       const card = news.el("div");
       card.append(news.el("small", title), news.el("strong", value));

@@ -27,7 +27,6 @@
     "prepare:market": "python3 Server/scripts/prepare_market_demo.py",
     "demo:monthly-trading": "npm run demo:monthly-trading --workspace Engine",
     "test:ui": "npm run test:ui --workspace Test",
-    "test:ui:life": "node --test Test/life-ui.spec.cjs",
     "db:migrate": "python3 Server/scripts/maintain_database.py migrate",
     "db:cleanup": "python3 Server/scripts/maintain_database.py cleanup",
     "format:client": "prettier --write \"Client/src/**/*.js\" \"Client/src/**/*.css\" Client/index.html",

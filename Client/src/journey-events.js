@@ -35,41 +35,14 @@ function eventPreview(m) {
   const reference = simulate(),
     candidate = simulate([...JourneyStore.current.mods, ...eventMods(m)]),
     next = JourneyStore.current.month + 1;
-  const difference =
-    Math.round(candidate[next].total * 10000) -
-    Math.round(reference[next].total * 10000);
-  const direction =
-    difference === 0 ? "neutral" : difference > 0 ? "positive" : "negative";
   show(
-    '<div class="game-dialog-kicker">' +
-      dates(JourneyStore.current.month) +
-      " · 인생 이벤트</div><h2>" +
-      event.title +
-      "</h2><p>" +
-      event.body +
-      '</p><div class="eventoptions"><button class="choice" aria-label="' +
-      event.a +
-      '" onclick="choose(' +
-      m +
-      ',true)" data-plan-action="event-choice"><strong>' +
-      event.a +
-      "</strong><small>" +
-      event.ad +
-      '</small><span class="life-choice-money" data-money-direction="' +
-      direction +
-      '">다음 달 순자산 ' +
-      (difference === 0
-        ? "변화 없음"
-        : (difference > 0 ? "+" : "") + mlFormatKoreanWon(difference)) +
-      '</span></button><button class="choice" aria-label="' +
-      event.b +
-      '" onclick="choose(' +
-      m +
-      ',false)" data-plan-action="event-choice"><strong>' +
-      event.b +
-      "</strong><small>" +
-      event.bd +
-      '</small><span>지금의 계획을 이어가요.</span></button></div><p class="note" role="status" id="life-choice-status">선택은 다음 달부터 반영돼요. 선택 전후의 여정을 보관하려면 서버 연결이 필요합니다.</p>',
+    `<header class="event-scene-header"><div><div class="game-kicker">${dates(JourneyStore.current.month)} · 인생의 갈림길</div><h2>${escapeHtml(event.title)}</h2></div></header>
+    <p>${escapeHtml(event.body)}</p>
+    <div class="game-event-forecast"><span>지금 계획의 목표 도달<strong>${gameGoalLabel(reference)}</strong></span><span aria-hidden="true">→</span><span>첫 번째 선택을 한다면<strong>${gameGoalLabel(candidate)}</strong></span></div>
+    <div class="eventoptions"><button class="choice" data-plan-action="life-choice" aria-label="${escapeHtml(event.a)}" onclick="choose(${m},true)"><strong>${escapeHtml(event.a)} ↗</strong><small>${escapeHtml(event.ad)}</small><span class="event-money" data-money-direction="${candidate[next].total < reference[next].total ? "negative" : candidate[next].total > reference[next].total ? "positive" : "neutral"}">다음 달 순자산 차이 ${candidate[next].total - reference[next].total > 0 ? "+" : ""}${money(candidate[next].total - reference[next].total)}</span></button>
+    <button class="choice" data-plan-action="life-choice" aria-label="${escapeHtml(event.b)}" onclick="choose(${m},false)"><strong>${escapeHtml(event.b)}</strong><small>${escapeHtml(event.bd)}</small><span>현재 조건을 유지해요</span></button></div>
+    <p id="life-event-feedback" role="status" aria-live="polite"></p><p class="note">선택은 다음 달부터 반영돼요. 확정하면 선택 전후 계획을 서버에 보관합니다.</p>`,
+    "event",
   );
 }
 function choose(m, accepted) {
@@ -88,7 +61,6 @@ function step() {
   if (JourneyStore.current.month >= 120) return;
   JourneyStore.increment("month", 1);
   render();
-  if (JourneyStore.current.month === 120) showLifeEnding();
   if (
     EV[JourneyStore.current.month] &&
     !JourneyStore.current.events.has(JourneyStore.current.month)
@@ -99,6 +71,7 @@ function toggle() {
   if (serverPlanBusy) return;
   if (JourneyStore.current.timer) {
     stop();
+    render();
     return;
   }
   if (
@@ -109,22 +82,34 @@ function toggle() {
     return;
   }
   if (JourneyStore.current.month >= 120) return;
+  if (
+    typeof eventRequests !== "undefined" &&
+    (eventRequests.get() || eventRequests.isSuspended())
+  ) {
+    toast("이전 선택의 저장 결과를 먼저 확인해주세요.");
+    return;
+  }
+  if (!$("overlay").classList.contains("hidden")) return;
   $("ml-play").textContent = "Ⅱ 잠시 멈춤";
   JourneyStore.set(
     "timer",
     setInterval(() => {
-      if (serverPlanBusy || JourneyStore.current.month >= 120) {
+      if (
+        serverPlanBusy ||
+        JourneyStore.current.activePage !== "dashboard" ||
+        JourneyStore.current.month >= 120
+      ) {
         stop();
         return;
       }
       JourneyStore.increment("month", 1);
-      render();
-      if (JourneyStore.current.month === 120) {
+      if (JourneyStore.current.month >= 120) {
         stop();
         render();
-        showLifeEnding();
+        toast("10년의 여정을 마쳤어요. 결과를 비교해보세요.");
         return;
       }
+      render();
       if (
         EV[JourneyStore.current.month] &&
         !JourneyStore.current.events.has(JourneyStore.current.month)
@@ -132,8 +117,9 @@ function toggle() {
         stop();
         eventPreview(JourneyStore.current.month);
       }
-    }, 1500 / JourneyStore.current.speed),
+    }, 2000 / JourneyStore.current.speed),
   );
+  render();
 }
 function nextEvent() {
   if (serverPlanBusy) return;
@@ -145,9 +131,7 @@ function nextEvent() {
         m >= JourneyStore.current.month && !JourneyStore.current.events.has(m),
     );
   if (next === undefined) {
-    JourneyStore.set("month", 120);
-    render();
-    showLifeEnding();
+    mlShowPage("report");
     return;
   }
   JourneyStore.set("month", next);

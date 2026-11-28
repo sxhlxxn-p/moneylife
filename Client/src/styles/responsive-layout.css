@@ -1,0 +1,1647 @@
+/* Layout layer: content-driven grids, a clear map, and independent supporting panels. */
+.ml-game-edition .ml-page:not(#ml-page-dashboard) {
+  max-width: 1240px;
+  margin-inline: auto;
+  min-width: 0;
+}
+.ml-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ui-space-16) var(--ui-space-24);
+}
+.ml-page-head > div {
+  min-width: 0;
+  max-width: 72ch;
+}
+.ml-page-head h1 {
+  font-size: clamp(25px, 2.4vw, 32px);
+}
+.ml-page-head p {
+  max-width: 66ch;
+}
+.ml-card,
+.play-turn-panel,
+.play-flow-grid > *,
+.ml-fields > * {
+  min-width: 0;
+}
+.ml-card h2 {
+  margin-top: 0;
+}
+.ml-content-grid {
+  align-items: start;
+}
+#ml-finance-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
+  align-items: start;
+  gap: clamp(18px, 2.2vw, 28px);
+}
+#ml-finance-form > section {
+  display: block;
+}
+#ml-finance-form > section > h2 {
+  margin-bottom: var(--ui-space-24);
+}
+.finance-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 26px;
+}
+.finance-groups fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.finance-groups fieldset:last-child {
+  grid-column: 1 / -1;
+}
+.finance-groups legend {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-8);
+  padding: 0 0 14px;
+  font-size: var(--ui-font-body);
+  font-weight: 700;
+  color: #45633e;
+}
+.finance-groups legend .ml-icon {
+  width: 18px;
+  height: 18px;
+}
+#ml-finance-form .finance-groups .ml-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-16);
+}
+#ml-finance-form .ml-field label {
+  min-height: 20px;
+  line-height: 1.6;
+}
+#ml-finance-form button[type="submit"] {
+  width: 100%;
+  margin-top: var(--ui-space-24);
+  min-height: 48px;
+}
+#ml-finance-error:not(:empty) {
+  margin-top: var(--ui-space-20);
+  color: var(--finance-negative);
+}
+.ml-finance-summary {
+  margin: 0;
+}
+.ml-finance-summary .ml-summary-row {
+  gap: 9px;
+}
+.ml-finance-summary .ml-summary-row strong {
+  font-size: clamp(21px, 2vw, 28px);
+  overflow-wrap: anywhere;
+}
+#ml-page-goal .ml-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--ui-space-24);
+}
+#ml-goal-form {
+  gap: var(--ui-space-20);
+}
+#ml-page-settings > .ml-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+  gap: var(--ui-space-24);
+  align-items: start;
+}
+#ml-page-settings > .ml-stack > .ml-card:first-child {
+  background: var(--ui-surface);
+}
+#ml-page-settings > .ml-stack > .ml-card:last-child {
+  background: #f0f4e6;
+}
+.ml-report-grid {
+  gap: 18px;
+}
+.ml-report-item {
+  padding: clamp(var(--ui-space-16), 2vw, var(--ui-space-24));
+}
+.ml-report-item .ml-report-net {
+  overflow-wrap: anywhere;
+  font-size: clamp(22px, 2vw, 28px);
+}
+.ml-report-plot {
+  margin-top: 26px;
+}
+.experience-page-actions {
+  padding-top: 18px;
+  border-top: 1px solid #e2e7da;
+}
+.play-heading h1 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--ui-space-4) var(--ui-space-16);
+}
+.play-heading h1 > span {
+  margin: 0;
+}
+.play-objective .game-goal {
+  grid-template-columns: minmax(0, 1fr) auto minmax(120px, 0.35fr);
+  gap: var(--ui-space-4) var(--ui-space-24);
+}
+.game-goal .ml-goal-money {
+  font-size: clamp(21px, 2.2vw, 28px);
+}
+.game-goal .ml-hint {
+  font-size: var(--ui-font-small);
+}
+.play-stage .ml-world-top {
+  flex-wrap: wrap;
+  gap: var(--ui-space-12) var(--ui-space-20);
+  padding: 14px var(--ui-space-24);
+}
+.play-stage .ml-world-top > div {
+  min-width: 0;
+}
+.play-stage .ml-world-copy {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.7fr);
+  align-items: center;
+  gap: 5px var(--ui-space-32);
+  max-width: none;
+  padding: var(--ui-space-20) var(--ui-space-24);
+  background: var(--ui-surface);
+}
+.play-stage .ml-world-copy .ml-chapter {
+  grid-column: 1;
+  font-size: 11px;
+}
+.play-stage .ml-world-copy h2 {
+  grid-column: 1;
+  margin: 0;
+  max-width: none;
+  font-size: clamp(20px, 2vw, 27px);
+  letter-spacing: -0.7px;
+}
+.play-stage .ml-world-copy p {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  max-width: 52ch;
+  margin: 0;
+  font-size: var(--ui-font-caption);
+  line-height: 1.8;
+}
+.play-stage .ml-world {
+  height: clamp(340px, 34vw, 520px);
+}
+.play-flow-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.32fr);
+}
+.play-turn-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.play-dialogue {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  padding: var(--ui-space-24);
+  min-height: 0;
+}
+.game-story {
+  max-width: 72ch;
+}
+.game-story strong {
+  font-size: 18px;
+  line-height: 1.6;
+}
+.game-story p {
+  font-size: var(--ui-font-caption);
+  line-height: 1.8;
+}
+.play-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
+  gap: 10px 18px;
+  margin-left: 44px;
+}
+.play-actions #ml-one-month {
+  min-width: 200px;
+  min-height: 44px;
+}
+.play-actions .play-skip {
+  display: none;
+}
+.play-stage .ml-event-card {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: auto;
+  padding: var(--ui-space-24);
+  border: 0;
+  border-left: 1px solid #e2e9d8;
+  border-radius: 0;
+  box-shadow: none;
+  background: #f4f7ed;
+}
+.play-stage .ml-event-card::after {
+  display: none;
+}
+.play-stage .ml-event-card .ml-eyebrow {
+  font-size: 11px;
+}
+.play-stage .ml-event-card h3 {
+  font-size: var(--ui-font-lead);
+  margin: var(--ui-space-8) 0;
+}
+.play-stage .ml-event-card p {
+  font-size: var(--ui-font-small);
+  margin-bottom: 10px;
+}
+.play-stage .ml-event-card #ml-event-yes {
+  min-height: 44px;
+  padding: var(--ui-space-8) 0;
+  font-weight: 700;
+  text-align: left;
+}
+.play-stage .ml-event-card #ml-event-later {
+  display: none;
+}
+.game-choice-result {
+  border-radius: 0;
+  padding: var(--ui-space-24);
+}
+.game-result-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--ui-space-16);
+}
+.game-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.game-month-receipt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.game-month-receipt > div {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.game-month-receipt strong {
+  overflow-wrap: anywhere;
+}
+.play-toolbelt {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.play-toolbelt button {
+  min-width: 0;
+}
+.play-details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
+  align-items: start;
+  gap: var(--ui-space-24);
+}
+.play-details-grid .ml-bottom-grid,
+.play-details-grid .ml-aside {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-width: 0;
+  gap: 18px;
+}
+#paperlab .paper-toolbar {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+#paperlab .paper-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+@media (min-width: 1001px) and (min-height: 720px) {
+  .ml-finance-summary,
+  #ml-page-goal .ml-content-grid > .ml-card:last-child {
+    position: sticky;
+    top: 92px;
+  }
+}
+@media (max-width: 1100px) {
+  .finance-groups {
+    grid-template-columns: 1fr;
+  }
+  .finance-groups fieldset:last-child {
+    grid-column: auto;
+  }
+  .play-objective .game-goal {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .game-goal .ml-bar {
+    grid-column: 1/-1;
+    grid-row: 3;
+  }
+  .game-goal .ml-hint {
+    grid-column: 1/-1;
+    grid-row: 4;
+  }
+  .play-stage .play-age {
+    display: none;
+  }
+}
+@media (max-width: 1000px) {
+  #ml-finance-form {
+    grid-template-columns: 1fr;
+  }
+  .finance-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .finance-groups fieldset:last-child {
+    grid-column: 1/-1;
+  }
+  .ml-finance-summary {
+    position: static;
+  }
+  .ml-finance-summary .ml-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ui-space-20);
+  }
+  .ml-finance-summary .ml-summary-row {
+    margin: 0;
+  }
+  .play-details-grid {
+    grid-template-columns: 1fr;
+  }
+  .play-details-grid .ml-aside {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .play-details-grid .ml-aside > :last-child {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 760px) {
+  .ml-game-edition .ml-main,
+  body.is-playing .ml-main {
+    padding: var(--ui-space-20) 14px 28px;
+  }
+  .play-objective {
+    padding-inline: var(--ui-space-16);
+  }
+  .play-objective .game-goal {
+    padding: var(--ui-space-16) 0;
+    gap: var(--ui-space-8) var(--ui-space-12);
+  }
+  .game-goal .ml-desc {
+    font-size: var(--ui-font-body);
+  }
+  .game-goal .ml-goal-money {
+    font-size: 21px;
+  }
+  .game-goal .ml-goal-money small {
+    display: block;
+    margin-top: var(--ui-space-4);
+    font-size: var(--ui-font-small);
+  }
+  .game-goal .ml-hint {
+    font-size: var(--ui-font-small);
+  }
+  .play-stage .ml-world-copy {
+    display: block;
+    padding: 18px;
+  }
+  .play-stage .ml-world-copy h2 {
+    margin: 7px 0;
+    font-size: 21px;
+  }
+  .play-stage .ml-world-copy p {
+    font-size: var(--ui-font-small);
+  }
+  .play-stage .ml-world-top {
+    padding: var(--ui-space-12) var(--ui-space-16);
+    gap: var(--ui-space-12);
+  }
+  .play-stage .ml-world-top > div:first-child {
+    flex: 1 1 100%;
+  }
+  .experience-time-controls {
+    justify-content: space-between;
+  }
+  .experience-time-controls #game-play-toggle {
+    flex: 1;
+    min-width: 0;
+    max-width: 240px;
+  }
+  #game-time-state {
+    flex: 0 0 auto;
+    margin: 0;
+    font-size: 11px;
+  }
+  .play-stage .ml-world {
+    height: clamp(260px, 66vw, 400px);
+  }
+  .play-stage .play-scenery,
+  .play-stage .ml-town {
+    top: 0;
+    height: 100%;
+    width: 120%;
+    left: -10%;
+  }
+  .play-flow-grid {
+    grid-template-columns: 1fr;
+  }
+  .play-dialogue {
+    padding: var(--ui-space-20) 18px;
+    gap: var(--ui-space-16);
+  }
+  .play-actions {
+    margin: 0;
+  }
+  .play-actions #ml-one-month {
+    width: 100%;
+    min-width: 0;
+  }
+  .play-stage .ml-event-card {
+    padding: var(--ui-space-16) 18px;
+    border-left: 0;
+    border-top: 1px solid #e2e9d8;
+  }
+  .game-month-receipt {
+    padding: 18px;
+    gap: var(--ui-space-12);
+  }
+  .game-month-receipt > div {
+    flex: 1 1 120px;
+    padding: 0;
+    border: 0;
+  }
+  .game-month-receipt span {
+    font-size: 11px;
+  }
+  .game-month-receipt strong {
+    font-size: var(--ui-font-lead);
+  }
+  .play-toolbelt {
+    grid-template-columns: 1fr;
+  }
+  .play-toolbelt button {
+    padding: var(--ui-space-16) 18px;
+    border-right: 0;
+    border-bottom: 1px solid #e2e9d8;
+  }
+  .play-toolbelt button:last-child {
+    border-bottom: 0;
+  }
+  .play-details-grid .ml-aside {
+    grid-template-columns: 1fr;
+  }
+  #ml-finance-form {
+    display: grid;
+    gap: 18px;
+  }
+  .finance-groups {
+    grid-template-columns: 1fr;
+    gap: var(--ui-space-24);
+  }
+  .finance-groups fieldset:last-child {
+    grid-column: auto;
+  }
+  #ml-finance-form .finance-groups .ml-fields {
+    gap: 14px;
+  }
+  #ml-finance-form .ml-field label {
+    min-height: 0;
+  }
+  #ml-page-goal .ml-content-grid,
+  #ml-page-settings > .ml-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  #ml-page-goal .ml-content-grid > .ml-card:last-child {
+    position: static;
+  }
+}
+@media (max-width: 380px) {
+  .game-goal .ml-goal-money {
+    grid-column: 1/-1;
+    grid-row: 3;
+  }
+  .game-goal .ml-goal-money small {
+    display: inline;
+  }
+  .game-goal .ml-bar {
+    grid-row: 4;
+  }
+  .game-goal .ml-hint {
+    grid-row: 5;
+  }
+  .experience-time-controls {
+    flex-wrap: wrap;
+  }
+  #game-time-state {
+    flex-basis: 100%;
+  }
+  #ml-finance-form .finance-groups .ml-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The illustration and its building buttons share one coordinate system. */
+.play-map-frame {
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 2;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+.play-stage .play-map-frame .play-scenery,
+.play-stage .play-map-frame .ml-town {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.play-actions #ml-one-month {
+  flex: 0 1 240px;
+  width: auto;
+}
+@media (max-width: 760px) {
+  .play-map-frame {
+    width: 120%;
+    left: -10%;
+  }
+  .play-stage .ml-world-copy p {
+    display: none;
+  }
+  .play-actions #ml-one-month {
+    flex: 1;
+    width: 100%;
+  }
+  .play-toolbelt button {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: var(--ui-space-4) var(--ui-space-12);
+    text-align: left;
+  }
+  .play-toolbelt button > span {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: center;
+    margin: 0;
+  }
+  .play-toolbelt strong {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .play-toolbelt small {
+    display: block;
+    grid-column: 2;
+    grid-row: 2;
+    font-size: var(--ui-font-small);
+  }
+}
+
+/* Keep goal editing in the card flow, never over the page heading. */
+.play-objective .play-objective-edit {
+  position: static;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  margin: 0;
+  padding: var(--ui-space-4) 0 var(--ui-space-4) var(--ui-space-12);
+  min-height: 32px;
+  font-size: var(--ui-font-small);
+  color: #526e48;
+}
+@media (max-width: 1100px) {
+  .play-objective .play-objective-edit {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .play-objective .ml-goal-money {
+    grid-row: 2;
+  }
+}
+@media (max-width: 380px) {
+  .play-objective .game-goal .ml-goal-money {
+    grid-column: 1/-1;
+    grid-row: 3;
+  }
+}
+.play-stage .ml-world-copy h2,
+.game-story strong {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+@media (max-width: 380px) {
+  .ml-game-edition .ml-topbar {
+    gap: var(--ui-space-8);
+    padding-inline: var(--ui-space-12);
+  }
+  .ml-game-edition .ml-brand {
+    flex-shrink: 0;
+    font-size: var(--ui-font-caption);
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .ml-game-edition .ml-brand-mark {
+    width: 26px;
+    height: 26px;
+  }
+  .play-header-tools {
+    flex-shrink: 0;
+    gap: 10px;
+  }
+  .play-header-tools button {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  #money-life-app #ml-mobile-toggle {
+    gap: 5px;
+    padding-inline: var(--ui-space-8);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  #ml-mobile-toggle .ml-icon {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+/* Desktop game: one viewport, with a persistent wallet, scene and decision column. */
+.desktop-live-summary {
+  display: none;
+}
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing {
+    overflow: hidden;
+  }
+  body.is-playing .ml-layout {
+    height: calc(100dvh - 68px);
+    min-height: 0;
+  }
+  body.is-playing .ml-main {
+    height: 100%;
+    max-width: none;
+    padding: 14px var(--ui-space-24);
+  }
+  body.is-playing #ml-page-dashboard.active {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    grid-template-rows: 42px minmax(0, 1fr) 28px;
+    gap: var(--ui-space-12) var(--ui-space-16);
+    height: 100%;
+    min-height: 0;
+    max-width: none;
+  }
+  body.is-playing .play-heading {
+    grid-column: 1/-1;
+    grid-row: 1;
+    margin: 0;
+    padding: 0;
+  }
+  body.is-playing .play-heading .play-label {
+    display: none;
+  }
+  body.is-playing .play-heading h1 {
+    margin: 0;
+    font-size: 23px;
+  }
+  body.is-playing .play-heading .ml-btn {
+    min-height: 34px;
+    padding-block: 6px;
+  }
+  body.is-playing .play-objective {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    padding: var(--ui-space-16);
+    margin: 0;
+    border-radius: 16px;
+    max-height: calc(100% - 172px);
+  }
+  body.is-playing .play-objective .game-goal {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    gap: var(--ui-space-8);
+  }
+  body.is-playing .game-goal h3 {
+    display: none;
+  }
+  body.is-playing .game-goal .ml-desc {
+    font-size: var(--ui-font-body);
+    line-height: 1.7;
+  }
+  body.is-playing .game-goal .ml-goal-money {
+    font-size: 23px;
+    line-height: 1.3;
+  }
+  body.is-playing .game-goal .ml-goal-money small {
+    display: block;
+    margin-top: 5px;
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .game-goal .ml-hint {
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .game-goal .ml-bar {
+    width: 100%;
+    margin: 6px 0;
+    flex-shrink: 0;
+  }
+  body.is-playing .play-objective .play-objective-edit {
+    order: -1;
+    align-self: flex-end;
+    min-height: 24px;
+    padding: 0;
+    font-size: 11px;
+  }
+  body.is-playing .desktop-live-summary {
+    display: block;
+    margin-top: 18px;
+    border-top: 1px solid #d7e0cd;
+    padding-top: var(--ui-space-16);
+  }
+  .desktop-live-summary h2 {
+    font-size: var(--ui-font-small);
+    margin: 0 0 var(--ui-space-12);
+    color: #5b7051;
+  }
+  .desktop-live-summary dl {
+    display: grid;
+    gap: var(--ui-space-12);
+    margin: 0;
+  }
+  .desktop-live-summary dl > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--ui-space-4) var(--ui-space-8);
+  }
+  .desktop-live-summary dt {
+    font-size: var(--ui-font-small);
+    color: #64755b;
+  }
+  .desktop-live-summary dd {
+    margin: 0;
+    font-size: var(--ui-font-body);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  body.is-playing .play-toolbelt {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+    border-radius: 14px;
+  }
+  body.is-playing .play-toolbelt button {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 10px;
+    padding: 13px 14px;
+    min-height: 48px;
+    text-align: left;
+    border-right: 0;
+    border-bottom: 1px solid #e2e9d8;
+  }
+  body.is-playing .play-toolbelt button:last-child {
+    border-bottom: 0;
+  }
+  body.is-playing .play-toolbelt button > span {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+  }
+  body.is-playing .play-toolbelt button strong {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .play-toolbelt small {
+    display: none;
+  }
+  body.is-playing .play-stage {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(230px, 20vw, 300px);
+    grid-template-rows: auto auto minmax(0, 1fr) auto 28px;
+    min-height: 0;
+    height: 100%;
+    border-radius: 18px;
+    overflow: visible;
+  }
+  body.is-playing .play-stage .ml-world-top {
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 18px 0 0;
+    padding: var(--ui-space-12) var(--ui-space-16);
+    gap: 10px;
+  }
+  body.is-playing .play-stage .ml-world-top > div:first-child {
+    gap: var(--ui-space-8);
+  }
+  body.is-playing .play-stage .ml-world-top strong {
+    font-size: var(--ui-font-caption);
+  }
+  body.is-playing .play-stage .ml-world-top small {
+    font-size: 10px;
+  }
+  body.is-playing .play-stage .play-age {
+    display: none;
+  }
+  body.is-playing .experience-time-controls {
+    flex-wrap: wrap;
+    gap: var(--ui-space-8) !important;
+    margin-left: auto;
+  }
+  body.is-playing #game-time-state {
+    display: none;
+  }
+  body.is-playing .experience-time-controls #game-play-toggle {
+    min-width: 128px;
+    min-height: 40px;
+    font-size: var(--ui-font-small);
+    padding: var(--ui-space-8) var(--ui-space-12);
+  }
+  body.is-playing .experience-time-controls .play-speed > summary {
+    min-height: 40px;
+    min-width: 48px;
+  }
+  body.is-playing .play-stage .ml-world-copy {
+    grid-column: 1;
+    grid-row: 2;
+    display: block;
+    padding: var(--ui-space-12) var(--ui-space-16) var(--ui-space-16);
+  }
+  body.is-playing .play-stage .ml-world-copy h2 {
+    font-size: clamp(19px, 1.6vw, 25px);
+    margin-top: 6px;
+  }
+  body.is-playing .play-stage .ml-world-copy p {
+    display: none;
+  }
+  body.is-playing .play-stage .ml-world {
+    grid-column: 1;
+    grid-row: 3/5;
+    height: 100%;
+    min-height: 0;
+  }
+  body.is-playing .play-stage .play-avatar {
+    width: clamp(70px, 6vw, 100px);
+  }
+  body.is-playing .play-flow-grid {
+    grid-column: 2;
+    grid-row: 1/4;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-left: 1px solid #e2e9d8;
+  }
+  body.is-playing .play-turn-panel {
+    flex: 1;
+    min-height: 0;
+  }
+  body.is-playing .play-dialogue {
+    padding: var(--ui-space-20);
+    gap: var(--ui-space-16);
+  }
+  body.is-playing .game-story-marker {
+    display: none;
+  }
+  body.is-playing .game-story strong {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  body.is-playing .game-story p {
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .play-actions {
+    margin: 0;
+  }
+  body.is-playing .play-actions #ml-one-month {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .play-stage .ml-event-card {
+    padding: 18px var(--ui-space-20);
+    border-left: 0;
+    border-top: 1px solid #e2e9d8;
+  }
+  body.is-playing .play-stage .ml-event-card h3 {
+    font-size: 15px;
+  }
+  body.is-playing .play-stage .ml-event-card #ml-event-yes {
+    min-height: 36px;
+  }
+  body.is-playing .game-month-receipt {
+    grid-column: 2;
+    grid-row: 4/6;
+    display: block;
+    padding: 14px var(--ui-space-20);
+    border-left: 1px solid #e2e9d8;
+    border-radius: 0 0 18px;
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  body.is-playing .game-month-receipt > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--ui-space-8);
+    padding: 6px 0;
+    border: 0;
+  }
+  body.is-playing .game-month-receipt span {
+    font-size: 11px;
+  }
+  body.is-playing .game-month-receipt strong {
+    font-size: var(--ui-font-caption);
+  }
+  body.is-playing .play-timeline {
+    grid-column: 1;
+    grid-row: 5;
+    padding: 6px var(--ui-space-16);
+    border-radius: 0 0 0 18px;
+  }
+  body.is-playing .ml-milestones {
+    display: none;
+  }
+  body.is-playing .game-choice-result {
+    padding: var(--ui-space-20);
+    max-height: 100%;
+    overflow: auto;
+  }
+  body.is-playing .game-choice-result > strong {
+    font-size: var(--ui-font-lead);
+  }
+  body.is-playing .game-choice-result > p {
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .game-result-metrics {
+    grid-template-columns: 1fr;
+    gap: var(--ui-space-12);
+  }
+  body.is-playing .game-result-metrics strong {
+    font-size: 15px;
+  }
+  body.is-playing .game-result-actions {
+    display: grid;
+  }
+  body.is-playing #play-details {
+    grid-column: 2;
+    grid-row: 3;
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+  body.is-playing #play-details > summary {
+    min-height: 28px;
+    padding: 0 var(--ui-space-4);
+  }
+  body.is-playing .ml-main > .ml-note {
+    display: none;
+  }
+  body.is-playing .journey-drawer {
+    position: fixed;
+    left: 24px;
+    bottom: 14px;
+    width: 210px;
+    margin: 0;
+    border: 0;
+    z-index: 6;
+  }
+  body.is-playing .journey-drawer > summary {
+    min-height: 28px;
+    font-size: 11px;
+  }
+  body.is-playing #play-details[open],
+  body.is-playing .journey-drawer[open] {
+    position: fixed;
+    inset: 90px 5vw 32px;
+    width: auto;
+    height: auto;
+    padding: var(--ui-space-24);
+    margin: 0;
+    border: 1px solid #dce5d2;
+    border-radius: 18px;
+    background: var(--ui-surface);
+    overflow: auto;
+    overscroll-behavior: contain;
+    box-shadow: 0 0 0 100vmax #172c2380;
+    z-index: 8;
+  }
+  body.is-playing #play-details[open] > summary,
+  body.is-playing .journey-drawer[open] > summary {
+    padding: 0 0 var(--ui-space-20);
+    min-height: 44px;
+    font-weight: 700;
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 780px) {
+  body.is-playing .play-objective {
+    padding: var(--ui-space-12);
+  }
+  body.is-playing .game-goal .ml-goal-money {
+    font-size: 21px;
+  }
+  body.is-playing .game-goal .ml-desc {
+    font-size: var(--ui-font-caption);
+  }
+  body.is-playing .desktop-live-summary {
+    padding-top: var(--ui-space-12);
+    margin-top: var(--ui-space-12);
+  }
+  .desktop-live-summary dl {
+    gap: var(--ui-space-8);
+  }
+  body.is-playing .play-dialogue {
+    padding: var(--ui-space-16);
+    gap: var(--ui-space-12);
+  }
+  body.is-playing .play-stage .ml-event-card {
+    padding: 14px var(--ui-space-16);
+  }
+  body.is-playing .play-stage .ml-world-copy {
+    padding-block: var(--ui-space-8) var(--ui-space-12);
+  }
+}
+.desktop-storage-trigger {
+  display: none;
+}
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing .desktop-storage-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-8);
+    grid-column: 1;
+    grid-row: 3;
+    padding: 0;
+    min-height: 28px;
+    background: none;
+    color: #526e48;
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing #play-details .journey-drawer,
+  body.is-playing #play-details .journey-drawer[open] {
+    position: static;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    padding: var(--ui-space-16) 0 0;
+    margin-top: var(--ui-space-20);
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid #dce5d2;
+    box-shadow: none;
+    overflow: visible;
+  }
+  body.is-playing #play-details:not([open]) .journey-drawer {
+    display: none;
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing .play-turn-panel {
+    justify-content: flex-start;
+  }
+  body.is-playing #play-details[open] {
+    inset: 136px 39px 54px 250px;
+    box-shadow: 0 12px 50px #172c2340;
+  }
+  body.is-playing #play-details[open] > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  body.is-playing #play-details[open] > summary > span {
+    display: none;
+  }
+  body.is-playing #play-details[open] > summary::after {
+    content: "닫기 ×";
+    font-size: var(--ui-font-caption);
+    color: var(--ui-accent);
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) {
+  body.is-playing .desktop-live-summary h2 {
+    display: none;
+  }
+}
+
+/* Browser content height at 100% zoom excludes browser chrome and the taskbar. */
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) {
+  body.is-playing .ml-main {
+    padding-block: 10px;
+  }
+  body.is-playing #ml-page-dashboard.active {
+    grid-template-rows: 34px minmax(0, 1fr) 24px;
+    gap: var(--ui-space-8) 14px;
+  }
+  body.is-playing .play-heading h1 {
+    font-size: 21px;
+  }
+  body.is-playing .play-objective {
+    max-height: calc(100% - 130px);
+    padding: 10px var(--ui-space-12);
+  }
+  body.is-playing .play-objective .game-goal {
+    gap: 5px;
+  }
+  body.is-playing .game-goal .ml-desc {
+    font-size: var(--ui-font-small);
+    line-height: 1.5;
+  }
+  body.is-playing .game-goal .ml-goal-money {
+    font-size: 20px;
+  }
+  body.is-playing .game-goal .ml-goal-money small {
+    display: inline;
+    margin: 0;
+    font-size: 11px;
+  }
+  body.is-playing .game-goal .ml-hint {
+    font-size: 11px;
+  }
+  body.is-playing .game-goal .ml-bar {
+    margin: 3px 0;
+  }
+  body.is-playing .play-objective .play-objective-edit {
+    min-height: 20px;
+  }
+  body.is-playing .desktop-live-summary {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  body.is-playing .desktop-live-summary h2 {
+    display: none;
+  }
+  body.is-playing .desktop-live-summary dl {
+    gap: 6px;
+  }
+  body.is-playing .desktop-live-summary dd {
+    font-size: var(--ui-font-caption);
+  }
+  body.is-playing .play-toolbelt button {
+    min-height: 38px;
+    padding-block: 9px;
+  }
+  body.is-playing .play-stage .ml-world-top {
+    padding: var(--ui-space-8) var(--ui-space-12);
+  }
+  body.is-playing .play-stage .ml-world-copy {
+    padding: var(--ui-space-8) var(--ui-space-12) 10px;
+  }
+  body.is-playing .play-stage .ml-world-copy h2 {
+    font-size: 19px;
+  }
+  body.is-playing .play-stage .ml-world-copy .ml-chapter {
+    font-size: 10px;
+  }
+  body.is-playing .play-dialogue {
+    padding: 14px;
+    gap: 10px;
+  }
+  body.is-playing .game-story strong {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  body.is-playing .game-story p {
+    margin-block: 6px;
+    line-height: 1.6;
+  }
+  body.is-playing .play-stage .ml-event-card {
+    padding: var(--ui-space-12) 14px;
+  }
+  body.is-playing .play-stage .ml-event-card h3 {
+    font-size: var(--ui-font-body);
+    margin-block: 5px;
+  }
+  body.is-playing .play-stage .ml-event-card p {
+    margin-bottom: var(--ui-space-4);
+  }
+  body.is-playing .game-month-receipt {
+    padding: 10px 14px;
+  }
+  body.is-playing #play-details[open] {
+    inset-block: 120px 44px;
+  }
+}
+
+/* Scene hierarchy: time controls, then chapter and its headline. */
+.game-date-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing .play-stage .ml-world-top {
+    min-height: 60px;
+    padding: 10px var(--ui-space-16);
+    border-bottom: 1px solid #e2e8da;
+    background: #f4f7ef;
+  }
+  body.is-playing .play-stage .ml-world-top > .game-date-block {
+    display: block;
+  }
+  body.is-playing .play-stage .ml-world-top strong {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  body.is-playing .play-stage .ml-world-top small {
+    font-size: var(--ui-font-small);
+    line-height: 1.5;
+    color: #607154;
+    padding: 3px 7px;
+    border: 1px solid #dce5d2;
+    border-radius: 6px;
+    background: var(--ui-surface);
+  }
+  body.is-playing .play-stage .ml-world-copy {
+    padding: var(--ui-space-12) var(--ui-space-16) var(--ui-space-16);
+    background: var(--ui-surface);
+  }
+  body.is-playing .play-stage .ml-world-copy .ml-chapter {
+    display: block;
+    margin: 0;
+    font-size: var(--ui-font-small);
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    color: #59724f;
+  }
+  body.is-playing .play-stage .ml-world-copy h2 {
+    margin: var(--ui-space-8) 0 0;
+    font-size: clamp(21px, 1.7vw, 26px);
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: -0.5px;
+    color: #2d493c;
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) {
+  body.is-playing .play-stage .ml-world-top {
+    min-height: 56px;
+    padding: var(--ui-space-8) var(--ui-space-12);
+  }
+  body.is-playing .play-stage .ml-world-copy {
+    padding: 10px var(--ui-space-12) var(--ui-space-12);
+  }
+  body.is-playing .play-stage .ml-world-copy h2 {
+    margin-top: 6px;
+    font-size: 20px;
+  }
+}
+@media (max-width: 760px) {
+  .play-stage .ml-world-copy {
+    padding: var(--ui-space-16) 18px;
+  }
+  .play-stage .ml-world-copy .ml-chapter {
+    font-size: var(--ui-font-small);
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    color: #59724f;
+  }
+  .play-stage .ml-world-copy h2 {
+    margin: var(--ui-space-8) 0 0;
+    font-size: 22px;
+    line-height: 1.5;
+  }
+}
+
+/* Give the goal its own readable hierarchy without changing the surrounding layout. */
+.goal-section,
+.goal-section-title {
+  display: contents;
+}
+.goal-amount-caption,
+.goal-progress-heading {
+  display: none;
+}
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing .play-objective .game-goal {
+    gap: 0;
+  }
+  body.is-playing .goal-section {
+    display: block;
+    min-width: 0;
+  }
+  body.is-playing .goal-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-8);
+    margin-bottom: var(--ui-space-8);
+  }
+  body.is-playing .goal-section-title h3 {
+    display: block;
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 0;
+    color: #5f7353;
+  }
+  body.is-playing .goal-section-title .play-objective-edit {
+    order: 0;
+    min-height: 24px;
+  }
+  body.is-playing .goal-section-heading .ml-desc {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  body.is-playing .goal-section-amount {
+    margin-top: var(--ui-space-12);
+    padding-block: var(--ui-space-12);
+    border-block: 1px solid #d7e0cd;
+  }
+  body.is-playing .goal-amount-caption {
+    display: block;
+    margin-bottom: 6px;
+    color: #5f7353;
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .goal-section-amount .ml-goal-money {
+    font-size: 27px;
+    line-height: 1.25;
+  }
+  body.is-playing .goal-section-amount .ml-goal-money small {
+    display: block;
+    font-size: 0;
+    margin-top: 6px;
+    color: #5f7353;
+  }
+  body.is-playing .goal-section-amount .ml-goal-money small::before {
+    content: "목표 ";
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .goal-section-amount .ml-goal-money small span {
+    font-size: var(--ui-font-small);
+  }
+  body.is-playing .goal-section-progress {
+    padding-top: var(--ui-space-12);
+  }
+  body.is-playing .goal-progress-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-8);
+    font-size: var(--ui-font-small);
+    color: #5f7353;
+  }
+  body.is-playing .goal-progress-heading strong {
+    font-size: 15px;
+    color: var(--ui-accent);
+  }
+  body.is-playing .goal-section-progress .ml-bar {
+    margin: 9px 0;
+    height: 6px;
+  }
+  body.is-playing .goal-section-progress .ml-hint {
+    margin: 0;
+    font-size: var(--ui-font-caption);
+    line-height: 1.6;
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) {
+  body.is-playing .goal-section-title {
+    margin-bottom: var(--ui-space-4);
+  }
+  body.is-playing .goal-section-title h3 {
+    display: none;
+  }
+  body.is-playing .goal-section-title .play-objective-edit {
+    margin-left: auto;
+    min-height: 20px;
+  }
+  body.is-playing .goal-section-heading .ml-desc {
+    font-size: var(--ui-font-body);
+    line-height: 1.5;
+  }
+  body.is-playing .goal-section-amount {
+    margin-top: 6px;
+    padding-block: 6px;
+  }
+  body.is-playing .goal-amount-caption {
+    display: none;
+  }
+  body.is-playing .goal-section-amount .ml-goal-money {
+    font-size: 22px;
+  }
+  body.is-playing .goal-section-amount .ml-goal-money small {
+    margin-top: 3px;
+  }
+  body.is-playing .goal-section-progress {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--ui-space-4) 10px;
+    padding-top: 6px;
+  }
+  body.is-playing .goal-progress-heading {
+    display: contents;
+  }
+  body.is-playing .goal-progress-heading > span {
+    display: none;
+  }
+  body.is-playing .goal-progress-heading strong {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: var(--ui-font-caption);
+  }
+  body.is-playing .goal-section-progress .ml-bar {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    margin: 0;
+  }
+  body.is-playing .goal-section-progress .ml-hint {
+    grid-column: 1/-1;
+    grid-row: 2;
+    font-size: 11px;
+  }
+}
+@media (min-width: 1024px) and (min-height: 701px) and (max-height: 780px) {
+  body.is-playing .goal-amount-caption {
+    display: none;
+  }
+  body.is-playing .goal-section-heading .ml-desc {
+    font-size: var(--ui-font-body);
+  }
+  body.is-playing .goal-section-amount {
+    margin-top: var(--ui-space-8);
+    padding-block: var(--ui-space-8);
+  }
+  body.is-playing .goal-section-amount .ml-goal-money {
+    font-size: 25px;
+  }
+  body.is-playing .goal-section-amount .ml-goal-money small {
+    margin-top: var(--ui-space-4);
+  }
+  body.is-playing .goal-section-progress {
+    padding-top: var(--ui-space-8);
+  }
+  body.is-playing .goal-progress-heading strong {
+    font-size: var(--ui-font-body);
+  }
+  body.is-playing .goal-section-progress .ml-bar {
+    margin-block: 6px;
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) {
+  body.is-playing .goal-section-progress {
+    padding-top: var(--ui-space-4);
+  }
+}
+
+/* A single quiet sidebar: goal first, wallet next, actions at the bottom. */
+.desktop-goal-panel {
+  display: contents;
+}
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing .desktop-goal-panel {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-column: 1;
+    grid-row: 2;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    border: 1px solid #dce4d5;
+    border-radius: 16px;
+    background: var(--ui-surface);
+    overflow: hidden;
+  }
+  body.is-playing .desktop-goal-panel > .play-objective {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: stretch;
+    height: 100%;
+    max-height: none;
+    min-height: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  body.is-playing .desktop-goal-panel .game-goal {
+    flex: 0 0 auto;
+    min-height: 0;
+    justify-content: flex-start;
+  }
+  body.is-playing .desktop-goal-panel .desktop-live-summary {
+    flex: 0 0 auto;
+  }
+  body.is-playing .desktop-goal-panel > .play-toolbelt {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: auto;
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-top: 1px solid #d7e0cd;
+    border-radius: 0;
+    background: transparent;
+  }
+  body.is-playing .desktop-goal-panel .play-toolbelt button {
+    background: transparent;
+  }
+  body.is-playing .desktop-goal-panel .play-toolbelt button:hover {
+    background: #edf3e6;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 560px) {
+  body.is-playing .desktop-goal-panel {
+    border-color: #d5dfcf;
+    box-shadow: 0 3px 14px #365f4e05;
+  }
+  body.is-playing .desktop-goal-panel .goal-section-title h3 {
+    color: #66775e;
+  }
+  body.is-playing .desktop-goal-panel .goal-section-heading .ml-desc {
+    font-weight: 700;
+    color: #2e493c;
+  }
+  body.is-playing .desktop-goal-panel .goal-section-amount {
+    border: 0;
+  }
+  body.is-playing .desktop-goal-panel .goal-section-amount .ml-goal-money {
+    color: #2c5342;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+  }
+  body.is-playing .desktop-goal-panel .goal-progress-heading strong {
+    color: var(--ui-accent);
+  }
+  body.is-playing .desktop-goal-panel .goal-section-progress .ml-bar {
+    background: #e5ebde;
+    border-radius: 10px;
+  }
+  body.is-playing .desktop-goal-panel .goal-section-progress .ml-bar > span {
+    background: #6f9061;
+    border-radius: inherit;
+  }
+  body.is-playing .desktop-goal-panel .desktop-live-summary {
+    margin-top: 18px;
+    padding-top: var(--ui-space-16);
+    border-color: #e0e7d9;
+  }
+  body.is-playing .desktop-goal-panel .desktop-live-summary h2 {
+    color: #566c4b;
+  }
+  body.is-playing .desktop-goal-panel .desktop-live-summary dt {
+    color: #69765f;
+  }
+  body.is-playing .desktop-goal-panel .desktop-live-summary dd {
+    color: #334c3f;
+  }
+  body.is-playing .desktop-goal-panel > .play-toolbelt {
+    border-color: #e0e7d9;
+    padding: 6px;
+  }
+  body.is-playing .desktop-goal-panel .play-toolbelt button {
+    border: 0;
+    border-radius: 8px;
+    padding-inline: 10px;
+  }
+  body.is-playing .desktop-goal-panel .play-toolbelt button > span {
+    color: #648456;
+  }
+  body.is-playing .desktop-goal-panel .play-toolbelt button strong {
+    color: #3c5445;
+    font-weight: 600;
+  }
+}
+@media (min-width: 1024px) and (min-height: 560px) and (max-height: 700px) {
+  body.is-playing .desktop-goal-panel .desktop-live-summary {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  body.is-playing .desktop-goal-panel > .play-toolbelt {
+    padding: var(--ui-space-4);
+  }
+  body.is-playing .desktop-goal-panel .play-toolbelt button {
+    min-height: 36px;
+    padding-block: var(--ui-space-8);
+  }
+}

@@ -3,22 +3,18 @@
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     if (!$("overlay").classList.contains("hidden")) closeModal();
-    else {
-      const panel = ["life-archive", "life-details", "life-time-options"]
-        .map($)
-        .find((node) => node?.open && node.getClientRects().length);
-      if (panel) {
-        panel.open = false;
-        panel.querySelector("summary")?.focus({ preventScroll: true });
-      }
+    else if ($("ml-mobile-toggle").getAttribute("aria-expanded") === "true") {
+      $("ml-mobile-toggle").setAttribute("aria-expanded", "false");
+      $("ml-mobile-toggle").focus();
     }
   }
   if (event.key === "Tab" && !$("overlay").classList.contains("hidden")) {
     const nodes = [
-      ...$("modal").querySelectorAll(
-        "button,input,select,textarea,a[href],summary,[tabindex='0']",
-      ),
-    ].filter((node) => !node.disabled && node.getClientRects().length > 0);
+      ...$("modal").querySelectorAll("button,input,select,textarea,a[href]"),
+    ].filter(
+      (node) =>
+        !node.disabled && node.getClientRects().length && node.tabIndex >= 0,
+    );
     if (event.shiftKey && document.activeElement === nodes[0]) {
       event.preventDefault();
       nodes.at(-1)?.focus();
@@ -42,47 +38,26 @@ $("ml-mobile-toggle").onclick = () => {
     String(button.getAttribute("aria-expanded") !== "true"),
   );
 };
+$("ml-mobile-toggle").addEventListener("keydown", (event) => {
+  if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
+  event.preventDefault();
+  $("ml-mobile-toggle").setAttribute("aria-expanded", "true");
+  const options = $("ml-main-nav").querySelectorAll("button");
+  (event.key === "ArrowUp" ? options[options.length - 1] : options[0]).focus();
+});
+document
+  .querySelectorAll("[data-game-place]")
+  .forEach((node) =>
+    node.addEventListener("click", () => openLifePlace(node.dataset.gamePlace)),
+  );
 $("ml-play").onclick = toggle;
-
-const lifePanels = ["life-details", "life-time-options", "life-archive"].map($);
-lifePanels.forEach((panel) => {
-  panel.addEventListener("toggle", () => {
-    if (!panel.open || JourneyStore.current.activePage !== "dashboard") return;
-    lifePanels.forEach((other) => {
-      if (other !== panel) other.open = false;
-    });
-    panel.querySelector("summary")?.focus({ preventScroll: true });
-  });
-});
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden && JourneyStore.current.timer) {
-    stop();
-    render();
-  }
-});
-$("ml-one-month").onclick = step;
-$("ml-next-event").onclick = playLifeStory;
-$("life-pause").onclick = () => {
-  stop();
-  render();
+$("ml-one-month").onclick = () => {
+  if (JourneyStore.current.month >= 120) compare();
+  else step();
 };
-$("life-time-options").addEventListener("toggle", () => {
-  if (!$("life-time-options").open && !lifeStoryRunning) {
-    stop();
-    render();
-  }
-});
-$("life-details").addEventListener("toggle", () => {
-  if ($("life-details").open) {
-    stop();
-    render();
-  }
-});
-$("life-open-archive").onclick = () => {
-  stop();
-  $("life-archive").open = true;
-  $("life-archive").scrollIntoView({ block: "start" });
-};
+$("ml-next-event").onclick = nextEvent;
+$("ml-event-yes").onclick = nextEvent;
+$("ml-event-later").onclick = toggle;
 document.querySelectorAll("[data-speed]").forEach(
   (node) =>
     (node.onclick = () => {
@@ -92,38 +67,56 @@ document.querySelectorAll("[data-speed]").forEach(
         item.setAttribute("aria-pressed", String(item === node));
       });
       if (JourneyStore.current.timer) {
-        const resumeStory = lifeStoryRunning;
         stop();
-        if (resumeStory) playLifeStory();
-        else toggle();
+        toggle();
       }
+      if (typeof GameExperience !== "undefined") GameExperience.speedChanged();
     }),
 );
 $("ml-finance-form").onsubmit = startFinance;
 $("ml-finance-form").oninput = financeSummary;
 $("ml-finance-reset").onclick = () => {
   for (const key of ["cash", "saved", "income", "expense"])
-    $("ml-" + key).value = defaults[key] * 10000;
-  $("ml-saving").value = 700000;
+    mlSetWon("ml-" + key, defaults[key] * 10000);
+  mlSetWon("ml-saving", 700000);
   $("ml-start-rate").value = 3;
+  for (const input of $("ml-finance-form").querySelectorAll(
+    "input[aria-invalid]",
+  )) {
+    if (input.validity.valid) input.removeAttribute("aria-invalid");
+  }
+  $("ml-finance-error").textContent = "";
   financeSummary();
 };
 $("ml-goal-form").onsubmit = (event) => {
   event.preventDefault();
   if (serverPlanBusy) return;
-  const target = Number($("ml-goal-amount").value.replaceAll(",", "")),
+  const amountText = $("ml-goal-amount").value.trim(),
+    target = Number(amountText.replaceAll(",", "")),
     months = Number($("ml-goal-months").value);
-  if (
-    !Number.isSafeInteger(target) ||
-    target < 1 ||
-    target > 10000000000 ||
-    !Number.isInteger(months) ||
-    months < 1 ||
-    months > 120
-  ) {
-    toast("목표" + " 금액·기한을 확인해주세요.");
+  const amountValid =
+    /^(?:\d+|\d{1,3}(?:,\d{3})+)$/.test(amountText) &&
+    Number.isSafeInteger(target) &&
+    target >= 1 &&
+    target <= 10000000000;
+  const monthsValid = Number.isInteger(months) && months >= 1 && months <= 120;
+  mlSetFieldError(
+    "ml-goal-amount",
+    "ml-goal-amount-error",
+    amountValid
+      ? ""
+      : "1원~100억 원 사이의 정수 금액을 입력하세요. 쉼표는 1,000처럼 세 자리마다 넣어주세요.",
+  );
+  mlSetFieldError(
+    "ml-goal-months",
+    "ml-goal-months-error",
+    monthsValid ? "" : "목표 기한은 1~120개월 사이의 정수로 입력하세요.",
+  );
+  if (!amountValid || !monthsValid) {
+    $(amountValid ? "ml-goal-months" : "ml-goal-amount").focus();
     return;
   }
+  GameExperience.clearGoalDraft();
   JourneyStore.set("goalName", $("ml-goal-name").value.trim() || "나의 목표");
   JourneyStore.set("goalMonths", months);
   JourneyStore.set("start", {
@@ -133,12 +126,23 @@ $("ml-goal-form").onsubmit = (event) => {
   render();
   toast("목표를 저장했어요.");
 };
+for (const name of ["amount", "months"])
+  $("ml-goal-" + name).addEventListener("input", () =>
+    mlSetFieldError("ml-goal-" + name, "ml-goal-" + name + "-error"),
+  );
 $("ml-refresh-report").onclick = () => {
   mlRenderReport();
+  toast("현재 조건으로 비교 결과를 갱신했어요.");
 };
-$("ml-apply-settings").onclick = () => {
+$("ml-settings-form").onsubmit = (event) => {
+  event.preventDefault();
   if (serverPlanBusy || JourneyStore.current.month >= 120) return;
-  const value = Number($("ml-setting-saving").value),
+  if (
+    !$("ml-setting-saving").reportValidity() ||
+    !$("ml-setting-rate").reportValidity()
+  )
+    return;
+  const value = mlParseWon($("ml-setting-saving").value),
     nextRate = Number($("ml-setting-rate").value);
   if (
     !Number.isSafeInteger(value) ||
@@ -151,6 +155,15 @@ $("ml-apply-settings").onclick = () => {
     toast("저축액과 금리를 확인해주세요.");
     return;
   }
+  if (
+    value / 10000 === JourneyStore.current.saving &&
+    nextRate === JourneyStore.current.rate
+  ) {
+    toast("변경된 값이 없어요.");
+    return;
+  }
+  const previousSaving = JourneyStore.current.saving;
+  const previousRate = JourneyStore.current.rate;
   JourneyStore.set("saving", value / 10000);
   JourneyStore.set("rate", nextRate);
   JourneyStore.mutate("mods", "push", {
@@ -162,14 +175,12 @@ $("ml-apply-settings").onclick = () => {
     m: JourneyStore.current.month + 1,
     v: JourneyStore.current.rate,
   });
-  log("다음 달 저축·금리 조건을 변경했어요.");
-  render();
-};
-$("ml-reset-all").onclick = () => {
-  settings();
-  toast(
-    "재무 입력에서 새 여정을 시작할 수 있어요. 기존 서버 기록은 보존됩니다.",
+  log(
+    `다음 달부터 월 저축 ${money(previousSaving)} → ${money(value / 10000)}, 연 저축 금리 ${previousRate}% → ${nextRate}%로 변경했어요.`,
   );
+  render();
+  GameExperience.showSettingsChange(previousSaving, previousRate);
+  toast("다음 달부터 새 저축액과 금리가 적용돼요.");
 };
 async function startApplication() {
   try {

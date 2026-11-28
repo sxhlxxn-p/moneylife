@@ -1,5 +1,4 @@
 let localStorageWarningShown = false;
-let hasRestoredLife = false;
 
 function persist() {
   try {
@@ -53,7 +52,6 @@ function restoreLocalJourney() {
         }),
       });
       JourneyStore.restore(decoded);
-      hasRestoredLife = true;
     }
     const profile = JSON.parse(localStorage.getItem("money-life-goal-v1"));
     if (!stored?.goalName && typeof profile?.goalName === "string")

@@ -1,23 +1,36 @@
 function fillFinance() {
   for (const key of ["cash", "saved", "income", "expense"])
-    $("ml-" + key).value = Math.round(JourneyStore.current.start[key] * 10000);
-  $("ml-saving").value = Math.round(JourneyStore.current.baseSaving * 10000);
+    mlSetWon("ml-" + key, Math.round(JourneyStore.current.start[key] * 10000));
+  mlSetWon("ml-saving", Math.round(JourneyStore.current.baseSaving * 10000));
   $("ml-start-name").value = JourneyStore.current.start.name;
   $("ml-start-age").value = JourneyStore.current.start.age;
   $("ml-start-rate").value = JourneyStore.current.baseRate;
   financeSummary();
 }
 function financeSummary() {
-  const value = (key) => Number($("ml-" + key).value) || 0;
+  const value = (key) => mlParseWon($("ml-" + key).value) || 0;
   $("ml-total-assets").textContent =
     (value("cash") + value("saved")).toLocaleString("ko-KR") + "원";
   $("ml-month-balance").textContent =
     (value("income") - value("expense")).toLocaleString("ko-KR") + "원";
   const balance = value("income") - value("expense");
   $("ml-month-balance").dataset.moneyDirection =
-    balance === 0 ? "neutral" : balance > 0 ? "positive" : "negative";
+    balance < 0 ? "negative" : balance > 0 ? "positive" : "neutral";
+  const hint = $("ml-cashflow-hint");
+  if (hint) {
+    hint.hidden = balance >= 0;
+    hint.textContent =
+      balance < 0
+        ? "생활비가 소득보다 매달 " +
+          mlFormatKoreanWon(-balance) +
+          " 많아요. 현재 현금으로 생활비를 충당할 수 있는지 확인하세요."
+        : "";
+  }
 }
 function applyFinance(values) {
+  if (typeof GameExperience !== "undefined") GameExperience.clearFinanceDraft();
+  if (typeof GameExperience !== "undefined") GameExperience.clearGoalDraft();
+  $("game-choice-result").hidden = true;
   JourneyStore.set("start", {
     ...JourneyStore.current.start,
     ...values.initial,
@@ -50,7 +63,7 @@ function startFinance(event) {
   };
   for (const key of ["cash", "saved", "income", "expense", "saving"]) {
     const input = $("ml-" + key),
-      value = Number(input.value);
+      value = mlParseWon(input.value);
     if (
       input.value.trim() === "" ||
       !Number.isSafeInteger(value) ||
@@ -78,12 +91,12 @@ function startFinance(event) {
   }
   const values = {
     initial,
-    saving: Number($("ml-saving").value) / 10000,
+    saving: mlParseWon($("ml-saving").value) / 10000,
     rate: annualRate,
   };
   if (JourneyStore.current.month || JourneyStore.current.mods.length) {
     show(
-      '<h2>새 여정을 시작할까요?</h2><p>현재 기록은 초기화됩니다. 남겨둘 기록은 먼저 서버에 저장해주세요.</p><button class="btn primary" id="confirmjourney">새 여정 시작</button>',
+      '<h2>새 여정을 시작할까요?</h2><p>현재 기기의 진행 월과 선택 기록이 초기화돼요. 서버에 저장한 여정은 유지됩니다. 남겨둘 기록은 먼저 저장해주세요.</p><div class="buttonrow"><button class="btn" onclick="closeModal()">입력으로 돌아가기</button><button class="btn primary" id="confirmjourney">새 여정 시작</button></div>',
     );
     $("confirmjourney").onclick = () => applyFinance(values);
   } else applyFinance(values);

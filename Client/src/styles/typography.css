@@ -1,0 +1,263 @@
+/* Korean phrases wrap at spaces; financial figures remain a single readable unit. */
+#money-life-app
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    small,
+    label,
+    dt,
+    dd,
+    strong,
+    button,
+    summary,
+    li,
+    span
+  ),
+#overlay
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    small,
+    label,
+    dt,
+    dd,
+    strong,
+    button,
+    summary,
+    li,
+    span
+  ),
+#game-month-receipt {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+#money-life-app :is(h1, h2, h3, h4),
+#overlay :is(h1, h2, h3, h4) {
+  text-wrap: balance;
+}
+#money-life-app :is(p, .ml-note, .ml-desc),
+#overlay p {
+  text-wrap: pretty;
+}
+.ml-input-wrap,
+.ml-field,
+.stock-workspace > *,
+.stock-symbol > *,
+.paper-toolbar > * {
+  min-width: 0;
+}
+#money-life-app
+  :is(
+    .ml-brand,
+    .play-header-tools button,
+    #ml-mobile-toggle,
+    .ml-nav-label,
+    .experience-report-tabs button,
+    .stock-data-tag
+  ) {
+  white-space: nowrap;
+}
+#money-life-app
+  :is(
+    #ml-total-assets,
+    #ml-month-balance,
+    #ml-game-goal-current,
+    #ml-game-goal-target,
+    #game-goal-percentage,
+    .ml-report-net,
+    .desktop-live-summary dd,
+    .stock-quote > strong,
+    .stock-cash
+  ) {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+#money-life-app .ml-report-item .ml-report-net {
+  font-size: clamp(20px, 1.8vw, 25px);
+}
+#money-life-app .ml-report-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+#money-life-app .ml-goal-money small {
+  white-space: nowrap;
+}
+.stock-symbol {
+  align-items: flex-start;
+}
+.stock-symbol h3 {
+  flex: 1 1 170px;
+}
+.stock-data-tag {
+  flex-shrink: 0;
+}
+#paperlab
+  :is(p, small, label, .stock-price-date, .stock-chart-note, .stock-data-tag) {
+  font-size: var(--ui-font-small);
+  line-height: 1.65;
+  color: var(--ui-muted);
+}
+#paperlab .btn {
+  font-size: var(--ui-font-small);
+  line-height: 1.5;
+}
+.buttonrow,
+.buttonrow-sm,
+.modalactions,
+.ml-button-row,
+.paper-toolbar {
+  flex-wrap: wrap;
+}
+#overlay .buttonrow > .btn,
+#overlay .modalactions > .btn {
+  min-width: 0;
+  max-width: 100%;
+}
+.game-start-card small {
+  display: grid;
+  gap: var(--ui-space-4);
+}
+.game-start-card small > span {
+  display: block;
+}
+.game-event-forecast strong,
+.event-money {
+  white-space: nowrap;
+}
+.run-summary,
+.news-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+}
+@media (max-width: 950px) {
+  .experience-report-tabs {
+    display: flex;
+    gap: var(--ui-space-4);
+    padding: var(--ui-space-4);
+    margin: 14px 0;
+    border: 1px solid #e0e8d5;
+    border-radius: 12px;
+    background: #eff5e6;
+  }
+  .experience-report-tabs button {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding: var(--ui-space-8);
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: #617452;
+    font-size: var(--ui-font-small);
+  }
+  .experience-report-tabs button[aria-selected="true"] {
+    background: var(--ui-surface);
+    color: var(--ui-accent);
+    font-weight: 700;
+  }
+  #money-life-app .ml-report-grid {
+    display: block;
+  }
+  .ml-report-item dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .ml-report-item dl > div {
+    min-width: 0;
+    margin: 0;
+  }
+  .ml-report-item dl > div:first-child {
+    grid-column: 1/-1;
+  }
+  #money-life-app .ml-report-item .ml-report-net {
+    font-size: clamp(20px, 4vw, 27px);
+  }
+}
+@media (max-width: 440px) {
+  #ml-finance-form .ml-finance-summary .ml-summary {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .ml-finance-summary .ml-summary-row {
+    display: grid;
+    gap: 6px;
+  }
+  .ml-finance-summary .ml-summary-row strong {
+    font-size: 22px;
+  }
+  .ml-page-head {
+    gap: var(--ui-space-12);
+  }
+  .ml-page-head > .ml-btn {
+    justify-self: start;
+  }
+  .experience-page-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .experience-page-actions .ml-btn {
+    width: 100%;
+  }
+  .ml-goal-facts > div {
+    flex-wrap: wrap;
+    gap: var(--ui-space-4) var(--ui-space-12);
+  }
+}
+
+/* Large balances keep all digits; give them room instead of splitting the number. */
+#ml-live-assets .ml-summary-row,
+#ml-live-assets .ml-summary-row strong {
+  min-width: 0;
+  max-width: 100%;
+}
+#money-life-app
+  :is(
+    .ml-summary-row strong,
+    .ml-report-net,
+    #ml-game-goal-current,
+    #ml-goal-current-page,
+    #ml-goal-target-page,
+    .stock-quote > strong,
+    .paper-metrics strong
+  ).is-long-money,
+#overlay :is(.run-summary strong, .news-metrics strong).is-long-money {
+  font-size: 20px;
+  white-space: nowrap;
+}
+#money-life-app
+  :is(
+    .ml-summary-row strong,
+    .ml-report-net,
+    #ml-game-goal-current,
+    #ml-goal-current-page,
+    #ml-goal-target-page,
+    .stock-quote > strong,
+    .paper-metrics strong
+  ).is-extra-long-money,
+#overlay :is(.run-summary strong, .news-metrics strong).is-extra-long-money {
+  font-size: 17px;
+}
+@media (max-width: 760px) {
+  #ml-live-assets .ml-summary-row:not(:last-child) {
+    flex-wrap: wrap;
+    gap: 6px var(--ui-space-12);
+  }
+  #ml-live-assets .ml-summary-row strong {
+    white-space: nowrap;
+  }
+}
+@media (max-width: 440px) {
+  .game-month-receipt > div {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+  }
+  .game-month-receipt strong {
+    white-space: nowrap;
+  }
+}

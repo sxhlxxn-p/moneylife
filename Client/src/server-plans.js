@@ -7,6 +7,7 @@ function setPlanBusy(busy) {
   serverPlanBusy = busy;
   for (const button of document.querySelectorAll("[data-plan-action]"))
     button.disabled = busy || button.dataset.paperDisabled === "true";
+  if (typeof GameExperience !== "undefined") GameExperience.setBusy(busy);
 }
 function planRequest(path, options) {
   return apiRequest("plans", path, options);
@@ -108,6 +109,8 @@ function restoreServerPlan(plan) {
   try {
     localStorage.setItem("money-life-server-plan", plan.id);
   } catch {}
+  $("ml-world-title").textContent = "저장한 여정에서 다시 시작해요";
+  $("ml-world-desc").textContent = "이 시점의 조건과 선택 기록을 불러왔어요.";
   closeModal();
   render();
   $("serverstatus").textContent =

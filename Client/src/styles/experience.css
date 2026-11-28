@@ -1,0 +1,2107 @@
+/* One calm financial world with monthly time controls and event dialogs. */
+.paper-explanation,
+.paper-orders,
+.paper-comparison,
+.paper-provenance,
+.paper-branch-cards > article,
+.news-investment-entry,
+.news-metrics > div,
+.news-saved-records,
+.news-comparison-cards article,
+.ai-change-detail {
+  background: #f2f6e9;
+  border-color: #dfe8d3;
+  color: #758d64;
+}
+.paper-explanation-facts article,
+.run-summary > div,
+.assumptions > div {
+  background: #f1f6e6;
+  border-color: #dfe8d3;
+}
+.paper-explanation-facts h5,
+.paper-explanation h4,
+.news-game,
+.news-game h3,
+.news-headline h4,
+.paper-orders h4,
+.paper-comparison h4 {
+  color: #3e5e42;
+}
+.paper-explanation-facts p,
+.paper-orders p,
+.paper-comparison p,
+.paper-provenance p,
+.news-investment-entry p,
+.news-metrics small {
+  color: #80966f;
+}
+.news-headline {
+  background: linear-gradient(135deg, #edf5e1, #fffef6);
+  border-color: #dae7cd;
+}
+.news-assumption {
+  color: #6c8e54;
+  border-color: #dce8cf;
+}
+.news-badge,
+.tag {
+  background: #eaf2dc;
+  color: #819c6a;
+}
+.news-round,
+.modal .eyebrow {
+  color: #849b70;
+}
+.news-preview {
+  border-color: #d9e7ca;
+}
+.news-history,
+.news-finish {
+  background: #f0f5e7;
+}
+.modal .news-choice[aria-pressed="true"] {
+  background: var(--ui-accent);
+  color: #fffef6;
+  border-color: var(--ui-accent);
+}
+.paper-branch-line-0 {
+  stroke: var(--ui-accent);
+}
+.paper-branch-dot-0 {
+  fill: var(--ui-accent);
+}
+.paper-branch-line-1 {
+  stroke: #9ab57c;
+}
+.paper-branch-dot-1 {
+  fill: #9ab57c;
+}
+.paper-branch-line-2 {
+  stroke: #ac8857;
+}
+.paper-branch-dot-2 {
+  fill: #ac8857;
+}
+.comparecard.em {
+  background: #eff6e4;
+  border-color: #c9dbb8;
+}
+.comparecard label,
+.assumptions small {
+  color: #8b9f79;
+}
+.comparecard strong,
+.assumptions strong {
+  color: #3e5e42;
+}
+:root {
+  --ink: var(--ui-ink);
+  --sub: #75836b;
+  --purple: var(--ui-accent);
+  --purple2: #edf2e4;
+  --line: #dfe5d5;
+  --bg: var(--ui-bg);
+  --finance-positive: var(--ui-positive);
+  --finance-negative: var(--ui-negative);
+}
+html {
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+html.game-modal-open {
+  overflow: hidden;
+}
+body,
+#money-life-app {
+  background: var(--ui-bg);
+  color: var(--ui-ink);
+  font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+}
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+button,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid #789767;
+  outline-offset: 4px;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+button:hover {
+  filter: none;
+}
+strong,
+input {
+  font-variant-numeric: tabular-nums;
+}
+.ml-game-edition .ml-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  height: 68px;
+  padding-inline: clamp(var(--ui-space-16), 3vw, 48px);
+  gap: 22px;
+  background: #fcfbf6;
+  border-color: #e2e7d8;
+}
+.ml-game-edition .ml-brand {
+  font-size: 19px;
+  color: #304d40;
+}
+.ml-game-edition .ml-brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+.play-header-tools {
+  gap: var(--ui-space-24);
+  margin: 0 0 0 auto;
+}
+.play-header-tools button {
+  min-height: 44px;
+  font-size: var(--ui-font-caption);
+}
+.ml-game-edition .ml-top-user {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  color: #809073;
+  font-size: 11px;
+}
+.ml-top-user > span:first-child {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ml-avatar {
+  background: #edf2e4;
+  border-color: #dfe7d3;
+  overflow: hidden;
+}
+.ml-avatar svg {
+  width: 24px;
+  height: 34px;
+}
+.ml-game-edition .ml-sidebar {
+  display: none;
+}
+.ml-game-edition .ml-layout {
+  display: block;
+  min-height: calc(100dvh - 68px);
+}
+#money-life-app .ml-mobile-menu {
+  display: block;
+  margin: 0;
+}
+#ml-mobile-current {
+  display: none;
+}
+#money-life-app #ml-mobile-toggle {
+  min-height: 38px;
+  padding: 6px 14px;
+  border-radius: 22px;
+  background: transparent;
+  color: #738565;
+  font-size: var(--ui-font-small);
+}
+#money-life-app .ml-topbar .ml-nav {
+  display: none;
+  position: absolute;
+  right: 24px;
+  top: calc(100% - 4px);
+  width: 370px;
+  max-width: calc(100vw - 24px);
+  padding: var(--ui-space-12);
+  gap: 6px;
+  border: 1px solid var(--ui-line);
+  border-radius: 18px;
+  background: var(--ui-surface);
+  box-shadow: 0 18px 48px #324b3520;
+}
+#money-life-app
+  .ml-topbar:has(#ml-mobile-toggle[aria-expanded="true"])
+  .ml-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+#money-life-app .ml-topbar .ml-nav button {
+  min-height: 46px;
+  padding: 10px var(--ui-space-12);
+  gap: 10px;
+  border-radius: 10px;
+  color: #72846a;
+}
+.ml-nav-icon svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#money-life-app .ml-nav button.active {
+  background: #edf2e4;
+  color: var(--ui-accent);
+  box-shadow: none;
+}
+#money-life-app .ml-nav button:hover {
+  background: #f1f5e9;
+}
+.ml-game-edition .ml-main,
+body.is-playing .ml-main {
+  width: 100%;
+  max-width: 1540px;
+  padding: var(--ui-space-24) clamp(var(--ui-space-16), 3vw, 42px) 28px;
+  margin: auto;
+}
+.ml-game-edition .ml-page,
+body.is-playing .ml-page {
+  max-width: 1440px;
+}
+.experience-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  margin: 0 0 var(--ui-space-12);
+  padding: 0;
+  background: transparent;
+  color: #7c8d6f;
+  font-size: var(--ui-font-small);
+}
+.ml-page-head {
+  margin-bottom: 22px;
+}
+.ml-eyebrow {
+  color: #8d9b7c;
+  letter-spacing: 0.8px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.ml-page-head h1 {
+  color: #304d40;
+  font-size: 29px;
+  letter-spacing: -1px;
+  margin: 7px 0;
+}
+.ml-page-head p,
+.ml-desc {
+  color: #78876d;
+  font-size: var(--ui-font-caption);
+  line-height: 1.85;
+}
+.ml-card {
+  padding: var(--ui-space-24);
+  border: 1px solid var(--ui-line);
+  border-radius: 20px;
+  background: var(--ui-surface);
+  box-shadow: 0 7px 28px #3b513004;
+}
+.ml-card h2,
+.ml-card h3 {
+  color: #36513f;
+  font-size: 18px;
+}
+#money-life-app .ml-btn,
+.btn {
+  min-height: 44px;
+  padding: 10px var(--ui-space-16);
+  border-radius: 12px;
+  border: 1px solid #dbe4ce;
+  background: var(--ui-surface);
+  color: #55734b;
+  box-shadow: none;
+  font-size: var(--ui-font-caption);
+  font-weight: 600;
+}
+#money-life-app .ml-btn:hover,
+.btn:hover {
+  background: #f0f5e7;
+  border-color: #adc19a;
+}
+#money-life-app .ml-btn.primary,
+.modal .btn.primary,
+.server-tools .btn.primary {
+  background: var(--ui-accent);
+  color: #fffef8;
+  border-color: var(--ui-accent);
+}
+#money-life-app .ml-btn.primary:hover,
+.modal .btn.primary:hover {
+  background: #294c3d;
+  border-color: #294c3d;
+}
+.ml-game-edition .ml-input-wrap {
+  min-height: 48px;
+  height: 48px;
+  border: 1px solid #dce4d0;
+  border-radius: 12px;
+  background: #fffefa;
+}
+.ml-input-wrap:focus-within {
+  border-color: #87a576;
+  box-shadow: 0 0 0 3px #87a57617;
+}
+#money-life-app .ml-input-wrap input {
+  font-size: 15px;
+  color: #38513f;
+}
+.ml-field label {
+  font-size: var(--ui-font-small);
+  color: #75876a;
+}
+.ml-fields {
+  gap: var(--ui-space-16);
+}
+.ml-unit {
+  color: #93a083;
+  font-size: 11px;
+}
+.experience-amount-hint {
+  display: block;
+  min-height: 17px;
+  margin-top: 5px;
+  color: #899b78;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.ml-summary,
+.ml-note,
+.ml-profile {
+  background: #f0f4e7;
+  color: #75896a;
+  border-color: #e0e7d4;
+  border-radius: 14px;
+}
+.ml-note,
+.ml-hint {
+  font-size: var(--ui-font-small);
+  line-height: 1.8;
+}
+.ml-summary-row {
+  color: #819273;
+  font-size: var(--ui-font-small);
+}
+.ml-summary-row strong {
+  color: #38573f;
+}
+.ml-summary-row.total strong {
+  color: var(--ui-accent);
+}
+.ml-bar {
+  background: #e1e8d5;
+  height: 6px;
+}
+.ml-bar > span {
+  background: #88a371;
+}
+.ml-main > .ml-note {
+  margin: var(--ui-space-16) 0;
+  padding: var(--ui-space-8) 2px;
+  background: transparent;
+  color: #92a081;
+  font-size: 10px;
+}
+#ml-finance-form {
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 22px;
+}
+.ml-finance-summary {
+  background: #f0f4e6;
+}
+.ml-finance-summary .ml-summary {
+  background: transparent;
+  padding: 0;
+  margin-top: 22px;
+}
+.ml-finance-summary .ml-summary-row {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 22px;
+}
+.ml-finance-summary strong {
+  font-size: 23px;
+  text-align: left;
+  letter-spacing: -0.6px;
+}
+#ml-finance-form > section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+#ml-finance-form > section > h2,
+#ml-finance-form > section > button,
+#ml-finance-error {
+  grid-column: 1/-1;
+}
+#ml-finance-form > section > .ml-fields {
+  grid-column: 1/-1;
+}
+@media (min-width: 1100px) {
+  #ml-finance-form > section > .ml-fields {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.life-form-chapter {
+  min-width: 0;
+  margin: 0;
+  padding: 14px 0 0;
+  border-color: #e4e9d9;
+}
+.life-form-chapter legend {
+  color: #627e54;
+  font-size: var(--ui-font-body);
+}
+.life-form-chapter legend > span {
+  background: #edf2e2;
+  border: 0;
+  color: #829c6d;
+  box-shadow: none;
+  border-radius: 8px;
+  font-size: 10px;
+}
+.life-form-chapter:nth-of-type(3) {
+  grid-column: 1/-1;
+}
+.life-form-chapter:nth-of-type(3) .ml-fields {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+#ml-finance-error:empty {
+  display: none;
+}
+#ml-live-assets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+#ml-live-assets .ml-summary-row {
+  display: grid;
+  gap: var(--ui-space-12);
+  padding: 18px;
+  margin: 0;
+  border: 1px solid #e3e9d9;
+  border-radius: 14px;
+  background: #f6f9f0;
+  align-items: center;
+}
+#ml-live-assets .ml-summary-row strong {
+  font-size: 20px;
+  text-align: left;
+}
+#ml-live-assets .ml-summary-row:last-child {
+  grid-column: 1/-1;
+  order: -1;
+  display: grid;
+  gap: 10px;
+  border: 0;
+  border-radius: 16px;
+  padding: var(--ui-space-24);
+  background: #edf3e1;
+  margin-bottom: var(--ui-space-8);
+}
+#ml-live-assets .ml-summary-row:last-child strong {
+  font-size: 34px;
+  text-align: left;
+  letter-spacing: -1px;
+}
+#ml-page-goal .ml-content-grid {
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+#ml-page-goal .ml-content-grid > .ml-card:last-child {
+  background: #f0f4e6;
+}
+.ml-goal-money {
+  font-size: 29px;
+  color: #36513f;
+}
+.ml-goal-money small {
+  color: #839675;
+}
+.ml-goal-facts {
+  gap: 15px;
+}
+.ml-report-summary {
+  padding: 18px;
+  background: #eef4e4;
+  border: 1px solid #e0e8d4;
+}
+.ml-report-summary dt {
+  color: #819471;
+}
+.ml-report-summary dd {
+  color: #3e6046;
+}
+.ml-report-grid {
+  gap: 14px;
+}
+.ml-report-item {
+  padding: var(--ui-space-20);
+  border-color: #dfe7d4;
+  border-radius: 16px;
+  background: var(--ui-surface);
+}
+.ml-report-item.featured {
+  background: #eff5e5;
+  border-color: #9eb98a;
+}
+.ml-report-item p,
+.ml-report-item dt {
+  color: #819471;
+}
+.ml-report-item .ml-report-net {
+  font-size: 25px;
+  color: #38553e;
+  letter-spacing: -0.7px;
+}
+.ml-report-item dl > div {
+  margin-bottom: 14px;
+}
+.ml-series-current {
+  --ml-series-color: var(--ui-accent);
+}
+.ml-series-base {
+  --ml-series-color: #a5b397;
+}
+.ml-series-stress {
+  --ml-series-color: #ac8857;
+}
+.ml-series-goal {
+  --ml-series-color: #819c68;
+}
+.ml-chart circle {
+  fill: var(--ui-accent);
+}
+.ml-chart-axis-label {
+  fill: #8a9b7c;
+}
+.ml-chart line:not(.ml-chart-goal) {
+  stroke: #e3ead8;
+}
+.experience-report-tabs {
+  display: none;
+}
+.ml-report-grid > [hidden] {
+  display: none !important;
+}
+#ml-page-settings > .ml-stack {
+  max-width: none;
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 22px;
+  align-items: start;
+}
+#ml-page-settings .ml-card:first-child {
+  background: #f0f4e6;
+}
+.paper-lab,
+.stock-market,
+.stock-ticket,
+.stock-account {
+  border-color: var(--ui-line);
+  border-radius: 18px;
+  background: var(--ui-surface);
+  box-shadow: none;
+}
+.paper-status,
+.paper-setup,
+.paper-explanation,
+.paper-review-grid > div {
+  border-color: #e0e8d5;
+  background: #f2f6e9;
+  border-radius: 14px;
+  color: #748967;
+}
+.paper-setup p,
+.paper-date,
+.paper-caption {
+  color: #819472;
+}
+.paper-lab :is(input, select, textarea) {
+  background: var(--ui-surface);
+  border-color: #dce5d1;
+  color: #36513f;
+}
+.paper-metrics > div {
+  background: #f4f7ee;
+  border-color: #e2e9d8;
+}
+.paper-metrics strong {
+  color: #36513f;
+}
+.paper-chart svg {
+  background: var(--ui-surface);
+  border-color: #e0e7d4;
+}
+.paper-line-invested {
+  stroke: var(--ui-accent);
+}
+.paper-dot-invested {
+  fill: var(--ui-accent);
+}
+.paper-line-baseline {
+  stroke: #a5b397;
+}
+.paper-comparison {
+  border-color: #dce6cf;
+  background: #f0f5e6;
+}
+.journey-drawer {
+  max-width: none;
+  border-color: #e1e8d6;
+}
+.journey-drawer summary {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  color: #829573;
+  font-size: var(--ui-font-small);
+  cursor: pointer;
+}
+.server-tools {
+  border-color: #dfe6d3;
+  background: var(--ui-surface);
+  border-radius: 16px;
+}
+.server-tools strong {
+  color: #3e5b43;
+}
+.server-tools p {
+  color: #829572;
+}
+.play-heading {
+  margin-bottom: 14px;
+}
+.play-heading h1 {
+  font-size: 26px;
+  color: #2e4b3d;
+}
+.play-heading h1 > span {
+  font-size: var(--ui-font-small);
+}
+.play-heading .ml-btn {
+  background: transparent;
+}
+.play-objective {
+  margin-bottom: var(--ui-space-16);
+  padding-inline: var(--ui-space-24);
+}
+.game-goal {
+  padding: var(--ui-space-16) 0;
+}
+.play-objective .game-goal {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: var(--ui-space-16) 0;
+}
+.play-objective .game-goal h3 {
+  font-size: 10px;
+  color: #839a70;
+  margin: 0 0 5px;
+}
+.game-goal .ml-goal-money {
+  font-size: 26px;
+}
+.game-goal .ml-desc {
+  font-size: var(--ui-font-lead);
+}
+.game-goal .ml-goal-money small {
+  font-size: 11px;
+}
+.play-stage {
+  border-radius: 24px;
+  background: var(--ui-surface);
+  box-shadow: 0 12px 40px #3b58360b;
+  overflow: visible;
+}
+.play-stage .ml-world-top {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-20);
+  padding: var(--ui-space-12) 22px;
+  border-radius: 24px 24px 0 0;
+  background: #fcfcf5;
+}
+.play-stage .ml-world-top strong {
+  font-size: var(--ui-font-body);
+}
+.play-stage .ml-world-top > div {
+  flex-shrink: 0;
+}
+.experience-time-controls {
+  margin-left: auto;
+  gap: 10px !important;
+}
+.experience-time-controls #game-play-toggle {
+  min-width: 150px;
+  min-height: 44px;
+  padding: 10px 18px;
+  font-size: var(--ui-font-caption);
+}
+#game-time-state {
+  font-size: 11px;
+  color: #899b78;
+  white-space: nowrap;
+}
+[data-playback="running"] #game-time-state {
+  color: #487a51;
+}
+[data-playback="running"] .play-live-dot {
+  animation: time-pulse 2s ease-in-out infinite;
+}
+.experience-time-controls .play-speed {
+  position: relative;
+}
+.experience-time-controls .play-speed > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  min-height: 44px;
+  padding: var(--ui-space-8) var(--ui-space-12);
+  border: 1px solid #dce5cf;
+  border-radius: 12px;
+  background: var(--ui-surface);
+  color: #6c885b;
+  font-size: var(--ui-font-small);
+  list-style: none;
+  cursor: pointer;
+}
+.experience-time-controls .play-speed[open] > div {
+  position: absolute;
+  right: 0;
+  left: auto;
+  bottom: auto;
+  top: calc(100% + 8px);
+  z-index: 6;
+  display: flex;
+  gap: 6px;
+  padding: var(--ui-space-8);
+  border: 1px solid #dce5cf;
+  border-radius: 12px;
+  box-shadow: 0 8px 26px #36513b16;
+  background: var(--ui-surface);
+}
+.experience-time-controls #ml-play {
+  display: none;
+}
+.ml-speed {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 9px;
+  background: #f3f6ec;
+  color: #809770;
+  font-size: var(--ui-font-small);
+}
+.ml-speed.active {
+  background: #e5efda;
+  color: #3b6545;
+}
+.play-stage .play-age {
+  margin-left: 0;
+  font-size: 11px;
+}
+.play-stage .play-age > span:first-child {
+  display: none;
+}
+.play-stage .ml-world {
+  height: clamp(450px, 43vw, 650px);
+  border-radius: 0;
+  background: #d8e3c5;
+}
+.play-stage .play-scenery {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  max-width: none;
+  object-fit: fill;
+  transition: filter 1s ease;
+}
+.ml-world[data-season="spring"] .play-scenery {
+  filter: hue-rotate(-6deg) saturate(0.94);
+}
+.ml-world[data-season="winter"] .play-scenery {
+  filter: saturate(0.72) brightness(1.03);
+}
+.play-stage .ml-world-copy {
+  top: 30px;
+  left: 34px;
+  max-width: 46%;
+}
+.play-stage .ml-world-copy h2 {
+  font-size: clamp(23px, 2.5vw, 34px);
+  line-height: 1.4;
+  max-width: 510px;
+  letter-spacing: -1.2px;
+}
+.play-stage .ml-world-copy p {
+  font-size: var(--ui-font-small);
+  max-width: 390px;
+}
+.play-stage .ml-chapter {
+  font-size: 10px;
+}
+.play-stage .ml-event-card {
+  top: 28px;
+  right: 30px;
+  width: 235px;
+  padding: var(--ui-space-16) 18px;
+  border-radius: 16px;
+  background: #fffef2ed;
+}
+.play-stage .ml-event-card h3 {
+  font-size: var(--ui-font-body);
+}
+.play-stage .ml-event-card p {
+  font-size: 11px;
+}
+.play-stage .ml-event-card button {
+  min-height: 34px;
+  font-size: var(--ui-font-small);
+}
+.play-avatar {
+  width: 100px;
+  left: 45%;
+  bottom: 10px;
+  animation: none;
+}
+.play-avatar-marker {
+  left: 30px;
+  top: -10px;
+}
+.play-avatar #game-character {
+  display: none;
+}
+[data-playback="running"] .play-avatar > svg {
+  animation: avatar-breathe 3s ease-in-out infinite;
+}
+.play-stage .ml-building strong {
+  padding: 10px 15px;
+  border: 1px solid #ecf0de;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 #6d8c4a0b;
+  font-size: var(--ui-font-caption);
+}
+.play-stage .ml-building strong small {
+  font-size: 10px;
+}
+.play-stage .ml-building:hover strong {
+  background: #f3f8e8;
+  border-color: #bdd2a7;
+}
+.play-stage .ml-building:focus-visible {
+  outline: 2px solid #719b5c;
+  outline-offset: 3px;
+}
+.play-dialogue {
+  padding: var(--ui-space-20) 26px;
+  min-height: 100px;
+  background: var(--ui-surface);
+  gap: var(--ui-space-24);
+}
+.game-story strong {
+  font-size: 18px;
+  color: #36513e;
+}
+.game-story p {
+  font-size: var(--ui-font-small);
+  line-height: 1.7;
+  color: #8a9a79;
+  max-width: 570px;
+}
+.game-story-marker {
+  border-radius: 12px;
+  background: #f0f3df;
+  color: #9d9f68;
+}
+.play-label {
+  color: #8a9b78;
+}
+.play-actions {
+  width: 235px;
+}
+.play-actions #ml-one-month {
+  min-height: 44px;
+  background: var(--ui-surface);
+  border: 1px solid #dce6cf;
+  border-radius: 12px;
+  color: #5e7c4f;
+  font-size: var(--ui-font-caption);
+  box-shadow: none;
+}
+.play-actions .play-skip {
+  min-height: 38px;
+  margin-top: var(--ui-space-4);
+  font-size: 11px;
+  color: #8a9d77;
+}
+.game-month-receipt {
+  display: flex;
+  align-items: center;
+  padding: 15px 26px;
+  background: #f4f7ed;
+  gap: 30px;
+  border-color: #e3ead8;
+}
+.game-month-receipt > div {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-right: var(--ui-space-24);
+  border-right: 1px solid #e2e9d6;
+}
+.game-month-receipt > div:last-of-type {
+  padding-right: 0;
+  border: 0;
+}
+.game-month-receipt span {
+  font-size: 11px;
+  color: #889a76;
+}
+.game-month-receipt strong {
+  font-size: var(--ui-font-lead);
+  white-space: nowrap;
+  color: #46663f;
+}
+[data-money-direction="negative"],
+.game-month-receipt [data-money-direction="negative"] {
+  color: var(--finance-negative);
+}
+[data-money-direction="positive"],
+.game-month-receipt [data-money-direction="positive"] {
+  color: var(--finance-positive);
+}
+.play-timeline {
+  padding: 14px 26px;
+  border-radius: 0 0 24px 24px;
+  background: #fcfcf6;
+}
+.ml-progress {
+  background: #e2e9d5;
+}
+.ml-progress > span {
+  background: #88a66e;
+  transition: width 0.5s ease;
+}
+.play-toolbelt {
+  margin-top: var(--ui-space-16);
+  border-color: #e1e8d5;
+  border-radius: 16px;
+}
+.play-toolbelt button {
+  padding: 17px var(--ui-space-24);
+  background: #fcfcf5;
+}
+.play-toolbelt strong {
+  font-size: var(--ui-font-caption);
+}
+.play-toolbelt small {
+  font-size: 11px;
+  color: #94a482;
+}
+.play-toolbelt button:hover {
+  background: #f0f6e4;
+}
+.game-choice-result {
+  background: #f4f8ec;
+  border-color: #e1ead5;
+  padding: 22px 26px;
+}
+.game-result-metrics > div {
+  border-color: #9ab980;
+}
+.game-result-actions .ml-btn {
+  min-height: 44px;
+}
+.event-dialog-stage {
+  display: contents;
+}
+.overlay {
+  padding: var(--ui-space-24);
+  background: #20372d80;
+  backdrop-filter: blur(3px);
+  z-index: 20;
+}
+.overlay.hidden {
+  display: none;
+}
+.modal {
+  background: var(--ui-surface);
+  border: 1px solid #e1e7d6;
+  border-radius: 22px;
+  box-shadow: 0 24px 90px #142d2c26;
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 26px;
+  scrollbar-width: thin;
+  scrollbar-color: #b9c9a8 transparent;
+}
+.modal .close {
+  z-index: 4;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  display: grid;
+  place-items: center;
+  color: #6f8b5d;
+  border: 1px solid #e2e9d6;
+  border-radius: 50%;
+  background: #f1f6e6;
+  font-size: 19px;
+}
+.modal h2 {
+  font-size: 25px;
+  color: #35533d;
+  letter-spacing: -0.7px;
+}
+.modal p {
+  color: #7d906d;
+  line-height: 1.8;
+}
+.modal .note {
+  font-size: 11px;
+  color: var(--ui-muted) !important;
+}
+.modal :is(input, textarea, select) {
+  border-color: #dce6cf;
+  border-radius: 10px;
+  color: #3d5940;
+  background: var(--ui-surface);
+}
+.game-kicker {
+  color: #8aa173;
+  font-size: 10px;
+  letter-spacing: 1.1px;
+}
+.overlay[data-scene="event"] {
+  padding: var(--ui-space-16);
+  background: rgba(16, 29, 23, 0.8);
+  backdrop-filter: none;
+}
+.overlay[data-scene="event"] .event-dialog-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(780px, 100%);
+  max-height: 100%;
+  isolation: isolate;
+}
+.overlay[data-scene="event"] .modal {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  flex-shrink: 1;
+  padding: 22px 26px var(--ui-space-20);
+  border: 1px solid #e1e9d7;
+  border-radius: 22px;
+  background: #fffef6;
+  box-shadow: 0 18px 70px #071b1655;
+  animation: bubble-appear 0.22s ease-out;
+}
+.overlay[data-scene="event"] .modal .close {
+  position: sticky;
+  float: right;
+  right: 0;
+  top: 0;
+  margin: 0 0 6px var(--ui-space-12);
+}
+.overlay[data-scene="event"] .event-scene-header {
+  display: block;
+  min-height: 0;
+  margin: 0 0 var(--ui-space-12);
+}
+.overlay[data-scene="event"] .game-kicker {
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: #8ba374;
+}
+.overlay[data-scene="event"] .modal h2 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.4;
+  color: #34553c;
+}
+.overlay[data-scene="event"] .modal > p {
+  font-size: var(--ui-font-caption);
+  color: #7e916d;
+  line-height: 1.7;
+  margin: 10px 0;
+}
+.overlay[data-scene="event"] .game-event-forecast {
+  gap: var(--ui-space-16);
+  padding: 13px var(--ui-space-16);
+  margin: var(--ui-space-16) 0;
+  background: #eef5e3;
+  border: 1px solid #e3ecd7;
+  border-radius: 13px;
+}
+.game-event-forecast span {
+  font-size: 11px;
+  color: #849b70;
+}
+.game-event-forecast strong {
+  font-size: 18px;
+  margin-top: 5px;
+  color: #496c3e;
+}
+.overlay[data-scene="event"] .eventoptions {
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ui-space-12);
+}
+.overlay[data-scene="event"] .choice,
+.overlay[data-scene="event"] .choice:first-child {
+  min-height: 0;
+  padding: var(--ui-space-16);
+  margin: 0;
+  border: 1px solid #dce8d0;
+  border-radius: 14px;
+  background: var(--ui-surface);
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.overlay[data-scene="event"] .choice:hover {
+  background: #f0f7e6;
+  border-color: #9dbb80;
+}
+.overlay[data-scene="event"] .choice strong {
+  font-size: var(--ui-font-lead);
+  line-height: 1.5;
+  color: #3d5e3e;
+}
+.overlay[data-scene="event"] .choice small {
+  margin: 6px 0 0;
+  font-size: var(--ui-font-small);
+  line-height: 1.6;
+  color: #8a9b77;
+}
+.overlay[data-scene="event"] .choice > span {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #8e9d80;
+}
+.overlay[data-scene="event"]
+  .choice
+  .event-money[data-money-direction="negative"] {
+  color: var(--finance-negative);
+}
+.overlay[data-scene="event"]
+  .choice
+  .event-money[data-money-direction="positive"] {
+  color: var(--finance-positive);
+}
+.overlay[data-scene="event"] .modal > p.note {
+  margin: var(--ui-space-12) 0 0;
+  font-size: 10px;
+  color: #98a588;
+}
+.overlay[data-scene="event"] #life-event-feedback:empty {
+  display: none;
+}
+.overlay[data-scene="event"] #life-event-feedback {
+  font-size: var(--ui-font-small);
+  line-height: 1.7;
+}
+.overlay[data-scene="event"] #life-event-feedback[data-state="error"] {
+  color: var(--finance-negative);
+}
+.overlay[data-scene="event"] #life-event-feedback[data-state="loading"] {
+  color: #6c8e51;
+}
+.game-start-card {
+  border-color: #dfe8d4;
+  border-radius: 16px;
+  background: #f4f8ec;
+}
+.game-start-card:hover {
+  background: #edf5df;
+  border-color: #b2c99b;
+}
+.game-start-card strong {
+  color: #3f6242;
+}
+.game-start-card small {
+  color: #879d73;
+}
+.toast {
+  z-index: 30;
+  background: var(--ui-accent);
+  border-radius: 12px;
+}
+@keyframes time-pulse {
+  50% {
+    box-shadow: 0 0 0 6px #dceacb;
+    opacity: 0.6;
+  }
+}
+@keyframes avatar-breathe {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes bubble-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 1050px) {
+  .ml-game-edition .ml-topbar {
+    gap: 14px;
+  }
+  .ml-top-user > span:first-child {
+    display: none;
+  }
+  .play-header-tools {
+    gap: 17px;
+  }
+  .play-stage .play-age {
+    display: none;
+  }
+  #ml-finance-form {
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 18px;
+  }
+  .life-form-chapter:nth-of-type(3) .ml-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+  .game-month-receipt > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  .play-stage .ml-world-copy {
+    max-width: 53%;
+    left: 26px;
+  }
+  .play-stage .ml-event-card {
+    width: 205px;
+    right: 24px;
+  }
+  .play-stage .ml-world-copy h2 {
+    font-size: 27px;
+  }
+}
+@media (max-width: 760px) {
+  #ml-live-assets {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  #ml-live-assets .ml-summary-row:not(:last-child) {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid #e3e9d9;
+    border-radius: 0;
+  }
+  .ml-game-edition .ml-topbar {
+    height: 62px;
+    padding-inline: 14px;
+    gap: 10px;
+  }
+  .ml-game-edition .ml-brand {
+    font-size: var(--ui-font-lead);
+    gap: var(--ui-space-8);
+  }
+  .ml-game-edition .ml-brand-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .play-header-tools {
+    margin-left: auto;
+    gap: 14px;
+  }
+  .play-header-tools button {
+    font-size: 11px;
+  }
+  .play-header-tools [data-page="finance"] {
+    display: none;
+  }
+  .ml-game-edition .ml-top-user {
+    display: none;
+  }
+  #money-life-app #ml-mobile-toggle {
+    min-width: 44px;
+    min-height: 38px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  #money-life-app .ml-topbar .ml-nav {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+  .ml-game-edition .ml-main,
+  body.is-playing .ml-main {
+    padding: 18px var(--ui-space-12) var(--ui-space-24);
+  }
+  .ml-page-head {
+    margin-bottom: 18px;
+  }
+  .ml-page-head h1 {
+    font-size: 25px;
+  }
+  .ml-page-head p {
+    font-size: var(--ui-font-small);
+  }
+  .experience-back {
+    min-height: 32px;
+    margin-bottom: var(--ui-space-8);
+    font-size: 11px;
+  }
+  .ml-card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+  .ml-card h2 {
+    font-size: 17px;
+  }
+  .ml-fields {
+    gap: 14px;
+  }
+  .ml-input-wrap input {
+    font-size: 15px;
+  }
+  .ml-field label {
+    font-size: 11px;
+  }
+  #ml-finance-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  #ml-finance-form > .ml-card {
+    width: 100%;
+  }
+  #ml-finance-form > section {
+    display: block;
+  }
+  #ml-finance-form .ml-fields {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ui-space-12);
+  }
+  .life-form-chapter {
+    margin-bottom: var(--ui-space-20);
+  }
+  .ml-finance-summary {
+    order: 0;
+    position: static;
+  }
+  .ml-finance-summary .ml-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: var(--ui-space-16);
+  }
+  .ml-finance-summary .ml-summary-row {
+    margin: 0;
+  }
+  .ml-finance-summary strong {
+    font-size: 19px;
+  }
+  .ml-finance-summary .ml-note {
+    padding: 10px 0;
+    margin: 10px 0 0;
+    background: none;
+    font-size: 10px;
+  }
+  #ml-finance-reset {
+    min-height: 36px;
+    font-size: 11px;
+  }
+  #ml-page-goal .ml-content-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  #ml-page-goal .ml-content-grid > .ml-card {
+    width: 100%;
+  }
+  .ml-goal-money {
+    font-size: 26px;
+  }
+  .experience-report-tabs {
+    display: flex;
+    gap: var(--ui-space-4);
+    padding: var(--ui-space-4);
+    margin: 14px 0;
+    border: 1px solid #e0e8d5;
+    border-radius: 12px;
+    background: #eff5e6;
+  }
+  .experience-report-tabs button {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font-size: 11px;
+    color: #7e9869;
+  }
+  .experience-report-tabs button[aria-selected="true"] {
+    background: var(--ui-surface);
+    color: #3d6440;
+    font-weight: 700;
+  }
+  .ml-report-grid {
+    display: block;
+  }
+  .ml-report-item h3 {
+    font-size: 15px;
+  }
+  .ml-report-item .ml-report-net {
+    font-size: 26px;
+  }
+  .ml-report-item dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ui-space-12);
+  }
+  .ml-report-item dl > div {
+    margin: 0;
+  }
+  .ml-report-item dl > div:first-child {
+    grid-column: 1/-1;
+  }
+  .ml-report-item p {
+    min-height: 0;
+    font-size: 11px;
+  }
+  .ml-report-plot .ml-chart {
+    max-height: 230px;
+  }
+  .ml-report-summary {
+    padding: 14px;
+  }
+  #ml-page-settings > .ml-stack {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  #ml-live-assets .ml-summary-row strong {
+    font-size: 17px;
+  }
+  #ml-live-assets .ml-summary-row:last-child strong {
+    font-size: 29px;
+  }
+  .ml-note {
+    font-size: 11px;
+  }
+  .play-heading h1 {
+    font-size: 22px;
+  }
+  .play-heading h1 > span {
+    display: none;
+  }
+  .play-heading .ml-btn {
+    min-height: 36px;
+    padding: 6px var(--ui-space-12);
+    font-size: 11px;
+  }
+  .play-objective {
+    padding-inline: var(--ui-space-16);
+  }
+  .game-goal {
+    padding: 13px 0;
+  }
+  .game-goal .ml-desc {
+    font-size: var(--ui-font-caption);
+  }
+  .game-goal .ml-goal-money {
+    font-size: 21px;
+  }
+  .game-goal .ml-goal-money small {
+    font-size: 10px;
+  }
+  .game-goal .ml-bar {
+    width: 100%;
+  }
+  .game-goal .ml-hint {
+    font-size: 9px;
+  }
+  .play-stage {
+    border-radius: 18px;
+  }
+  .play-stage .ml-world-top {
+    padding: 10px var(--ui-space-12);
+    gap: var(--ui-space-8);
+    flex-wrap: wrap;
+    border-radius: 18px 18px 0 0;
+  }
+  .play-stage .ml-world-top > div {
+    gap: var(--ui-space-8);
+  }
+  .play-stage .ml-world-top > div:first-child {
+    flex: 1;
+  }
+  .play-stage .ml-world-top strong {
+    font-size: var(--ui-font-small);
+  }
+  .play-stage .ml-world-top small {
+    font-size: 9px;
+  }
+  .experience-time-controls {
+    width: 100%;
+    justify-content: flex-end;
+    gap: var(--ui-space-8) !important;
+    margin-left: 0;
+  }
+  .experience-time-controls #game-play-toggle {
+    min-width: 142px;
+    min-height: 42px;
+    font-size: var(--ui-font-small);
+  }
+  #game-time-state {
+    margin-right: auto;
+    font-size: 10px;
+  }
+  .experience-time-controls .play-speed > summary {
+    min-height: 42px;
+    min-width: 50px;
+  }
+  .play-stage .ml-world {
+    height: 450px;
+  }
+  .play-stage .play-scenery {
+    width: 120%;
+    height: 340px;
+    top: 110px;
+    left: -10%;
+  }
+  .play-stage .ml-town {
+    top: 110px;
+    height: 340px;
+    width: 120%;
+    left: -10%;
+  }
+  .play-stage .ml-world-copy {
+    top: 18px;
+    left: 18px;
+    max-width: calc(100% - 36px);
+  }
+  .play-stage .ml-world-copy h2 {
+    font-size: 23px;
+    margin: 9px 0 7px;
+    max-width: 100%;
+  }
+  .play-stage .ml-world-copy p {
+    font-size: 11px;
+    max-width: 100%;
+  }
+  .play-stage .ml-chapter {
+    font-size: 9px;
+  }
+  .play-stage .ml-event-card {
+    display: none;
+  }
+  .play-avatar {
+    width: 73px;
+    left: 40%;
+    bottom: 6px;
+  }
+  .play-avatar-marker {
+    left: 23px;
+    top: -14px;
+    font-size: 9px;
+  }
+  .play-stage .ml-building strong {
+    min-width: 67px;
+    padding: var(--ui-space-8) 9px;
+    font-size: 11px;
+    bottom: -18px;
+  }
+  .play-stage .ml-building strong small {
+    font-size: 9px;
+  }
+  .play-stage .ml-building > span {
+    width: 20px;
+    height: 20px;
+    font-size: var(--ui-font-small);
+  }
+  .play-dialogue {
+    padding: 18px;
+    min-height: 0;
+    gap: 14px;
+  }
+  .game-story {
+    gap: 10px;
+  }
+  .game-story-marker {
+    display: none;
+  }
+  .game-story strong {
+    font-size: var(--ui-font-lead);
+  }
+  .game-story p {
+    font-size: 11px;
+    margin: 6px 0 0;
+  }
+  .play-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .play-actions #ml-one-month {
+    min-height: 42px;
+    font-size: var(--ui-font-small);
+    padding: var(--ui-space-8);
+  }
+  .play-actions .play-skip {
+    min-height: 42px;
+    margin: 0;
+    flex: auto;
+    font-size: 10px;
+  }
+  .game-month-receipt {
+    padding: 13px var(--ui-space-16);
+    gap: var(--ui-space-12);
+    flex-wrap: nowrap;
+  }
+  .game-month-receipt > div {
+    padding-right: var(--ui-space-8);
+    gap: 6px;
+    min-width: 0;
+  }
+  .game-month-receipt span {
+    font-size: 9px;
+  }
+  .game-month-receipt strong {
+    font-size: var(--ui-font-small);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .play-timeline {
+    padding: 13px var(--ui-space-16);
+  }
+  .play-toolbelt {
+    margin-top: 14px;
+    border-radius: 14px;
+  }
+  .play-toolbelt button {
+    padding: 14px 7px;
+    gap: var(--ui-space-8);
+  }
+  .play-toolbelt strong {
+    font-size: 11px;
+  }
+  .play-toolbelt small {
+    display: none;
+  }
+  .play-toolbelt button > span {
+    font-size: 22px;
+  }
+  .play-details > summary {
+    font-size: 11px;
+  }
+  .journey-drawer {
+    padding-block: var(--ui-space-12);
+  }
+  .journey-drawer summary {
+    font-size: 10px;
+  }
+  .overlay {
+    padding: 14px;
+  }
+  .modal {
+    padding: var(--ui-space-20);
+    max-height: calc(100dvh - 28px);
+    border-radius: 18px;
+  }
+  .modal h2 {
+    font-size: 22px;
+  }
+  .modal p {
+    font-size: var(--ui-font-caption);
+  }
+  .modal .close {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+  }
+  .overlay[data-scene="event"] {
+    padding: var(--ui-space-12);
+  }
+  .overlay[data-scene="event"] .modal {
+    padding: var(--ui-space-16) 18px;
+    max-height: calc(100dvh - 24px);
+    border-radius: 20px;
+  }
+  .overlay[data-scene="event"] .modal h2 {
+    font-size: 22px;
+  }
+  .overlay[data-scene="event"] .modal > p {
+    font-size: var(--ui-font-small);
+    margin: var(--ui-space-8) 0;
+  }
+  .overlay[data-scene="event"] .game-event-forecast {
+    padding: 11px 13px;
+    margin: var(--ui-space-12) 0;
+    gap: 10px;
+  }
+  .game-event-forecast span {
+    font-size: 10px;
+  }
+  .game-event-forecast strong {
+    font-size: 15px;
+  }
+  .overlay[data-scene="event"] .choice,
+  .overlay[data-scene="event"] .choice:first-child {
+    padding: 13px;
+  }
+  .overlay[data-scene="event"] .choice strong {
+    font-size: var(--ui-font-body);
+  }
+  .overlay[data-scene="event"] .choice small {
+    font-size: 11px;
+    margin-top: var(--ui-space-4);
+  }
+  .overlay[data-scene="event"] .choice > span {
+    font-size: 10px;
+    margin-top: 7px;
+  }
+  .overlay[data-scene="event"] .eventoptions {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+  .overlay[data-scene="event"] .modal > p.note {
+    font-size: 9px;
+    margin-top: 10px;
+  }
+}
+@media (max-height: 650px) {
+  .overlay[data-scene="event"] .modal {
+    max-height: calc(100dvh - 32px);
+  }
+  .overlay[data-scene="event"] .modal > p.note {
+    font-size: 9px;
+  }
+}
+@media (max-width: 360px) {
+  .play-header-tools {
+    gap: 10px;
+  }
+  .play-header-tools button {
+    font-size: 10px;
+  }
+  .ml-game-edition .ml-brand {
+    font-size: var(--ui-font-body);
+  }
+  .ml-game-edition .ml-topbar {
+    gap: var(--ui-space-8);
+  }
+  .game-goal .ml-goal-money {
+    font-size: 18px;
+  }
+  .play-stage .ml-world-copy h2 {
+    font-size: 21px;
+  }
+  .game-month-receipt strong {
+    font-size: 11px;
+  }
+  .overlay[data-scene="event"] .modal {
+    padding: 14px var(--ui-space-16);
+  }
+  .overlay[data-scene="event"] .modal h2 {
+    font-size: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .ml-game-edition *,
+  .overlay * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Shared visual language and clear next actions across the whole journey. */
+.ml-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+i[data-icon] {
+  font-style: normal;
+}
+.ml-btn:has(.ml-icon),
+.btn:has(.ml-icon),
+.experience-back,
+#game-play-toggle,
+#ml-mobile-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-8);
+}
+.ml-brand-mark .ml-icon {
+  width: 23px;
+  height: 23px;
+}
+.play-header-tools button[aria-current="page"] {
+  color: var(--ui-accent);
+  font-weight: 700;
+  box-shadow: inset 0 -2px var(--ui-accent);
+}
+.experience-back {
+  justify-content: flex-start;
+}
+.experience-page-context {
+  margin: -8px 0 var(--ui-space-20);
+  color: #53664f;
+  font-size: var(--ui-font-caption);
+  line-height: 1.7;
+}
+.experience-form-note {
+  color: #5b6e55;
+  font-size: var(--ui-font-caption);
+  line-height: 1.8;
+  margin: 0 0 18px;
+  max-width: 850px;
+}
+#experience-settings-note {
+  margin: var(--ui-space-16) 0 0;
+}
+.experience-page-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--ui-space-12);
+  margin-top: var(--ui-space-20);
+}
+.experience-page-actions .ml-btn {
+  min-height: 44px;
+}
+.experience-page-actions .ml-btn:last-child {
+  color: var(--ui-surface);
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.experience-start-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  padding: var(--ui-space-16) 0;
+  margin: var(--ui-space-16) 0 0;
+  list-style: none;
+  counter-reset: steps;
+  color: #53684e;
+  font-size: var(--ui-font-caption);
+}
+.experience-start-steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-8);
+  counter-increment: steps;
+}
+.experience-start-steps li::before {
+  content: counter(steps);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #cad8bf;
+  border-radius: 50%;
+  font-size: var(--ui-font-small);
+  font-weight: 700;
+}
+.game-start-card > span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #d7e2cd;
+  border-radius: 12px;
+  background: var(--ui-surface);
+}
+.game-start-card > span .ml-icon {
+  width: 25px;
+  height: 25px;
+}
+.game-start-card small,
+.game-start-card em {
+  font-size: var(--ui-font-caption);
+  color: #586f50;
+}
+.game-start-card {
+  min-height: 0;
+}
+.ml-profile-avatar {
+  overflow: hidden;
+}
+.ml-profile-avatar > svg {
+  width: 44px;
+  height: 44px;
+}
+.ml-log:empty,
+#ml-game-log {
+  color: #5e7256;
+  font-size: var(--ui-font-caption);
+  line-height: 1.8;
+}
+.ml-field label {
+  color: #50634b;
+  font-size: var(--ui-font-caption);
+}
+.ml-page-head p,
+.ml-desc,
+.ml-note,
+.ml-hint,
+.modal p,
+.paper-lab p,
+.paper-provenance p {
+  color: var(--ui-muted);
+}
+.ml-note,
+.ml-hint {
+  font-size: var(--ui-font-small);
+  line-height: 1.8;
+}
+.experience-amount-hint {
+  font-size: var(--ui-font-small);
+  color: #526f48;
+}
+.ml-input-wrap:focus-within {
+  border-color: #5e8052;
+  box-shadow: 0 0 0 3px #365f4e10;
+}
+.play-stage .ml-world-copy p {
+  color: #53694d;
+  font-size: var(--ui-font-caption);
+}
+.play-stage .ml-event-card p {
+  color: #5e7256;
+  font-size: var(--ui-font-small);
+}
+.play-stage .ml-event-card h3 {
+  font-size: 15px;
+}
+.play-stage .ml-building .ml-icon {
+  width: 17px;
+  height: 17px;
+}
+.game-story-marker .ml-icon {
+  width: 19px;
+  height: 19px;
+}
+.play-dialogue p,
+.play-toolbelt small {
+  color: #5e7256;
+  font-size: var(--ui-font-small);
+}
+.game-result-metrics strong[data-money-direction="negative"] {
+  color: var(--finance-negative);
+}
+.game-result-metrics strong[data-money-direction="positive"] {
+  color: var(--finance-positive);
+}
+.game-choice-result > strong {
+  display: block;
+  font-size: 19px;
+}
+.game-choice-result > p {
+  font-size: var(--ui-font-caption);
+  line-height: 1.8;
+  color: #5e7256;
+}
+.game-month-receipt span {
+  color: #5b7051;
+  font-size: var(--ui-font-small);
+}
+#game-time-state {
+  color: #5e7256;
+}
+.ml-chart-axis-label {
+  fill: var(--ui-muted);
+}
+.ml-game-edition h1:focus {
+  outline: none;
+}
+@media (max-width: 760px) {
+  .experience-page-context {
+    font-size: var(--ui-font-small);
+    margin-top: -6px;
+  }
+  .experience-form-note {
+    font-size: var(--ui-font-small);
+  }
+  .experience-page-actions {
+    justify-content: stretch;
+    gap: var(--ui-space-8);
+  }
+  .experience-page-actions .ml-btn {
+    flex: 1 1 auto;
+  }
+  .experience-start-steps {
+    gap: 10px 14px;
+    font-size: var(--ui-font-small);
+  }
+  .experience-start-steps li {
+    gap: 5px;
+  }
+  .game-start-card small,
+  .game-start-card em {
+    font-size: var(--ui-font-small);
+  }
+  .ml-page-head p,
+  .ml-desc {
+    font-size: var(--ui-font-caption);
+  }
+  .play-stage .ml-world-copy p {
+    font-size: var(--ui-font-small);
+  }
+  #ml-mobile-toggle .ml-icon {
+    width: 17px;
+    height: 17px;
+  }
+  .ml-field label {
+    font-size: var(--ui-font-small);
+  }
+}

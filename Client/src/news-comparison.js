@@ -46,7 +46,7 @@ function installNewsComparison(news) {
             "p",
             `뉴스에 따른 소득 변화 ${news.signed(path.incomeChange)} · 추가 생활비 ${news.signed(path.expenseChange)}`,
           ),
-          news.el("p", `새로 발생한 미충족 생활비 ${news.won(path.shortfall)}`),
+          news.el("p", `새로 발생한 생활비 부족액 ${news.won(path.shortfall)}`),
           news.el(
             "p",
             index
@@ -131,7 +131,7 @@ function installNewsComparison(news) {
       svg.append(line);
     });
     figure.append(
-      news.el("figcaption", "공통 라운드 순자산 · A 보라 / B 초록 / C 황토"),
+      news.el("figcaption", "공통 라운드 순자산 · A 진녹색 / B 연두 / C 황토"),
       svg,
     );
     return figure;
@@ -185,7 +185,7 @@ function installNewsComparison(news) {
     figure.append(
       news.el(
         "figcaption",
-        "연습 순자산 · 보라: 나의 대응 / 회색 점선: 계속 보유",
+        "연습 순자산 · 진녹색 실선: 나의 대응 / 회색 점선: 계속 보유",
       ),
       svg,
       news.el(

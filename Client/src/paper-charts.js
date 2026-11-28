@@ -45,7 +45,7 @@ function installPaperCharts(paper) {
     wrap.append(
       paper.node(
         "figcaption",
-        "지금까지의 순자산 · 보라: 투자 / 회색 점선: 비투자",
+        "지금까지의 순자산 · 진녹색 실선: 투자 / 회색 점선: 비투자",
       ),
       svg,
       paper.node(
@@ -98,7 +98,7 @@ function installPaperCharts(paper) {
       svg.append(dot);
     });
     figure.append(
-      paper.node("figcaption", "순자산 경로 · A 보라 / B 초록 / C 황토"),
+      paper.node("figcaption", "순자산 경로 · A 진녹색 / B 연두 / C 황토"),
       svg,
       paper.node(
         "p",

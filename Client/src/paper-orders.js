@@ -108,7 +108,7 @@ function installPaperOrders(paper) {
         warning.append(
           paper.node(
             "p",
-            `다음 달 지출 중 ${paper.won(review.estimatedNextShortfall)}이 부족해요. 주식은 자동 매도하지 않고 같은 달 매도 대금으로 앞선 미충족 지출을 지우지 않아요.`,
+            `다음 달 지출 중 ${paper.won(review.estimatedNextShortfall)}이 부족해요. 주식은 자동 매도하지 않고 같은 달 매도 대금으로 앞선 충당하지 못한 지출을 지우지 않아요.`,
           ),
         );
       container.append(warning);
