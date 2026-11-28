@@ -21,6 +21,186 @@ async function open(t,viewport={width:1366,height:900}){
   page.on('pageerror',error=>errors.push(error.message));t.after(()=>assert.deepEqual(errors,[]));
   await page.goto(url);await page.locator('#game-continue').click();return page;
 }
+test('월 정산·작은 목표 달성·다음 장과 재접속은 실제 자산을 유지한다',{timeout:30000},async t=>{
+  const page=await open(t);
+  const expected=await page.evaluate(()=>simulate()[2].total);
+  await page.locator('#ml-one-month').click();
+  assert.equal(await page.locator('#life-settlement').isVisible(),true);
+  assert.match(await page.locator('#life-settlement').innerText(),/저축 이동\s*700,000원/);
+  await page.locator('#ml-one-month').click();
+  await page.locator('#life-chapter-continue').waitFor();
+  assert.equal(await page.locator('#overlay').getAttribute('data-scene'),'life-milestone');
+  assert.equal(await page.evaluate(()=>simulate()[JourneyStore.current.month].total),expected);
+  assert.equal(await page.evaluate(()=>JourneyStore.current.timer),null);
+  await page.locator('#life-chapter-continue').click();
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),2);
+  assert.match(await page.locator('#ml-game-chapter').innerText(),/2장/);
+  await page.reload();await page.locator('#game-continue').click();
+  assert.equal(await page.locator('#overlay').isVisible(),false);
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),2);
+  await page.locator('.life-album-trigger').click();
+  assert.equal(await page.locator('.life-chapter-step.is-complete').count(),1);
+  assert.match(await page.locator('.life-chapter-list').innerText(),/2026년 12월/);
+});
+
+test('마을 이름표를 눌러 장소를 열고 결과 화면의 이야기에서 마을로 돌아온다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.locator('.ml-building.home strong').click();await page.locator('#game-place-next').waitFor();
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),0);await page.keyboard.press('Escape');
+  await page.evaluate(()=>{JourneyStore.set('month',13);JourneyStore.set('events',new Set([12]));JourneyStore.set('logs',[{month:12,text:EV[12].a}]);render();});
+  await page.locator('.ml-building.home strong').click();
+  assert.equal(await page.locator('.life-place-wallet').isVisible(),true);
+  assert.match(await page.locator('#modal').innerText(),/나의 집과 일상/);
+  await page.keyboard.press('Escape');
+  await page.locator('.play-header-tools [data-page="report"]').click();await page.locator('#life-report-story').click();
+  await page.locator('#life-album-back').click();
+  assert.equal(await page.locator('#ml-page-dashboard').isVisible(),true);
+});
+
+test('모바일에서는 날짜 옆에서 한 달을 진행하고 목표 초안은 화면 갱신에도 유지한다',{timeout:30000},async t=>{
+  const page=await open(t,{width:320,height:740});
+  const box=await page.locator('#life-step-control').boundingBox();
+  assert.ok(box&&box.y+box.height<=740);
+  await page.locator('#life-step-control').click();assert.equal(await page.evaluate(()=>JourneyStore.current.month),1);
+  await page.locator('#ml-mobile-toggle').click();await page.locator('#ml-main-nav [data-page="goal"]').click();
+  await page.locator('#ml-goal-amount').fill('87654321');
+  await page.locator('#ml-goal-amount').evaluate(e=>e.setSelectionRange(3,3));
+  await page.evaluate(()=>render());
+  assert.equal(await page.locator('#ml-goal-amount').inputValue(),'87,654,321');
+  assert.equal(await page.locator('#ml-goal-amount').evaluate(e=>e.selectionStart),3);
+  assert.equal(await page.locator('#goal-save-state').innerText(),'저장 전 변경');
+});
+
+test('목표에 도달한 뒤 지출이 커지면 과거 달성과 현재 부족분을 구분한다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.evaluate(()=>{JourneyStore.set('start',{...JourneyStore.current.start,target:1100});JourneyStore.set('mods',[{type:'once',v:2000,m:3,end:null}]);JourneyStore.set('month',3);render();});
+  assert.match(await page.locator('#game-story-title').innerText(),/다시 준비/);
+  assert.match(await page.locator('#game-story-body').innerText(),/지금은 목표보다.*부족/);
+  assert.match(await page.locator('#life-mission-amount').innerText(),/−/);
+  await page.locator('#life-mission-open').click();assert.equal(await page.locator('#ml-page-goal').isVisible(),true);
+});
+
+test('이벤트와 겹친 목표 달성은 선택 후 확인하고 닫은 팝업은 다시 강제하지 않는다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.route('**/api/event-branches',async route=>{
+    const command=route.request().postDataJSON(),state=structuredClone(command.base.state);
+    state.events.push(12);state.logs.unshift({month:12,text:catalog.events[0].b});
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({plan:{id:'coincident-goal',schemaVersion:1,goalBasis:'net_assets',state}})});
+  });
+  await page.evaluate(()=>{JourneyStore.set('start',{...JourneyStore.current.start,income:168.3334});JourneyStore.set('baseSaving',0);JourneyStore.set('baseRate',0);JourneyStore.set('month',11);render();});
+  await page.locator('#ml-one-month').click();await page.locator('.eventoptions button').last().click();
+  await page.waitForFunction(()=>JourneyStore.current.events.has(12)&&!serverPlanBusy);
+  await page.locator('#game-choice-result button').first().click();
+  await page.locator('#life-chapter-continue').waitFor();assert.equal(await page.evaluate(()=>JourneyStore.current.month),12);
+  await page.keyboard.press('Escape');await page.locator('#game-choice-result button').first().click();
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),13);
+});
+
+test('마지막 여정의 미달성 목표와 늦은 도달을 정확히 설명한다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.evaluate(()=>{JourneyStore.set('start',{...JourneyStore.current.start,target:1000000});JourneyStore.set('month',120);render();LifeJourney.showAlbum();});
+  assert.match(await page.locator('.life-chapter-list').innerText(),/이번 여정에서는 미도달/);
+  assert.doesNotMatch(await page.locator('.life-chapter-list').innerText(),/앞으로 만들어갈/);
+  assert.match(await page.locator('.life-empty').innerText(),/저장된 인생 선택이 없어요/);
+  await page.keyboard.press('Escape');
+  await page.evaluate(()=>{JourneyStore.set('start',{...JourneyStore.current.start,target:1100});JourneyStore.set('goalMonths',1);JourneyStore.set('month',1);LifeJourney.reset();render();});
+  await page.locator('#ml-one-month').click();await page.locator('#life-next-goal').waitFor();
+  assert.match(await page.locator('.life-goal-timing').innerText(),/기한보다 1개월 늦게/);
+});
+
+test('소득 없는 시작과 생활비 부족을 구분하고 작은 PC에서도 두 번째 목표가 겹치지 않는다',{timeout:30000},async t=>{
+  const page=await open(t,{width:1024,height:560});
+  await page.evaluate(()=>{window.originalStart={...JourneyStore.current.start};JourneyStore.set('month',2);render();});
+  assert.match(await page.locator('#game-story-title').innerText(),/시작 생활비/);
+  assert.equal(await page.locator('#ml-one-month').evaluate(button=>{const r=button.getBoundingClientRect();return button.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}),true);
+  await page.evaluate(()=>{JourneyStore.set('start',{...originalStart,income:0,expense:0});JourneyStore.set('month',0);render();});
+  assert.doesNotMatch(await page.locator('#ml-world-title').innerText(),/월급/);
+  await page.locator('#ml-one-month').click();assert.match(await page.locator('#ml-world-title').innerText(),/소득 없이/);
+  await page.evaluate(()=>{JourneyStore.set('start',{...originalStart,income:0,expense:50000});render();});
+  assert.match(await page.locator('#game-story-body').innerText(),/부족액/);
+  await page.locator('#life-mission-open').click();assert.equal(await page.locator('#ml-page-assets').isVisible(),true);
+});
+
+test('독립 선택은 다음 달에 마을을 바꾸고 다음 이벤트의 이야기에 이어진다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.route('**/api/event-branches',async route=>{
+    const command=route.request().postDataJSON(),state=structuredClone(command.base.state);
+    const event=catalog.events.find(item=>item.month===command.eventMonth);
+    state.events.push(event.month);state.logs.unshift({month:event.month,text:command.accepted?event.a:event.b});
+    if(command.accepted)state.changes.push(...event.rule.effects.map(effect=>({type:effect.type,v:effect.value,m:event.month+1,end:null})));
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({plan:{id:'life-story-fixture',schemaVersion:1,goalBasis:'net_assets',state}})});
+  });
+  await page.evaluate(()=>{JourneyStore.set('month',12);render();eventPreview(12);});
+  await page.locator('.eventoptions button').first().click();
+  await page.waitForFunction(()=>JourneyStore.current.events.has(12)&&!serverPlanBusy);
+  assert.equal(await page.locator('.ml-world').getAttribute('data-life-home'),'family');
+  await page.locator('#game-choice-result button').first().click();
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),13);
+  assert.equal(await page.locator('.ml-world').getAttribute('data-life-home'),'independent');
+  assert.match(await page.locator('.ml-building.home strong').innerText(),/나의 집/);
+  await page.reload();await page.locator('#game-continue').click();
+  assert.equal(await page.locator('.ml-world').getAttribute('data-life-home'),'independent');
+  await page.evaluate(()=>{JourneyStore.set('month',30);render();eventPreview(30);});
+  assert.match(await page.locator('.life-event-context').innerText(),/독립을 선택한 뒤/);
+  for(const [width,height] of [[1366,768],[375,667],[320,740]]){
+    await page.setViewportSize({width,height});
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    const box=await page.locator('#modal').boundingBox();assert.ok(box.x>=0&&box.y>=0&&box.y+box.height<=height+1);
+    await page.locator('.eventoptions button').last().scrollIntoViewIfNeeded();
+    assert.equal(await page.locator('.eventoptions button').last().isEnabled(),true);
+  }
+});
+
+test('낮은 PC 화면에서도 월 정산 뒤 진행 버튼과 다음 이벤트가 겹치지 않는다',{timeout:30000},async t=>{
+  const page=await open(t,{width:1024,height:560});
+  await page.locator('#ml-one-month').click();
+  const fit=await page.locator('#ml-one-month').evaluate(button=>{
+    const rect=button.getBoundingClientRect(),top=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);
+    const actor=document.querySelector('.play-avatar').getBoundingClientRect(),world=document.querySelector('.ml-world').getBoundingClientRect();
+    return {clickable:button.contains(top),actorVisible:actor.bottom<=world.bottom+1&&actor.top>=world.top,overflow:document.documentElement.scrollHeight>innerHeight};
+  });
+  assert.deepEqual(fit,{clickable:true,actorVisible:true,overflow:false});
+  await page.locator('#ml-one-month').click();await page.locator('#life-chapter-continue').waitFor();
+});
+
+test('한 달에 여러 목표를 넘으면 최종 목표를 축하하고 다음 목표는 직접 정한다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.evaluate(()=>{JourneyStore.set('start',{...JourneyStore.current.start,target:1100,income:1000});render();});
+  const expected=await page.evaluate(()=>simulate()[1].total);
+  await page.locator('#ml-one-month').click();await page.locator('#life-next-goal').waitFor();
+  assert.equal(await page.evaluate(()=>simulate()[1].total),expected);
+  await page.locator('#life-next-goal').click();
+  assert.equal(await page.locator('#ml-page-goal').isVisible(),true);
+  assert.equal(await page.evaluate(()=>JourneyStore.current.start.target),1100);
+});
+
+test('목표와 인생 선택이 같은 달이면 선택 팝업을 먼저 보여준다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.evaluate(()=>{JourneyStore.set('start',{...JourneyStore.current.start,income:168.3334});JourneyStore.set('baseSaving',0);JourneyStore.set('baseRate',0);JourneyStore.set('month',11);render();});
+  await page.locator('#ml-one-month').click();
+  assert.equal(await page.locator('#overlay').getAttribute('data-scene'),'event');
+  await page.waitForTimeout(100);
+  assert.equal(await page.locator('#overlay').getAttribute('data-scene'),'event');
+  assert.equal(await page.locator('#life-chapter-continue').count(),0);
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),12);
+});
+
+test('마지막 선택 뒤에는 남은 일상을 진행하고 120개월에서 여정을 마친다',{timeout:30000},async t=>{
+  const page=await open(t);
+  await page.evaluate(()=>{JourneyStore.set('events',new Set([12,30,48,72,96]));JourneyStore.set('month',97);JourneyStore.set('speed',12);render();});
+  assert.match(await page.locator('#ml-event-title').innerText(),/내가 고른 삶/);
+  await page.locator('#ml-event-yes').click();
+  assert.notEqual(await page.evaluate(()=>JourneyStore.current.timer),null);
+  await page.locator('#ml-event-yes').click();
+  assert.equal(await page.evaluate(()=>JourneyStore.current.timer),null);
+  assert.equal(await page.locator('#ml-page-dashboard').isVisible(),true);
+  await page.evaluate(()=>{JourneyStore.set('month',119);render();});
+  await page.locator('#ml-event-yes').click();
+  await page.locator('#life-album-back').waitFor();
+  assert.equal(await page.evaluate(()=>JourneyStore.current.month),120);
+  assert.match(await page.locator('#ml-game-chapter').innerText(),/여정 완료/);
+});
+
 test('자동 실행은 매달 하나씩 정산하고 정지·배속·화면 이동을 존중한다',{timeout:30000},async t=>{
   const page=await open(t);
   await page.evaluate(()=>{
@@ -30,12 +210,13 @@ test('자동 실행은 매달 하나씩 정산하고 정지·배속·화면 이�
   });
   await page.locator('#game-play-toggle').click();
   await page.waitForFunction(()=>JourneyStore.current.month>=2);
-  await page.locator('#game-play-toggle').click();
+  await page.locator('#life-chapter-continue').waitFor();
   const state=await page.evaluate(()=>({month:JourneyStore.current.month,timer:JourneyStore.current.timer,months:observedMonths,total:money(simulate()[JourneyStore.current.month].total)}));
   assert.equal(state.timer,null);assert.ok(state.month>=2&&state.month<12);
   assert.deepEqual(state.months,Array.from({length:state.month},(_,i)=>i+1));
   assert.equal(await page.locator('#ml-game-goal-current').innerText(),state.total);
   await page.waitForTimeout(350);assert.equal(await page.evaluate(()=>JourneyStore.current.month),state.month);
+  await page.locator('#life-chapter-continue').click();
   await page.locator('.play-speed > summary').click();await page.locator('[data-speed="4"]').click();
   assert.equal(await page.locator('.play-speed > summary').innerText(),'4×');
   assert.equal(await page.evaluate(()=>JourneyStore.current.timer),null);
@@ -105,6 +286,8 @@ test('120개월에서 정지하고 전체 화면·모바일 메뉴와 계획 비
   await page.evaluate(()=>{JourneyStore.set('month',119);JourneyStore.set('speed',12);render();});
   await page.locator('#game-play-toggle').click();await page.waitForFunction(()=>JourneyStore.current.month===120&&!JourneyStore.current.timer);
   await page.waitForTimeout(350);assert.equal(await page.evaluate(()=>JourneyStore.current.month),120);
+  assert.equal(await page.locator('#overlay').getAttribute('data-scene'),'life-album');
+  await page.locator('#life-album-back').click();
   await page.locator('#game-play-toggle').click();assert.equal(await page.locator('#ml-page-report').isVisible(),true);
   for(const width of [1366,820,375,320]){
     await page.setViewportSize({width,height:844});

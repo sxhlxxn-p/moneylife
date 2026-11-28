@@ -20,6 +20,20 @@ function renderEventRecovery() {
 async function saveEventBranchTransaction(eventMonth, accepted) {
   if (serverPlanBusy || JourneyStore.current.events.has(eventMonth)) return;
   stop();
+  // Leave room for the server's new choice record without evicting older choices.
+  if (
+    !eventRequests.get() &&
+    JourneyStore.current.logs.length >= 80 &&
+    typeof MoneyLifeStory !== "undefined"
+  )
+    JourneyStore.set(
+      "logs",
+      MoneyLifeStory.retainLogs(
+        JourneyStore.current.logs,
+        LifeEventCatalog,
+        79,
+      ),
+    );
   const command = {
     base: {
       schemaVersion: 1,

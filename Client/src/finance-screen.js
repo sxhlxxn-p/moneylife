@@ -28,6 +28,7 @@ function financeSummary() {
   }
 }
 function applyFinance(values) {
+  if (typeof LifeJourney !== "undefined") LifeJourney.reset();
   if (typeof GameExperience !== "undefined") GameExperience.clearFinanceDraft();
   if (typeof GameExperience !== "undefined") GameExperience.clearGoalDraft();
   $("game-choice-result").hidden = true;

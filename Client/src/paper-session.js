@@ -59,6 +59,7 @@ function installPaperSession(paper) {
   };
   paper.setup = function () {
     if (!paper.available()) return;
+    const selectingSource = document.activeElement?.id === "paperseries";
     paper.render();
     const box = paper.node("div", undefined, "paper-setup");
     box.append(
@@ -131,7 +132,8 @@ function installPaperSession(paper) {
         ),
       );
     }
-    $("papercontent").append(box);
+    paper.showPanel(box);
+    if (selectingSource) $("paperseries")?.focus();
   };
   paper.create = async function (example) {
     if (!paper.available() || !paper.sources.length) return;
@@ -260,7 +262,7 @@ function installPaperSession(paper) {
       if (plans.length === 20)
         pages.append(paper.button("다음 목록", () => paper.list(offset + 20)));
       box.append(pages);
-      $("papercontent").append(box);
+      paper.showPanel(box);
       paper.message("불러올 시점을 선택해주세요.");
     } catch (error) {
       paper.message(error.message);

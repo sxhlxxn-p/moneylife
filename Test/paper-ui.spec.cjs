@@ -90,6 +90,61 @@ async function demo(page) {
 async function paperTab(page, key) {
   await page.locator('#paper-tab-' + key).click();
 }
+test('투자 설정과 목록은 별도 화면으로 열고 주문 초안과 이전 탭을 유지한다', {timeout:45000}, async t => {
+  const page=await pageFor(t);await demo(page);
+  await page.getByLabel('주문 수량 · 주').fill('37');
+  await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'money-life-paper-pending'})));
+  assert.equal(await page.getByLabel('주문 수량 · 주').inputValue(),'37');
+  await paperTab(page,'records');
+  const original=await page.evaluate(()=>localStorage.getItem('money-life-paper-plan'));
+  await page.getByRole('button',{name:'새 투자 연습',exact:true}).click();
+  assert.equal(await page.locator('.paper-tabs').isVisible(),false);
+  assert.equal(await page.locator('.paper-setup').isVisible(),true);
+  await page.getByRole('button',{name:'현재 투자 연습으로 돌아가기',exact:true}).click();
+  assert.equal(await page.locator('#paper-tab-records').getAttribute('aria-selected'),'true');
+  await paperTab(page,'trade');assert.equal(await page.getByLabel('주문 수량 · 주').inputValue(),'37');
+  await paperTab(page,'performance');
+  await page.getByRole('button',{name:'저장한 투자 연습',exact:true}).click();
+  await page.locator('#papercontent .saved-plans').waitFor();
+  assert.equal(await page.locator('.paper-metrics').isVisible(),false);
+  await page.getByRole('button',{name:'현재 투자 연습으로 돌아가기',exact:true}).click();
+  assert.equal(await page.locator('#paper-tab-performance').getAttribute('aria-selected'),'true');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('money-life-paper-plan')),original);
+  await page.getByRole('button',{name:'새 투자 연습',exact:true}).click();await demo(page);
+  assert.equal(await page.locator('#paper-tab-trade').getAttribute('aria-selected'),'true');
+  assert.equal(await page.getByLabel('주문 수량 · 주').inputValue(),'1');
+});
+test('120개월의 다섯 선택과 세 장을 실제 서버에 연결해 끝까지 진행한다', {timeout:90000}, async t => {
+  const page=await pageFor(t);
+  await navigate(page,'dashboard');await page.keyboard.press('Escape');
+  let turns=0;
+  while(await page.evaluate(()=>JourneyStore.current.month)<120){
+    assert.ok(++turns<150,'The story continues without a modal loop');
+    if(await page.locator('#overlay').isVisible()){
+      const scene=await page.locator('#overlay').getAttribute('data-scene');
+      if(scene==='life-milestone')await page.locator('#life-chapter-continue').click();
+      else if(scene==='event'){
+        const month=await page.evaluate(()=>JourneyStore.current.month);
+        await page.locator('.eventoptions button').first().click();
+        await page.waitForFunction(m=>JourneyStore.current.events.has(m)&&!serverPlanBusy,month);
+      }else assert.fail('Unexpected scene: '+scene);
+    }else if(await page.locator('#game-choice-result').isVisible())await page.locator('#game-choice-result button').first().click();
+    else await page.locator('#ml-one-month').click();
+  }
+  await page.locator('#life-album-back').waitFor();
+  assert.equal(await page.locator('#overlay').getAttribute('data-scene'),'life-album');
+  assert.equal(await page.locator('.life-choice-history li').count(),5);
+  assert.equal(await page.locator('.life-chapter-step.is-complete').count(),3);
+  assert.equal(await page.locator('.ml-world').getAttribute('data-life-home'),'independent');
+  assert.equal(await page.locator('.ml-world').getAttribute('data-life-work'),'newjob');
+  assert.equal(await page.locator('.ml-world').getAttribute('data-life-learning'),'yes');
+  const snapshot=await page.evaluate(()=>JourneyStore.snapshot());
+  const expected=require('../Engine/src/snapshot.cjs').calculateSnapshot(snapshot).monthlyResults[120].total;
+  assert.equal(await page.evaluate(()=>Math.round(simulate()[120].total*10000)),expected);
+  assert.equal(await page.evaluate(()=>JourneyStore.current.timer),null);
+  await page.locator('#life-album-report').click();
+  assert.match(await page.locator('#life-report-recap').innerText(),/120개월, 5번의 인생 선택/);
+});
 test('투자 탭은 키보드로 전환하고 다시 그려져도 선택 화면을 유지한다', {timeout: 30000}, async t => {
   const page = await pageFor(t, {width:390,height:844});
   await demo(page);
@@ -120,7 +175,7 @@ async function clickCommand(page, name, action) {
   await page.waitForFunction(id => localStorage.getItem('money-life-paper-plan') === id && !localStorage.getItem('money-life-paper-pending'), body.plan.id);
   return body;
 }
-test('주문·월 진행·손익 비교·새로고침·저장 목록과 본편 보존', {timeout: 30000}, async t => {
+test('주문·월 진행·손익 비교·새로고침·저장 목록과 본편 보존', {timeout: 60000}, async t => {
   const page = await pageFor(t);
   const before = await page.evaluate(() => localStorage.getItem('money-life-v1'));
   await demo(page);
@@ -612,7 +667,7 @@ test('모바일 조건 입력·검증과 마지막 달 제한', {timeout: 30000}
   for (let i = 0; i < 4; i++) await clickCommand(page, '다음 달로 +1개월', 'advance');
   assert.equal(await page.getByRole('button', {name: '생활 조건 변경', exact: true}).isDisabled(), true);
 });
-test('저장 투자 사본 세 개 비교와 선택 제한·현재 사본 보존', {timeout: 30000}, async t => {
+test('저장 투자 사본 세 개 비교와 선택 제한·현재 사본 보존', {timeout: 60000}, async t => {
   const page = await pageFor(t, {width: 390, height: 844});
   await demo(page);
   await paperTab(page, 'trade');

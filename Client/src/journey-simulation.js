@@ -45,7 +45,13 @@ function log(text) {
     month: JourneyStore.current.month,
     text,
   });
-  if (JourneyStore.current.logs.length > 80) JourneyStore.mutate("logs", "pop");
+  if (JourneyStore.current.logs.length > 80)
+    JourneyStore.set(
+      "logs",
+      typeof MoneyLifeStory !== "undefined" && LifeEventCatalog
+        ? MoneyLifeStory.retainLogs(JourneyStore.current.logs, LifeEventCatalog)
+        : JourneyStore.current.logs.slice(0, 80),
+    );
 }
 function stressChanges(path = simulate()) {
   return [

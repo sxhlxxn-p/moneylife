@@ -98,9 +98,7 @@ function renderGameplay(path) {
   $("play-dialogue").hidden = false;
   $("ml-one-month").disabled = false;
   $("ml-one-month").textContent =
-    JourneyStore.current.month >= 120
-      ? "나의 10년 돌아보기 →"
-      : "한 달만 진행";
+    JourneyStore.current.month >= 120 ? "나의 10년 돌아보기 →" : "한 달만 진행";
   const state = JourneyStore.current,
     row = path[state.month],
     previous = path[Math.max(0, state.month - 1)];
@@ -157,6 +155,18 @@ function renderGameplay(path) {
   $("ml-event-later").textContent = state.timer
     ? "잠시 멈추기"
     : "한 달씩 자동 진행";
+  const upcoming = Object.keys(EV)
+    .map(Number)
+    .find((month) => month >= state.month && !state.events.has(month));
+  if (upcoming === undefined && state.month < 120) {
+    $("ml-event-status").textContent = "선택 이후의 일상";
+    $("ml-event-title").textContent = "내가 고른 삶을 이어가요";
+    $("ml-event-desc").textContent =
+      `10년의 마무리까지 ${120 - state.month}개월. 매달의 변화를 확인해요.`;
+    $("ml-event-yes").textContent = state.timer
+      ? "일시 정지"
+      : "남은 일상 살아보기";
+  }
   const receipt = $("game-month-receipt");
   receipt.replaceChildren();
   if (!state.month) {
@@ -188,6 +198,7 @@ function renderGameplay(path) {
 }
 function openLifePlace(place) {
   if (serverPlanBusy) return;
+  if (typeof LifeJourney !== "undefined" && LifeJourney.openPlace(place)) return;
   const months = place === "home" ? [12] : [30, 48, 96];
   const target = months.find(
     (month) =>

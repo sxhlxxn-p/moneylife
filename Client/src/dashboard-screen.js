@@ -35,9 +35,13 @@ function mlShowGoalDeadline(id, hit, prefix = "") {
         : "기한 내 도달");
 }
 function mlRenderGoal(path = simulate()) {
-  $("ml-goal-name").value = financialProfile().goalName;
-  $("ml-goal-amount").value = mlFormatAmount(financialProfile().goalAmount);
-  $("ml-goal-months").value = financialProfile().goalMonths;
+  if (!(
+    typeof GameExperience !== "undefined" && GameExperience.hasGoalDraft()
+  )) {
+    $("ml-goal-name").value = financialProfile().goalName;
+    $("ml-goal-amount").value = mlFormatAmount(financialProfile().goalAmount);
+    $("ml-goal-months").value = financialProfile().goalMonths;
+  }
   const state = path[JourneyStore.current.month];
   $("ml-goal-current-page").textContent = mlFormatMan(state.total);
   $("ml-goal-target-page").textContent = mlFormatKoreanWon(
@@ -164,6 +168,7 @@ function render() {
   });
   renderGameplay(path);
   if (typeof GameExperience !== "undefined") GameExperience.render(path);
+  if (typeof LifeJourney !== "undefined") LifeJourney.render(path);
   persist();
   renderEventRecovery();
   renderSaveRecovery();

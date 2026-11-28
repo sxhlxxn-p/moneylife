@@ -37,7 +37,7 @@ const GameExperience = (() => {
   liveSummary.className = "desktop-live-summary";
   liveSummary.setAttribute("aria-label", "현재 월 재무 요약");
   liveSummary.innerHTML =
-    '<h2>이번 달 내 지갑</h2><dl><div><dt>현금</dt><dd id="desktop-game-cash"></dd></div><div><dt>월 소득</dt><dd id="desktop-game-income"></dd></div><div><dt>생활비</dt><dd id="desktop-game-expense"></dd></div></dl>';
+    '<h2>이번 달 내 지갑</h2><dl><div><dt>현금</dt><dd id="desktop-game-cash"></dd></div><div><dt>이번 달 소득</dt><dd id="desktop-game-income"></dd></div><div><dt>이번 달 지출</dt><dd id="desktop-game-expense"></dd></div></dl>';
   document.querySelector(".play-objective").append(liveSummary);
   const storageDrawer = document.querySelector(".journey-drawer");
   const storageAnchor = document.createComment(
@@ -478,6 +478,19 @@ const GameExperience = (() => {
             ? "시간 진행 중"
             : "일시 정지";
     $("ml-one-month").disabled = serverPlanBusy;
+    if ($("life-step-control")) {
+      $("life-step-control").disabled = serverPlanBusy;
+      $("life-step-control").textContent =
+        state.month >= 120 ? "결과" : due ? "선택 확인" : "한 달";
+      $("life-step-control").setAttribute(
+        "aria-label",
+        state.month >= 120
+          ? "10년 결과 보기"
+          : due
+            ? "지금 인생 선택 확인"
+            : "한 달 진행",
+      );
+    }
     $("ml-next-event").disabled = serverPlanBusy || running;
     document.querySelector(".play-speed > summary").textContent =
       state.speed + "×";
@@ -692,6 +705,7 @@ const GameExperience = (() => {
     clearGoalDraft: () => {
       goalDraft = null;
     },
+    hasGoalDraft: () => Boolean(goalDraft && goalDraft.base === goalKey()),
     showSettingsChange,
     speedChanged,
   };

@@ -58,6 +58,7 @@ function installPaperCommands(paper) {
         body: JSON.stringify(request.body),
       });
       // Store the returned reference before clearing the recoverable command.
+      if (request.action === "create") paper.activeTab = "trade";
       paper.remember(result);
       paper.queue.clear(request.body.requestId);
       paper.message(

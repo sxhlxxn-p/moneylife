@@ -89,8 +89,30 @@ function installPaperView(paper) {
     paper.reference = bundle.plan.id;
     localStorage.setItem(paper.referenceKey, paper.reference);
   };
+  paper.showPanel = function (box) {
+    const root = $("papercontent");
+    root.classList.add("paper-has-panel");
+    box.classList.add("paper-editor-panel");
+    if (paper.current)
+      box.append(
+        paper.button("현재 투자 연습으로 돌아가기", () => paper.render()),
+      );
+    root.append(box);
+    const heading = box.querySelector("h3");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+    box.scrollIntoView({ block: "nearest" });
+  };
   paper.render = function () {
     const root = $("papercontent");
+    const quantityDraft =
+      root.dataset.paperPlan === paper.current?.plan.id
+        ? root.querySelector("#paperquantity")?.value
+        : null;
+    root.dataset.paperPlan = paper.current?.plan.id || "";
+    root.classList.remove("paper-has-panel");
     root.replaceChildren();
     const controls = paper.node("div", undefined, "paper-toolbar");
     controls.append(
@@ -297,7 +319,7 @@ function installPaperView(paper) {
     input.min = "1";
     input.max = "1000000000";
     input.step = "1";
-    input.value = "1";
+    input.value = quantityDraft ?? "1";
     input.inputMode = "numeric";
     input.dataset.planAction = "paper-input";
     input.dataset.paperDisabled = String(

@@ -64,5 +64,8 @@
   "/typography.css": "Client/src/styles/typography.css",
   "/ui-states.css": "Client/src/styles/ui-states.css",
   "/money-input.js": "Client/src/money-input.js",
-  "/design-tokens.css": "Client/src/styles/design-tokens.css"
+  "/design-tokens.css": "Client/src/styles/design-tokens.css",
+  "/life-story.js": "Client/src/life-story.js",
+  "/life-journey.js": "Client/src/life-journey.js",
+  "/life-journey.css": "Client/src/styles/life-journey.css"
 }
